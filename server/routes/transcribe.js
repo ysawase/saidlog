@@ -1,37 +1,40 @@
 import { Router } from 'express';
-import multer from 'multer';
-import path from 'node:path';
 import { transcribe } from '../stt/index.js';
+import { createSignedAudioUrl, deleteAudio, supabaseConfigured } from '../services/storage.js';
+import { cleanupOldFiles } from '../services/cleanup.js';
 
 const router = Router();
 
-const ALLOWED_EXTENSIONS = new Set(['.mp3', '.mp4', '.wav', '.m4a']);
+// {uuid}/{ASCII安全なファイル名} 形式のみ受け付ける（パス潜り対策）
+const FILE_PATH_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[a-zA-Z0-9._-]+$/i;
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 200 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (ALLOWED_EXTENSIONS.has(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error('対応していないファイル形式です（mp3 / mp4 / wav / m4a のみ）'));
-    }
-  },
-});
-
-router.post('/transcribe', upload.single('audio'), async (req, res, next) => {
+router.post('/transcribe', async (req, res, next) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: '音声ファイルが選択されていません' });
+    const { filePath } = req.body ?? {};
+    if (typeof filePath !== 'string' || !FILE_PATH_PATTERN.test(filePath)) {
+      return res.status(400).json({ error: 'ファイルパスが不正です。アップロードからやり直してください' });
+    }
+    if (!supabaseConfigured()) {
+      return res.status(500).json({ error: 'サーバーにSupabaseの接続情報が設定されていません' });
     }
     if (!process.env.ASSEMBLYAI_API_KEY) {
       return res.status(500).json({ error: 'サーバーに ASSEMBLYAI_API_KEY が設定されていません' });
     }
 
-    console.log(`文字起こし開始: ${req.file.originalname} (${(req.file.size / 1024 / 1024).toFixed(1)}MB)`);
-    const result = await transcribe({ audio: req.file.buffer, language: 'ja' });
-    console.log(`文字起こし完了 (発言数: ${result.utterances.length})`);
+    const audioUrl = await createSignedAudioUrl(filePath);
+
+    console.log(`文字起こし開始: ${filePath}`);
+    let result;
+    try {
+      result = await transcribe({ audio: audioUrl, language: 'ja' });
+    } finally {
+      // 会議データを残さない方針：成功・失敗を問わず即削除
+      deleteAudio(filePath).catch((err) => console.error(`削除失敗 (${filePath}):`, err.message));
+    }
+    console.log(`文字起こし完了: ${filePath} (発言数: ${result.utterances.length}, 音声長: ${result.audioDurationSec}s)`);
+
+    // piggyback掃除：削除に失敗した過去ファイルの残骸を非同期で回収（応答はブロックしない）
+    cleanupOldFiles().catch((err) => console.error('クリーンアップ失敗:', err.message));
 
     res.json(result);
   } catch (err) {
