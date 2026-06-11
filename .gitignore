@@ -7,3 +7,6 @@ dist/
 
 # Claude Code（個人ローカル設定はコミットしない）
 .claude/settings.local.json
+
+# 検証スクリプトの出力（文字起こし内容を含むためコミットしない）
+scripts/last-result.json
