@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'node:path';
-import { transcribeAudio } from '../services/assemblyai.js';
+import { transcribe } from '../stt/index.js';
 
 const router = Router();
 
@@ -30,8 +30,8 @@ router.post('/transcribe', upload.single('audio'), async (req, res, next) => {
     }
 
     console.log(`文字起こし開始: ${req.file.originalname} (${(req.file.size / 1024 / 1024).toFixed(1)}MB)`);
-    const result = await transcribeAudio(req.file.buffer);
-    console.log(`文字起こし完了: ${result.id} (発言数: ${result.utterances.length})`);
+    const result = await transcribe({ audio: req.file.buffer, language: 'ja' });
+    console.log(`文字起こし完了 (発言数: ${result.utterances.length})`);
 
     res.json(result);
   } catch (err) {

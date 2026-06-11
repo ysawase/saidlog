@@ -60,7 +60,7 @@ export default function TranscriptView({ result }) {
       <ul className="utterance-list">
         {result.utterances.map((u, i) => (
           <li key={i} className="utterance">
-            <span className="timestamp">{formatTime(u.start)}</span>
+            <span className="timestamp">{formatTime(u.startMs)}</span>
             <span className="speaker-name" style={{ color: colorOf(u.speaker) }}>
               {names[u.speaker]}：
             </span>
