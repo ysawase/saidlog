@@ -49,6 +49,9 @@ export default function TranscriptView({ result }) {
                 onChange={(e) => setNames({ ...names, [s]: e.target.value })}
                 aria-label={`話者${s}の名前`}
               />
+              <span className="pen-icon" aria-hidden="true">
+                ✎
+              </span>
             </label>
           ))}
         </div>

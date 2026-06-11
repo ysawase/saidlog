@@ -79,6 +79,18 @@ export default function App() {
         )}
       </main>
 
+      <section className="usage-notes">
+        <p>ご利用にあたって</p>
+        <ul>
+          <li>各話者が15秒以上話すと識別精度が上がります</li>
+          <li>発言量が少ない話者は識別されにくい場合があります</li>
+          <li>話者名は右のペンアイコンから編集できます</li>
+          <li>
+            本サービスはAI処理に外部APIを使用しています。無料枠を超えた場合、運営側に費用が発生します。長時間の録音は分割してご利用ください。
+          </li>
+        </ul>
+      </section>
+
       <footer className="footer">Meetlog MVP — AI文字起こし・話者識別</footer>
     </div>
   );
