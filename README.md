@@ -18,6 +18,8 @@
 
 ```
 meetlog/
+├── api/
+│   └── index.js                 # Vercel Functions エントリ（Expressをエクスポート）
 ├── client/                      # フロントエンド (React + Vite)
 │   └── src/
 │       ├── App.jsx              # 画面全体の状態管理
@@ -26,11 +28,13 @@ meetlog/
 │           ├── UploadForm.jsx   # ファイルアップロードUI
 │           └── TranscriptView.jsx # 結果表示（話者名は編集可能）
 ├── server/                      # バックエンド (Express)
-│   ├── index.js                 # エントリポイント
+│   ├── app.js                   # Expressアプリ本体（ローカル/Vercel共通）
+│   ├── index.js                 # ローカル開発用エントリポイント
 │   ├── routes/transcribe.js     # POST /api/transcribe
 │   ├── services/assemblyai.js   # AssemblyAI 呼び出し
 │   └── utils/removeFillers.js   # フィラー語除去
-└── package.json                 # ルート（client/server を一括起動）
+├── vercel.json                  # Vercel ビルド・ルーティング設定
+└── package.json                 # ルート（サーバー依存＋一括起動スクリプト）
 ```
 
 ## セットアップ
@@ -78,7 +82,24 @@ npm run dev
 
 `start` / `end` はミリ秒。フィラー語は除去済み。
 
+## Vercel へのデプロイ
+
+リポジトリを Vercel に接続すると、`vercel.json` の設定で以下が自動構成されます。
+
+- フロントエンド: `client/` を Vite でビルドし `client/dist` を静的配信
+- バックエンド: `api/index.js`（Express アプリ）が Vercel Functions として動作し、`/api/*` を処理
+
+デプロイ前に Vercel ダッシュボードで以下を設定してください。
+
+1. **Settings → General → Root Directory**: 空（リポジトリルート）にする
+2. **Settings → Environment Variables**: `ASSEMBLYAI_API_KEY` を追加
+
+### Vercel 上の制限（重要）
+
+- **アップロード上限 約4.5MB**: Vercel Functions のリクエストボディ制限。大きな会議音声はローカル実行を使うか、フェーズ2のストレージ直接アップロード対応が必要
+- **実行時間上限**: 長時間音声は文字起こし完了前にタイムアウトする可能性あり（`maxDuration: 300` を設定済み）
+
 ## ロードマップ
 
-- **フェーズ1（現在）**: アップロード → 文字起こし＋話者識別 → 表示、フィラー語除去
-- **フェーズ2**: Supabase による履歴保存、Vercel デプロイ
+- **フェーズ1（現在）**: アップロード → 文字起こし＋話者識別 → 表示、フィラー語除去、Vercel デプロイ
+- **フェーズ2**: Supabase による履歴保存＋ストレージ直接アップロード（Vercelの4.5MB制限の回避）
