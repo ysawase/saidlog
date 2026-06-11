@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import UploadForm from './components/UploadForm.jsx';
+import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
 import { uploadAudio, requestTranscription } from './api.js';
+import { extensionOf } from './lib/recorder.js';
 
 export default function App() {
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
@@ -35,6 +37,15 @@ export default function App() {
     }
   };
 
+  // 録音Blobをファイル化して、手動アップロードと同じ文字起こし経路に合流させる
+  const handleRecordedTranscribe = (blob, mimeType) => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+    const file = new File([blob], `meetlog-${stamp}.${extensionOf(mimeType)}`, { type: mimeType });
+    handleTranscribe(file);
+  };
+
   const handleReset = () => {
     setStatus('idle');
     setResult(null);
@@ -52,6 +63,8 @@ export default function App() {
 
       <main>
         {status !== 'done' && <UploadForm onSubmit={handleTranscribe} processing={busy} />}
+
+        {status !== 'done' && !busy && <Recorder onTranscribe={handleRecordedTranscribe} />}
 
         {status === 'uploading' && (
           <div className="notice processing">
