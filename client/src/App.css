@@ -1,0 +1,252 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  background: #f4f6f9;
+  color: #1f2937;
+}
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  color: #111827;
+}
+
+.tagline {
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+/* アップロード */
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dropzone {
+  border: 2px dashed #c3cad6;
+  border-radius: 12px;
+  background: #fff;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dropzone:hover,
+.dropzone.drag-over {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.dropzone-main {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.dropzone-sub {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 6px;
+}
+
+.file-info strong {
+  word-break: break-all;
+}
+
+.file-info span {
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+.warning {
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+/* ボタン */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn.primary:not(:disabled):hover {
+  background: #1d4ed8;
+}
+
+.btn.secondary {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 8px 14px;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+.btn.secondary:hover {
+  background: #f9fafb;
+}
+
+/* 通知 */
+.notice {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+}
+
+.notice.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.notice.processing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #374151;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 3px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 文字起こし結果 */
+.transcript {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.transcript-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 12px;
+}
+
+.transcript-toolbar .btn.secondary {
+  margin-bottom: 0;
+}
+
+.speaker-legend {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.speaker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #fff;
+}
+
+.speaker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.speaker-chip input {
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  width: 6em;
+  background: transparent;
+}
+
+.utterance-list {
+  list-style: none;
+  padding: 0;
+}
+
+.utterance {
+  display: flex;
+  gap: 10px;
+  padding: 10px 4px;
+  line-height: 1.7;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.utterance:last-child {
+  border-bottom: none;
+}
+
+.timestamp {
+  flex-shrink: 0;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+  width: 3.2em;
+  text-align: right;
+}
+
+.speaker-name {
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.utterance-text {
+  word-break: break-word;
+}
+
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.8rem;
+}
