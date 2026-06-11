@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 const ACCEPT = '.mp3,.mp4,.wav,.m4a,.webm';
-const MAX_SIZE_MB = 200;
+const MAX_SIZE_MB = 50;
 
 export default function UploadForm({ onSubmit, processing }) {
   const [file, setFile] = useState(null);
