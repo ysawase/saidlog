@@ -15,10 +15,12 @@ const SPACE_BETWEEN_JA = new RegExp(`(?<=${JA_CHAR})[ \\t\\u3000]+(?=${JA_CHAR})
  */
 export function removeFillers(text) {
   if (!text) return '';
+  // STTは「ええ と、」のように語中にスペースを挟むことがあるため、
+  // 先に日本語文字間のスペースを正規化してからフィラーを照合する
   return text
+    .replace(SPACE_BETWEEN_JA, '')
     .replace(JA_FILLER, '')
     .replace(EN_FILLER, '')
-    .replace(SPACE_BETWEEN_JA, '')
     .replace(/^[、。,.\s]+/, '')
     .replace(/、{2,}/g, '、')
     .replace(/。{2,}/g, '。')
