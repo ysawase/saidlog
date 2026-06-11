@@ -1,19 +1,20 @@
+export { uploadAudio } from './lib/storage.js';
+
 /**
- * 音声ファイルをサーバーに送信し、文字起こし結果を受け取る。
+ * アップロード済みファイルのパスを渡して文字起こしを依頼する。
+ * 音声データ本体はSupabase Storage経由でAssemblyAIに渡るため、ここを通らない。
  * 長い会議は処理に数分かかることがある。
  */
-export async function transcribeFile(file) {
-  const formData = new FormData();
-  formData.append('audio', file);
-
+export async function requestTranscription(filePath) {
   const res = await fetch('/api/transcribe', {
     method: 'POST',
-    body: formData,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filePath }),
   });
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `サーバーエラー（${res.status}）`);
+    throw new Error(data.error || `文字起こしに失敗しました（HTTP ${res.status}）`);
   }
   return res.json();
 }

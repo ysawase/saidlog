@@ -1,23 +1,36 @@
 import { useState } from 'react';
 import UploadForm from './components/UploadForm.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
-import { transcribeFile } from './api.js';
+import { uploadAudio, requestTranscription } from './api.js';
 
 export default function App() {
-  const [status, setStatus] = useState('idle'); // idle | processing | done | error
+  const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
   const handleTranscribe = async (file) => {
-    setStatus('processing');
     setError('');
     setResult(null);
+
+    setStatus('uploading');
+    setUploadProgress(0);
+    let filePath;
     try {
-      const data = await transcribeFile(file);
+      filePath = await uploadAudio(file, setUploadProgress);
+    } catch (err) {
+      setError(`アップロードエラー: ${err.message}`);
+      setStatus('error');
+      return;
+    }
+
+    setStatus('processing');
+    try {
+      const data = await requestTranscription(filePath);
       setResult(data);
       setStatus('done');
     } catch (err) {
-      setError(err.message);
+      setError(`文字起こしエラー: ${err.message}`);
       setStatus('error');
     }
   };
@@ -28,6 +41,8 @@ export default function App() {
     setError('');
   };
 
+  const busy = status === 'uploading' || status === 'processing';
+
   return (
     <div className="app">
       <header className="header">
@@ -36,8 +51,13 @@ export default function App() {
       </header>
 
       <main>
-        {status !== 'done' && (
-          <UploadForm onSubmit={handleTranscribe} processing={status === 'processing'} />
+        {status !== 'done' && <UploadForm onSubmit={handleTranscribe} processing={busy} />}
+
+        {status === 'uploading' && (
+          <div className="notice processing">
+            <div className="spinner" />
+            <p>アップロード中… {uploadProgress}%</p>
+          </div>
         )}
 
         {status === 'processing' && (
@@ -59,7 +79,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className="footer">Meetlog MVP — AssemblyAI による文字起こし・話者識別</footer>
+      <footer className="footer">Meetlog MVP — AI文字起こし・話者識別</footer>
     </div>
   );
 }

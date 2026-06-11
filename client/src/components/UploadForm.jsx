@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-const ACCEPT = '.mp3,.mp4,.wav,.m4a';
+const ACCEPT = '.mp3,.mp4,.wav,.m4a,.webm';
 const MAX_SIZE_MB = 200;
 
 export default function UploadForm({ onSubmit, processing }) {
@@ -13,7 +13,7 @@ export default function UploadForm({ onSubmit, processing }) {
     if (!f) return;
     const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
     if (!ACCEPT.split(',').includes(ext)) {
-      setWarning('対応形式は mp3 / mp4 / wav / m4a です');
+      setWarning('対応形式は mp3 / mp4 / wav / m4a / webm です');
       return;
     }
     if (f.size > MAX_SIZE_MB * 1024 * 1024) {
@@ -57,7 +57,7 @@ export default function UploadForm({ onSubmit, processing }) {
         ) : (
           <>
             <p className="dropzone-main">音声ファイルをドラッグ＆ドロップ</p>
-            <p className="dropzone-sub">またはクリックして選択（mp3 / mp4 / wav / m4a）</p>
+            <p className="dropzone-sub">またはクリックして選択（mp3 / mp4 / wav / m4a / webm）</p>
           </>
         )}
       </div>
