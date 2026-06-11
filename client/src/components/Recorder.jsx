@@ -175,7 +175,9 @@ export default function Recorder({ onTranscribe }) {
             <p className="warning">長時間の録音は精度・コストの面で分割を推奨します</p>
           )}
           {sizeWarning && (
-            <p className="warning">録音サイズが45MBを超えました。50MBに達する前に停止してください</p>
+            <p className="warning">
+              ファイルサイズが大きくなっています。まもなく上限（50MB）に達します。上限を超えると文字起こしができなくなります。録音を停止して分割することをお勧めします。
+            </p>
           )}
           <button className="btn primary" onClick={handleStop}>
             停止
