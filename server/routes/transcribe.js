@@ -28,13 +28,22 @@ router.post('/transcribe', async (req, res, next) => {
     try {
       result = await transcribe({ audio: audioUrl, language: 'ja' });
     } finally {
-      // 会議データを残さない方針：成功・失敗を問わず即削除
-      deleteAudio(filePath).catch((err) => console.error(`削除失敗 (${filePath}):`, err.message));
+      // 会議データを残さない方針：成功・失敗を問わず即削除。
+      // Vercelはレスポンス後に実行が凍結されるため、必ずawaitしてから応答する
+      try {
+        await deleteAudio(filePath);
+      } catch (err) {
+        console.error(`削除失敗 (${filePath}):`, err.message);
+      }
     }
     console.log(`文字起こし完了: ${filePath} (発言数: ${result.utterances.length}, 音声長: ${result.audioDurationSec}s)`);
 
-    // piggyback掃除：削除に失敗した過去ファイルの残骸を非同期で回収（応答はブロックしない）
-    cleanupOldFiles().catch((err) => console.error('クリーンアップ失敗:', err.message));
+    // piggyback掃除：削除に失敗した過去ファイルの残骸を回収（同上の理由でawait）
+    try {
+      await cleanupOldFiles();
+    } catch (err) {
+      console.error('クリーンアップ失敗:', err.message);
+    }
 
     res.json(result);
   } catch (err) {
