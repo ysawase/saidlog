@@ -1,4 +1,4 @@
-# Meetlog
+# SaidLog
 
 リアル会議向けの、話者識別付き音声文字起こしWebアプリ。
 
@@ -17,7 +17,7 @@
 ## ディレクトリ構成
 
 ```
-meetlog/
+saidlog/
 ├── api/
 │   └── index.js                 # Vercel Functions エントリ（Expressをエクスポート）
 ├── client/                      # フロントエンド (React + Vite)

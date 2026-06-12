@@ -64,7 +64,7 @@ export default function App() {
     const d = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-    const file = new File([blob], `saidlog-${stamp}.${extensionOf(mimeType)}`, { type: mimeType });
+    const file = new File([blob], `SaidLog-${stamp}.${extensionOf(mimeType)}`, { type: mimeType });
     setRecordedFile(file);
     handleTranscribe(file);
   };
@@ -90,7 +90,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Saidlog</h1>
+        <h1>SaidLog</h1>
         <p className="tagline">会議音声をアップロードするだけで、話者ごとの議事録に</p>
       </header>
 
@@ -147,7 +147,7 @@ export default function App() {
         </ul>
       </section>
 
-      <footer className="footer">Saidlog MVP — AI文字起こし・話者識別</footer>
+      <footer className="footer">SaidLog MVP — AI文字起こし・話者識別</footer>
     </div>
   );
 }
