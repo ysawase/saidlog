@@ -10,6 +10,7 @@ export default function App() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [recordedFile, setRecordedFile] = useState(null);
   const [processingElapsed, setProcessingElapsed] = useState(0);
   const processingTimerRef = useRef(null);
 
@@ -64,13 +65,24 @@ export default function App() {
     const pad = (n) => String(n).padStart(2, '0');
     const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
     const file = new File([blob], `saidlog-${stamp}.${extensionOf(mimeType)}`, { type: mimeType });
+    setRecordedFile(file);
     handleTranscribe(file);
+  };
+
+  const handleSaveRecording = () => {
+    const url = URL.createObjectURL(recordedFile);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = recordedFile.name;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleReset = () => {
     setStatus('idle');
     setResult(null);
     setError('');
+    setRecordedFile(null);
   };
 
   const busy = status === 'uploading' || status === 'processing';
@@ -109,6 +121,11 @@ export default function App() {
             <button className="btn secondary" onClick={handleReset}>
               ← 別のファイルを文字起こしする
             </button>
+            {recordedFile && (
+              <button className="btn secondary" onClick={handleSaveRecording}>
+                録音を保存
+              </button>
+            )}
             <TranscriptView result={result} />
           </>
         )}
