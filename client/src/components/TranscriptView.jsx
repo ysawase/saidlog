@@ -20,9 +20,34 @@ export default function TranscriptView({ result }) {
     Object.fromEntries(speakers.map((s) => [s, `話者${s}`]))
   );
   const [copied, setCopied] = useState(false);
+  const [summaryTemplate, setSummaryTemplate] = useState('bullets');
+  const [summary, setSummary] = useState('');
+  const [summaryStatus, setSummaryStatus] = useState('idle'); // idle | loading | done | error
 
   const colorOf = (speaker) =>
     SPEAKER_COLORS[speakers.indexOf(speaker) % SPEAKER_COLORS.length];
+
+  const generateSummary = async () => {
+    setSummaryStatus('loading');
+    try {
+      const res = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          utterances: result.utterances,
+          template: summaryTemplate,
+          names,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      setSummary(data.summary);
+      setSummaryStatus('done');
+    } catch (err) {
+      setSummary(`要約エラー: ${err.message}`);
+      setSummaryStatus('error');
+    }
+  };
 
   const copyTranscript = async () => {
     const text = result.utterances
@@ -58,6 +83,29 @@ export default function TranscriptView({ result }) {
         <button className="btn secondary" onClick={copyTranscript}>
           {copied ? 'コピーしました ✓' : 'テキストをコピー'}
         </button>
+      </div>
+
+      <div className="summary-section">
+        <div className="summary-controls">
+          <select
+            value={summaryTemplate}
+            onChange={(e) => setSummaryTemplate(e.target.value)}
+            disabled={summaryStatus === 'loading'}
+            aria-label="要約テンプレート"
+          >
+            <option value="bullets">決定事項・アクションアイテム</option>
+            <option value="minutes">議事録形式</option>
+          </select>
+          <button
+            className="btn secondary"
+            onClick={generateSummary}
+            disabled={summaryStatus === 'loading'}
+          >
+            {summaryStatus === 'loading' ? '生成中…' : '要約を生成'}
+          </button>
+        </div>
+        {summaryStatus === 'error' && <div className="notice error">{summary}</div>}
+        {summaryStatus === 'done' && <div className="summary-result">{summary}</div>}
       </div>
 
       <ul className="utterance-list">
