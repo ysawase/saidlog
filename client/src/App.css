@@ -255,6 +255,36 @@ body {
   font-size: 0.8rem;
 }
 
+/* AI要約セクション */
+.summary-section {
+  margin: 1.5rem 0;
+}
+
+.summary-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.summary-controls select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.summary-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-left: 3px solid #2563eb;
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
 /* 注意書き（画面下部・プレーンテキスト） */
 .usage-notes {
   margin-top: 40px;
