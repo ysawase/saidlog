@@ -3,7 +3,7 @@ import UploadForm from './components/UploadForm.jsx';
 import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
 import { uploadAudio, requestTranscription } from './api.js';
-import { extensionOf } from './lib/recorder.js';
+import { recordingFileName, downloadBlob } from './lib/recorder.js';
 
 export default function App() {
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
@@ -61,21 +61,13 @@ export default function App() {
 
   // 録音Blobをファイル化して、手動アップロードと同じ文字起こし経路に合流させる
   const handleRecordedTranscribe = (blob, mimeType) => {
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-    const file = new File([blob], `SaidLog-${stamp}.${extensionOf(mimeType)}`, { type: mimeType });
+    const file = new File([blob], recordingFileName(mimeType), { type: mimeType });
     setRecordedFile(file);
     handleTranscribe(file);
   };
 
   const handleSaveRecording = () => {
-    const url = URL.createObjectURL(recordedFile);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = recordedFile.name;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(recordedFile, recordedFile.name);
   };
 
   const handleReset = () => {

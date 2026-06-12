@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createRecorder, extensionOf } from '../lib/recorder.js';
+import { createRecorder, recordingFileName, downloadBlob } from '../lib/recorder.js';
 import { listSessions, getSessionBlob, clearSession, cleanupStale } from '../lib/recordingDb.js';
 
 const MAX_SIZE_BYTES = 50 * 1024 * 1024;
@@ -14,13 +14,6 @@ function formatDuration(ms) {
   const mm = String(m).padStart(2, '0');
   const ss = String(s).padStart(2, '0');
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-}
-
-function downloadFileName(mimeType) {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-  return `SaidLog-${stamp}.${extensionOf(mimeType)}`;
 }
 
 /**
@@ -112,12 +105,7 @@ export default function Recorder({ onTranscribe }) {
   };
 
   const handleSave = () => {
-    const url = URL.createObjectURL(result.blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = downloadFileName(result.mimeType);
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(result.blob, recordingFileName(result.mimeType));
     // Blobはメモリに保持しているため、保存後も「文字起こしする」は引き続き使える
     clearSession(result.sessionId).catch(() => {});
   };

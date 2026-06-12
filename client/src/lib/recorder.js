@@ -20,6 +20,24 @@ export function extensionOf(mimeType) {
   return mimeType === 'audio/mp4' ? 'mp4' : 'webm';
 }
 
+/** 録音ファイルの共通ファイル名（SaidLog-YYYYMMDD-HHmm.拡張子）を返す */
+export function recordingFileName(mimeType) {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+  return `SaidLog-${stamp}.${extensionOf(mimeType)}`;
+}
+
+/** Blobを端末にダウンロード保存する */
+export function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /**
  * 録音セッションを作成する。
  * @param {{ onSizeWarning?: () => void }} [callbacks]
