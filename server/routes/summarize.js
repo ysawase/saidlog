@@ -1,0 +1,77 @@
+import express from 'express';
+import Anthropic from '@anthropic-ai/sdk';
+
+const router = express.Router();
+
+const PROMPTS = {
+  bullets: `以下は会議の文字起こしです。
+次の2点を箇条書きで出力してください。
+
+## 決定事項
+- （決まったことを箇条書き）
+
+## アクションアイテム
+- （誰が・何をするかを箇条書き。担当者が不明な場合は「要確認」とする）
+
+担当者名は文字起こしに登場する話者名をそのまま使うこと。
+余計な前置きや後書きは不要。`,
+
+  minutes: `以下は会議の文字起こしです。
+次の形式で議事録を出力してください。
+
+## 概要
+（会議全体を2〜3文で要約）
+
+## 主な議題と議論
+（話題ごとに見出しを立てて要点をまとめる）
+
+## 決定事項
+- （箇条書き）
+
+## 次のアクション
+- （担当者：タスク内容）
+
+担当者名は文字起こしに登場する話者名をそのまま使うこと。
+余計な前置きや後書きは不要。`,
+};
+
+router.post('/summarize', async (req, res, next) => {
+  try {
+    const { utterances, template = 'bullets', names = {} } = req.body;
+
+    if (!utterances || utterances.length === 0) {
+      return res.status(400).json({ error: '文字起こしデータがありません' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'ANTHROPIC_API_KEY が設定されていません' });
+    }
+
+    const prompt = PROMPTS[template] ?? PROMPTS.bullets;
+
+    // utterancesを話者名付きテキストに変換
+    const transcript = utterances
+      .map((u) => `${names[u.speaker] ?? `話者${u.speaker}`}：${u.text}`)
+      .join('\n');
+
+    const client = new Anthropic({ apiKey });
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'user',
+          content: `${prompt}\n\n---\n${transcript}`,
+        },
+      ],
+    });
+
+    const summary = message.content[0]?.text ?? '';
+    res.json({ summary });
+  } catch (err) {
+    next(err);
+  }
+});
+
+export default router;

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import transcribeRouter from './routes/transcribe.js';
+import summarizeRouter from './routes/summarize.js';
 import { supabaseConfigured } from './services/storage.js';
 import { cleanupOldFiles } from './services/cleanup.js';
 
@@ -40,6 +41,7 @@ app.get('/api/cleanup', async (req, res, next) => {
 });
 
 app.use('/api', transcribeRouter);
+app.use('/api', summarizeRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
