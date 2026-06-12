@@ -244,6 +244,12 @@ body {
   word-break: break-word;
 }
 
+.done-elapsed {
+  color: #6b7280;
+  font-size: 0.8rem;
+  margin: 0 0 8px;
+}
+
 .pen-icon {
   color: #9ca3af;
   font-size: 0.8rem;

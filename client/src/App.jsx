@@ -118,6 +118,7 @@ export default function App() {
 
         {status === 'done' && result && (
           <>
+            <p className="done-elapsed">文字起こし完了（所要時間：{formatElapsed(processingElapsed)}）</p>
             <button className="btn secondary" onClick={handleReset}>
               ← 別のファイルを文字起こしする
             </button>
