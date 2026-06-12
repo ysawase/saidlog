@@ -3,7 +3,7 @@
 // ondataavailable ごとにチャンクを保存し、次回起動時に復元できるようにする。
 // スキーマ：{ sessionId, seq, blob, mimeType, ts }（キーは [sessionId, seq]）
 
-const DB_NAME = 'meetlog-recording';
+const DB_NAME = 'saidlog-recording';
 const DB_VERSION = 1;
 const STORE = 'chunks';
 
