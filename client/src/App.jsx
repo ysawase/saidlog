@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import UploadForm from './components/UploadForm.jsx';
 import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
@@ -10,6 +10,27 @@ export default function App() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [processingElapsed, setProcessingElapsed] = useState(0);
+  const processingTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (status === 'processing') {
+      setProcessingElapsed(0);
+      processingTimerRef.current = setInterval(
+        () => setProcessingElapsed((s) => s + 1),
+        1000,
+      );
+    } else {
+      clearInterval(processingTimerRef.current);
+    }
+    return () => clearInterval(processingTimerRef.current);
+  }, [status]);
+
+  const formatElapsed = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
 
   const handleTranscribe = async (file) => {
     setError('');
@@ -76,7 +97,8 @@ export default function App() {
         {status === 'processing' && (
           <div className="notice processing">
             <div className="spinner" />
-            <p>文字起こし中です… 音声の長さによっては数分かかります。</p>
+            <p>処理中... {formatElapsed(processingElapsed)}</p>
+            <p>音声の長さの約10%の時間がかかります（混雑時はさらにかかる場合があります）</p>
           </div>
         )}
 
