@@ -105,7 +105,14 @@ export default function TranscriptView({ result }) {
           </button>
         </div>
         {summaryStatus === 'error' && <div className="notice error">{summary}</div>}
-        {summaryStatus === 'done' && <div className="summary-result">{summary}</div>}
+        {summaryStatus === 'done' && (
+          <>
+            <p style={{ fontSize: '0.8rem', color: '#888' }}>
+              AIによる自動要約です。内容は必ずご確認ください。
+            </p>
+            <div className="summary-result">{summary}</div>
+          </>
+        )}
       </div>
 
       <ul className="utterance-list">
