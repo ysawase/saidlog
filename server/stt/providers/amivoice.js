@@ -37,7 +37,7 @@ async function convertToWav(buffer, ext) {
   }
 }
 
-export async function transcribe({ audio, language, filename }) {
+export async function transcribe({ audio, filename }) {
   const appkey = process.env.AMIVOICE_APPKEY;
   if (!appkey) throw new Error('AMIVOICE_APPKEY が設定されていません');
 
@@ -73,7 +73,6 @@ export async function transcribe({ audio, language, filename }) {
   }
 
   const submitJson = await submitRes.json();
-  console.log('AmiVoice submit response:', submitJson);
   const { sessionid } = submitJson;
   if (!sessionid) {
     throw new Error(`AmiVoice ジョブ投入失敗: code=${submitJson.code} message=${submitJson.message}`);

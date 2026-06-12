@@ -2,7 +2,7 @@ export { uploadAudio } from './lib/storage.js';
 
 /**
  * アップロード済みファイルのパスを渡して文字起こしを依頼する。
- * 音声データ本体はSupabase Storage経由でAssemblyAIに渡るため、ここを通らない。
+ * 音声データ本体はSupabase Storage経由でSTTプロバイダーに渡るため、ここを通らない。
  * 長い会議は処理に数分かかることがある。
  */
 export async function requestTranscription(filePath) {
