@@ -20,7 +20,7 @@ function downloadFileName(mimeType) {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-  return `saidlog-${stamp}.${extensionOf(mimeType)}`;
+  return `SaidLog-${stamp}.${extensionOf(mimeType)}`;
 }
 
 /**

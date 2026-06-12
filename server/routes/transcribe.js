@@ -17,8 +17,11 @@ router.post('/transcribe', async (req, res, next) => {
     if (!supabaseConfigured()) {
       return res.status(500).json({ error: 'サーバーにSupabaseの接続情報が設定されていません' });
     }
-    if (!process.env.ASSEMBLYAI_API_KEY) {
-      return res.status(500).json({ error: 'サーバーに ASSEMBLYAI_API_KEY が設定されていません' });
+    // プロバイダーに対応するAPIキーを起動前に検証する（不正リクエストでSTT処理に入る前に弾く）
+    const provider = process.env.STT_PROVIDER || 'assemblyai';
+    const requiredKey = provider === 'amivoice' ? 'AMIVOICE_APPKEY' : 'ASSEMBLYAI_API_KEY';
+    if (!process.env[requiredKey]) {
+      return res.status(500).json({ error: `サーバーに ${requiredKey} が設定されていません` });
     }
 
     const audioUrl = await createSignedAudioUrl(filePath);
