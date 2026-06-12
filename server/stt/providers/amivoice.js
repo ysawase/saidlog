@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { readFile, writeFile, unlink } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import ffmpegStatic from 'ffmpeg-static';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
@@ -20,7 +21,8 @@ async function convertToWav(buffer, ext) {
   try {
     await writeFile(inputPath, buffer);
     await new Promise((resolve, reject) => {
-      const ffmpeg = spawn('ffmpeg', ['-i', inputPath, '-ar', '16000', '-ac', '1', '-f', 'wav', outputPath]);
+      // ffmpeg-staticのバイナリを優先し、未対応環境ではPATH上のffmpegにフォールバック
+      const ffmpeg = spawn(ffmpegStatic ?? 'ffmpeg', ['-i', inputPath, '-ar', '16000', '-ac', '1', '-f', 'wav', outputPath]);
       let stderr = '';
       ffmpeg.stderr.on('data', (d) => { stderr += d; });
       ffmpeg.on('error', reject);
