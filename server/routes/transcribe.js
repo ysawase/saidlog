@@ -26,7 +26,8 @@ router.post('/transcribe', async (req, res, next) => {
     console.log(`文字起こし開始: ${filePath}`);
     let result;
     try {
-      result = await transcribe({ audio: audioUrl, language: 'ja' });
+      // filePath は {uuid}/{ファイル名} 形式。拡張子による変換判定用にファイル名部分を渡す
+      result = await transcribe({ audio: audioUrl, language: 'ja', filename: filePath.split('/').pop() });
     } finally {
       // 会議データを残さない方針：成功・失敗を問わず即削除。
       // Vercelはレスポンス後に実行が凍結されるため、必ずawaitしてから応答する
