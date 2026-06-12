@@ -97,8 +97,8 @@ export default function App() {
         {status === 'processing' && (
           <div className="notice processing">
             <div className="spinner" />
+            <p>文字起こし中です。音声の長さの約10%の時間がかかります（混雑時はさらにかかる場合があります）</p>
             <p>処理中... {formatElapsed(processingElapsed)}</p>
-            <p>音声の長さの約10%の時間がかかります（混雑時はさらにかかる場合があります）</p>
           </div>
         )}
 
