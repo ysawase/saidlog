@@ -7,10 +7,12 @@ import { recordingFileName, downloadBlob } from './lib/recorder.js';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { saveTranscript } from './lib/history.js';
+import { HistoryList } from './components/HistoryList.jsx';
 
 function AppInner() {
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
   const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
@@ -92,6 +94,7 @@ function AppInner() {
         <div className="header-auth">
           {user ? (
             <>
+              <button onClick={() => setShowHistory(!showHistory)}>履歴</button>
               <span>{user.email}</span>
               <button onClick={signOut}>ログアウト</button>
             </>
@@ -137,6 +140,9 @@ function AppInner() {
             )}
             <TranscriptView result={result} />
           </>
+        )}
+        {showHistory && user && (
+          <HistoryList onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }} />
         )}
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </main>
