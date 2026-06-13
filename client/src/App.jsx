@@ -4,8 +4,12 @@ import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
 import { uploadAudio, requestTranscription } from './api.js';
 import { recordingFileName, downloadBlob } from './lib/recorder.js';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { AuthModal } from './components/AuthModal.jsx';
 
-export default function App() {
+function AppInner() {
+  const { user, signOut } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
   const [uploadProgress, setUploadProgress] = useState(0);
   const [result, setResult] = useState(null);
@@ -83,6 +87,16 @@ export default function App() {
     <div className="app">
       <header className="header">
         <h1>SaidLog</h1>
+        <div className="header-auth">
+          {user ? (
+            <>
+              <span>{user.email}</span>
+              <button onClick={signOut}>ログアウト</button>
+            </>
+          ) : (
+            <button onClick={() => setShowAuthModal(true)}>ログイン / 登録</button>
+          )}
+        </div>
         <p className="tagline">会議音声をアップロードするだけで、話者ごとの議事録に</p>
       </header>
 
@@ -122,6 +136,7 @@ export default function App() {
             <TranscriptView result={result} />
           </>
         )}
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </main>
 
       <section className="usage-notes">
@@ -141,5 +156,13 @@ export default function App() {
 
       <footer className="footer">SaidLog MVP — AI文字起こし・話者識別</footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
   );
 }
