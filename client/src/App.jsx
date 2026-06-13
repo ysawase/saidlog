@@ -6,6 +6,7 @@ import { uploadAudio, requestTranscription } from './api.js';
 import { recordingFileName, downloadBlob } from './lib/recorder.js';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
+import { saveTranscript } from './lib/history.js';
 
 function AppInner() {
   const { user, signOut } = useAuth();
@@ -57,6 +58,7 @@ function AppInner() {
       const data = await requestTranscription(filePath);
       setResult(data);
       setStatus('done');
+      saveTranscript({ filename: file.name, result: data });
     } catch (err) {
       setError(`文字起こしエラー: ${err.message}`);
       setStatus('error');
