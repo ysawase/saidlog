@@ -6,7 +6,7 @@ import cors from 'cors';
 import transcribeRouter from './routes/transcribe.js';
 import summarizeRouter from './routes/summarize.js';
 import { supabaseConfigured } from './services/storage.js';
-import { cleanupOldFiles } from './services/cleanup.js';
+import { cleanupOldFiles, runRetentionCleanup } from './services/cleanup.js';
 
 // server/.env を明示パスで読む（ローカル開発用。Vercel上はダッシュボードの
 // 環境変数が使われ、.envが無くてもno-opになる）
@@ -27,18 +27,22 @@ app.get('/api/health', (req, res) => {
 });
 
 // Vercel Cron から1日1回呼ばれる（vercel.json の crons 参照）。
-// CRON_SECRET 設定時は Authorization ヘッダーを検証する。
-app.get('/api/cleanup', async (req, res, next) => {
+// CLEANUP_SECRET 設定時は Authorization ヘッダーを検証する。
+async function handleCleanup(req, res, next) {
   try {
-    if (process.env.CRON_SECRET && req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+    const secret = process.env.CLEANUP_SECRET;
+    if (secret && req.headers.authorization !== `Bearer ${secret}`) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    const deleted = await cleanupOldFiles();
-    res.json({ ok: true, deleted });
+    const [deleted, retentionDeleted] = await Promise.all([cleanupOldFiles(), runRetentionCleanup()]);
+    res.json({ ok: true, deleted, retentionDeleted });
   } catch (err) {
     next(err);
   }
-});
+}
+
+app.get('/api/cleanup', handleCleanup);
+app.post('/api/cleanup', handleCleanup);
 
 app.use('/api', transcribeRouter);
 app.use('/api', summarizeRouter);

@@ -1,5 +1,24 @@
 import { BUCKET, getSupabase, supabaseConfigured } from './storage.js';
 
+/** audio_retention テーブルの保持期限切れレコードをストレージとDBから削除する。 */
+export async function runRetentionCleanup() {
+  if (!supabaseConfigured()) return 0;
+  const supabase = getSupabase();
+  const { data: expired, error } = await supabase
+    .from('audio_retention')
+    .select('id, file_path')
+    .lt('delete_after', new Date().toISOString());
+  if (error) throw new Error(`audio_retention照会失敗: ${error.message}`);
+  if (!expired?.length) return 0;
+
+  const paths = expired.map((r) => r.file_path);
+  const ids = expired.map((r) => r.id);
+  await supabase.storage.from(BUCKET).remove(paths);
+  await supabase.from('audio_retention').delete().in('id', ids);
+  console.log(`保持期間クリーンアップ: ${paths.length}件削除`);
+  return paths.length;
+}
+
 // 通常は文字起こし完了直後に削除されるため、ここで消すのは削除失敗の残骸のみ。
 // Vercel Cron（1日1回）と、文字起こしAPI呼び出し時のpiggybackの両方から呼ばれる。
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;

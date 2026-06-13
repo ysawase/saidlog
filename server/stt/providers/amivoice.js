@@ -7,7 +7,7 @@ import ffmpegStatic from 'ffmpeg-static';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-const ASYNC_API_BASE = 'https://acp-api-async.amivoice.com/v2/recognitions';
+const ASYNC_API_BASE = 'https://acp-api-async.amivoice.com/v2/nolog/recognitions';
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 10 * 60 * 1000;
 

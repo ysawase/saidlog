@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { transcribe } from '../stt/index.js';
-import { createSignedAudioUrl, deleteAudio, supabaseConfigured } from '../services/storage.js';
+import {
+  createSignedAudioUrl, deleteAudio, supabaseConfigured,
+  getStorageUsageRatio, deleteOldAudioFiles, scheduleAudioDeletion, THRESHOLD_HIGH,
+} from '../services/storage.js';
 import { cleanupOldFiles } from '../services/cleanup.js';
 
 const router = Router();
@@ -24,6 +27,13 @@ router.post('/transcribe', async (req, res, next) => {
       return res.status(500).json({ error: `サーバーに ${requiredKey} が設定されていません` });
     }
 
+    // 文字起こし前に使用量を確認し、80%超なら古いファイルを削除してから処理を続行
+    const uploadedAt = new Date();
+    const ratio = await getStorageUsageRatio();
+    if (ratio >= THRESHOLD_HIGH) {
+      await deleteOldAudioFiles();
+    }
+
     const audioUrl = await createSignedAudioUrl(filePath);
 
     console.log(`文字起こし開始: ${filePath}`);
@@ -39,6 +49,7 @@ router.post('/transcribe', async (req, res, next) => {
       } catch (err) {
         console.error(`削除失敗 (${filePath}):`, err.message);
       }
+      await scheduleAudioDeletion(filePath, uploadedAt);
     }
     console.log(`文字起こし完了: ${filePath} (発言数: ${result.utterances.length}, 音声長: ${result.audioDurationSec}s)`);
 
