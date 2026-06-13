@@ -105,6 +105,17 @@ function AppInner() {
         <p className="tagline">会議音声をアップロードするだけで、話者ごとの議事録に</p>
       </header>
 
+      {showHistory && user && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:900,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'80px'}}>
+          <div style={{background:'#fff',borderRadius:'8px',padding:'1.5rem',width:'90%',maxWidth:'480px',maxHeight:'70vh',overflowY:'auto'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
+              <h2 style={{margin:0}}>履歴</h2>
+              <button onClick={() => setShowHistory(false)}>閉じる</button>
+            </div>
+            <HistoryList onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }} />
+          </div>
+        </div>
+      )}
       <main>
         {status !== 'done' && <UploadForm onSubmit={handleTranscribe} processing={busy} />}
 
@@ -140,9 +151,6 @@ function AppInner() {
             )}
             <TranscriptView result={result} />
           </>
-        )}
-        {showHistory && user && (
-          <HistoryList onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }} />
         )}
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       </main>
