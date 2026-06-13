@@ -1,4 +1,4 @@
-# SaidLog 作業引き継ぎ（2026-06-12）
+# SaidLog 作業引き継ぎ（2026-06-13）
 
 ## アプリ概要
 - 名称：SaidLog（旧Meetlog）
@@ -29,6 +29,7 @@
 - 文字起こし中：経過時間カウンター表示・所要時間目安メッセージ
 - 結果画面：「録音を保存」ボタン（録音由来のみ表示）・所要時間表示
 - AI要約（箇条書き・議事録形式の2テンプレート、Claude Haiku使用、注意文言表示）
+- Capacitorプロジェクト（Android）導入済み・Androidビルド可能な状態
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -101,7 +102,8 @@
 
 ### フェーズ3：アプリ化
 - 🔲 PWA対応（ホーム画面追加・無料・すぐできる）
-- 🔲 Capacitor導入・録音プラグイン対応
+- ✅ Capacitor導入・Androidプロジェクト生成
+- 🔲 Capacitorネイティブ録音プラグイン対応
 - 🔲 Google Play申請（$25・一回のみ）
 - 🔲 App Store申請（年$99）
 
@@ -137,6 +139,17 @@
 - **フェーズ計画**：完了したものは✅にして残す。削らない
 - **変更前の内容**：よほど重要な判断の経緯がある場合のみ「変更前」として残す。それ以外は最新に上書き
 - MDが肥大化しないよう、状態管理系（実装済み機能・フェーズ）は最新のみ保持し、判断・思想系は蓄積する
+
+## Capacitor / Android 対応メモ（2026-06-13 確定）
+
+- `capacitor.config.json` に `server.androidScheme: "https"` を設定済み（CapacitorのWebViewでhttps扱いにする）
+- `client/.env` に `VITE_API_BASE=https://saidlog.vercel.app` を追加済み
+- `api.js` の全fetch呼び出しは `${API_BASE}/api/...` の絶対パス形式に統一済み
+- `android/app/src/main/res/xml/network_security_config.xml` を作成済み（saidlog.vercel.app・supabase.co への通信許可）
+- `storage.js` のアップロードはXHR廃止・`file.arrayBuffer()` → fetch方式に変更済み
+  - 理由：CapacitorのWebViewはXHRがブロックされる場合があり、ReadableStreamをfetch bodyに渡す方法（duplex）も非対応
+  - 進捗表示はアップロード開始時0%・完了時100%のみ（中間進捗なし）
+- ビルド手順：`npm --prefix client run build` → `npx cap sync android` → Android Studioでビルド
 
 ### ブレやすい注意点（毎回確認すること）
 - SaidLogは「軽い・速い・安い・シンプル」が売り
