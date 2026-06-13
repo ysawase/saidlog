@@ -1,5 +1,8 @@
 {
   "appId": "com.saidlog.app",
   "appName": "SaidLog",
-  "webDir": "client\\dist"
+  "webDir": "client/dist",
+  "server": {
+    "androidScheme": "https"
+  }
 }

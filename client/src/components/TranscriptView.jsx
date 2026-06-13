@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { requestSummary } from '../api.js';
 
 const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 
@@ -30,17 +31,11 @@ export default function TranscriptView({ result }) {
   const generateSummary = async () => {
     setSummaryStatus('loading');
     try {
-      const res = await fetch('/api/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          utterances: result.utterances,
-          template: summaryTemplate,
-          names,
-        }),
+      const data = await requestSummary({
+        utterances: result.utterances,
+        template: summaryTemplate,
+        names,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setSummary(data.summary);
       setSummaryStatus('done');
     } catch (err) {

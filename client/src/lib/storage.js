@@ -1,6 +1,6 @@
 // Supabase Storage への直接アップロード。
-// supabase-js の標準アップロードは進捗イベント非対応のため、
-// Storage REST API へ XHR でPOSTする（認証は同じくanonキー＋RLS INSERTポリシー）。
+// Capacitor WebView は ReadableStream を fetch body に渡す方法（duplex）非対応のため、
+// arrayBuffer() で先読みしてから fetch に渡す。
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const BUCKET = 'audio-uploads';
@@ -34,35 +34,37 @@ function contentTypeOf(file) {
 /**
  * 音声ファイルをSupabase Storageへ直接アップロードする。
  * @param {File} file
- * @param {(percent: number) => void} [onProgress] 0-100
+ * @param {(percent: number) => void} [onProgress] 0%（開始）と100%（完了）のみ通知
  * @returns {Promise<string>} アップロード先の filePath（{uuid}/{ファイル名}）
  */
-export function uploadAudio(file, onProgress) {
-  return new Promise((resolve, reject) => {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      reject(new Error('Supabaseの接続設定がありません（client/.env の VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY を確認）'));
-      return;
-    }
-    const filePath = `${crypto.randomUUID()}/${sanitizeFileName(file.name)}`;
+export async function uploadAudio(file, onProgress) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('Supabaseの接続設定がありません（client/.env の VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY を確認）');
+  }
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`);
-    xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON_KEY}`);
-    xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
-    xhr.setRequestHeader('Content-Type', contentTypeOf(file));
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && onProgress) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
-      }
-    };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(filePath);
-      } else {
-        reject(new Error(`アップロードに失敗しました（HTTP ${xhr.status}）`));
-      }
-    };
-    xhr.onerror = () => reject(new Error('アップロードに失敗しました（ネットワークエラー）'));
-    xhr.send(file);
-  });
+  const filePath = `${crypto.randomUUID()}/${sanitizeFileName(file.name)}`;
+  const buffer = await file.arrayBuffer();
+
+  onProgress?.(0);
+
+  const res = await fetch(
+    `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${filePath}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
+        'Content-Type': contentTypeOf(file),
+      },
+      body: buffer,
+    }
+  );
+
+  if (!res.ok) {
+    const msg = await res.text().catch(() => '');
+    throw new Error(`アップロードに失敗しました（HTTP ${res.status}）${msg ? ': ' + msg : ''}`);
+  }
+
+  onProgress?.(100);
+  return filePath;
 }
