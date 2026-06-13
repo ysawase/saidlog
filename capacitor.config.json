@@ -1,0 +1,5 @@
+{
+  "appId": "com.saidlog.app",
+  "appName": "SaidLog",
+  "webDir": "client\\dist"
+}
