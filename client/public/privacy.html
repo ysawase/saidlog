@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>プライバシーポリシー / Privacy Policy — SaidLog</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #333;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.05rem; margin-top: 2rem; margin-bottom: 0.5rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+    p, li { margin: 0.4rem 0; }
+    ul { padding-left: 1.4rem; }
+    .meta { color: #666; font-size: 0.875rem; margin-bottom: 2rem; }
+    hr { border: none; border-top: 2px solid #eee; margin: 3rem 0; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+
+<!-- 日本語 -->
+<h1>プライバシーポリシー</h1>
+<p class="meta">サービス名：SaidLog　／　制定日：2026年XX月XX日　／　運営者：個人</p>
+
+<p>運営者（以下「当方」）は、SaidLog（以下「本サービス」）におけるユーザーの個人情報の取り扱いについて、以下のとおり定めます。</p>
+
+<h2>1. 収集する情報</h2>
+<ul>
+  <li>メールアドレスおよびハッシュ化されたパスワード（Supabase Auth による認証情報）</li>
+  <li>文字起こしテキスト（ログイン時のみ、Supabase データベースに保存）</li>
+  <li>音声ファイル（処理のため一時的に Supabase Storage に保存し、処理完了後に自動削除）</li>
+  <li>ログイン日時・アカウント登録日時</li>
+</ul>
+
+<h2>2. 外部サービスへの送信</h2>
+<ul>
+  <li><strong>音声データ：</strong>AmiVoice（株式会社アドバンスト・メディア）に送信し、音声認識処理を行います。ログは保存されません。</li>
+  <li><strong>文字起こしテキスト：</strong>Anthropic 社の Claude API に送信し、AI による要約処理を行います（要約機能使用時のみ）。</li>
+</ul>
+
+<h2>3. データ保持期間</h2>
+<ul>
+  <li><strong>音声ファイル：</strong>処理完了後に即時削除します。削除失敗時の安全網として、Supabase Storage の使用量に応じて最大30日で自動削除します。</li>
+  <li><strong>文字起こしテキスト：</strong>ユーザーが削除するまで保持します（表示は直近30件）。</li>
+  <li><strong>アカウント情報：</strong>ユーザーがアカウントを削除するまで保持します。</li>
+</ul>
+
+<h2>4. ユーザーの権利</h2>
+<p>ユーザーはアプリ内のアカウント削除機能から、すべてのデータ（文字起こしテキスト・音声ファイル残存分・アカウント情報）を削除できます。</p>
+
+<h2>5. 第三者提供</h2>
+<p>上記「外部サービスへの送信」に記載した処理委託を除き、ユーザーの情報を第三者に提供することはありません。</p>
+
+<h2>6. Cookie・アクセス解析</h2>
+<p>本サービスは現時点でアクセス解析ツールおよびトラッキング Cookie を使用していません。</p>
+
+<h2>7. お問い合わせ</h2>
+<p>個人情報の取り扱いに関するお問い合わせは、下記までご連絡ください。<br>
+メール：XX@XX（準備中）</p>
+
+<h2>8. ポリシーの変更</h2>
+<p>本ポリシーは必要に応じて改定することがあります。重要な変更がある場合は、本ページおよびアプリ内でお知らせします。</p>
+
+<hr>
+
+<!-- English -->
+<h1>Privacy Policy</h1>
+<p class="meta">Service: SaidLog　／　Effective date: XXXX-XX-XX (TBD)　／　Operator: Individual</p>
+
+<p>The operator of SaidLog ("we" or "us") sets out the following policy regarding the handling of user information in this service.</p>
+
+<h2>1. Information We Collect</h2>
+<ul>
+  <li>Email address and hashed password (authentication credentials managed by Supabase Auth)</li>
+  <li>Transcription text (stored in Supabase database only when the user is signed in)</li>
+  <li>Audio files (temporarily stored in Supabase Storage for processing; automatically deleted after processing)</li>
+  <li>Login timestamps and account registration date</li>
+</ul>
+
+<h2>2. Data Sent to Third-Party Services</h2>
+<ul>
+  <li><strong>Audio data:</strong> Sent to AmiVoice (Advanced Media, Inc.) for speech recognition. No logs are retained by the provider.</li>
+  <li><strong>Transcription text:</strong> Sent to Anthropic's Claude API for AI-generated summarization (only when the summary feature is used).</li>
+</ul>
+
+<h2>3. Data Retention</h2>
+<ul>
+  <li><strong>Audio files:</strong> Deleted immediately after processing. As a safety net for deletion failures, files are automatically deleted within a maximum of 30 days based on Supabase Storage usage.</li>
+  <li><strong>Transcription text:</strong> Retained until deleted by the user (up to the 30 most recent entries are displayed).</li>
+  <li><strong>Account information:</strong> Retained until the user deletes their account.</li>
+</ul>
+
+<h2>4. User Rights</h2>
+<p>Users can delete all their data — including transcription text, any remaining audio files, and account information — using the account deletion feature available within the app.</p>
+
+<h2>5. Disclosure to Third Parties</h2>
+<p>We do not share user information with third parties except for the processing services described in Section 2 above.</p>
+
+<h2>6. Cookies and Analytics</h2>
+<p>This service does not currently use any analytics tools or tracking cookies.</p>
+
+<h2>7. Contact</h2>
+<p>For inquiries regarding personal information, please contact us at:<br>
+Email: XX@XX (coming soon)</p>
+
+<h2>8. Changes to This Policy</h2>
+<p>We may revise this policy as necessary. For significant changes, we will provide notice on this page and within the app.</p>
+
+</body>
+</html>
