@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createRecorder, recordingFileName, downloadBlob } from '../lib/recorder.js';
 import { listSessions, getSessionBlob, clearSession, cleanupStale } from '../lib/recordingDb.js';
 
 const MAX_SIZE_BYTES = 50 * 1024 * 1024;
 const LONG_RECORDING_MS = 90 * 60 * 1000;
-const CHUNK_SEC = 5; // recorder.js の timeslice と対応（復元時の録音時間概算用）
+const CHUNK_SEC = 5;
 
 function formatDuration(ms) {
   const sec = Math.round(ms / 1000);
@@ -16,12 +17,8 @@ function formatDuration(ms) {
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-/**
- * 録音UI一式（idle → recording → confirming）。
- * 起動時に未処理の録音チャンクがあれば復元ダイアログを出す。
- * @param {{ onTranscribe: (blob: Blob, mimeType: string) => void }} props
- */
 export default function Recorder({ onTranscribe }) {
+  const { t } = useTranslation();
   const [phase, setPhase] = useState('idle'); // idle | recording | confirming
   const [restoreInfo, setRestoreInfo] = useState(null);
   const [recordingMs, setRecordingMs] = useState(0);
@@ -36,7 +33,6 @@ export default function Recorder({ onTranscribe }) {
     listSessions()
       .then((sessions) => {
         if (sessions.length === 0) return;
-        // 複数残っていても直近の1件のみ復元対象にする（残りは7日で自動削除）
         const latest = sessions.reduce((a, b) => (a.lastAt > b.lastAt ? a : b));
         setRestoreInfo(latest);
       })
@@ -59,8 +55,8 @@ export default function Recorder({ onTranscribe }) {
     } catch (err) {
       setError(
         err.name === 'NotAllowedError'
-          ? 'マイクの使用が許可されませんでした。ブラウザの設定を確認してください'
-          : `録音を開始できませんでした: ${err.message}`,
+          ? t('recorder.errorMic')
+          : t('recorder.errorStart', { message: err.message }),
       );
       return;
     }
@@ -76,7 +72,7 @@ export default function Recorder({ onTranscribe }) {
       setResult(res);
       setPhase('confirming');
     } catch (err) {
-      setError(`録音の停止に失敗しました: ${err.message}`);
+      setError(t('recorder.errorStop', { message: err.message }));
       setPhase('idle');
     }
     recorderRef.current = null;
@@ -94,7 +90,7 @@ export default function Recorder({ onTranscribe }) {
       setResult({ blob, sessionId, mimeType, durationMs: chunkCount * CHUNK_SEC * 1000 });
       setPhase('confirming');
     } catch (err) {
-      setError(`録音の復元に失敗しました: ${err.message}`);
+      setError(t('recorder.errorResume', { message: err.message }));
     }
   };
 
@@ -106,7 +102,6 @@ export default function Recorder({ onTranscribe }) {
 
   const handleSave = () => {
     downloadBlob(result.blob, recordingFileName(result.mimeType));
-    // Blobはメモリに保持しているため、保存後も「文字起こしする」は引き続き使える
     clearSession(result.sessionId).catch(() => {});
   };
 
@@ -138,37 +133,35 @@ export default function Recorder({ onTranscribe }) {
           {restoreInfo && (
             <div className="notice">
               <p>
-                前回の録音が残っています（約
+                {t('recorder.confirm.pending')}（約
                 {Math.max(1, Math.round((restoreInfo.chunkCount * CHUNK_SEC) / 60))}
-                分）。復元しますか？
+                分）{t('recorder.confirm.resume')}
               </p>
               <button className="btn primary" onClick={handleRestore}>
-                復元する
+                {t('recorder.confirm.resumeBtn')}
               </button>
               <button className="btn secondary" onClick={handleDiscardRestore}>
-                破棄する
+                {t('recorder.confirm.discard')}
               </button>
             </div>
           )}
           <button className="btn primary" onClick={handleStart}>
-            録音を開始する
+            {t('recorder.start')}
           </button>
         </>
       )}
 
       {phase === 'recording' && (
         <div className="notice">
-          <p>録音中 {formatDuration(recordingMs)}</p>
+          <p>{t('recorder.recording', { duration: formatDuration(recordingMs) })}</p>
           {recordingMs > LONG_RECORDING_MS && (
-            <p className="warning">長時間の録音は精度・コストの面で分割を推奨します</p>
+            <p className="warning">{t('recorder.warning.long')}</p>
           )}
           {sizeWarning && (
-            <p className="warning">
-              ファイルサイズが大きくなっています。まもなく上限（50MB）に達します。上限を超えると文字起こしができなくなります。録音を停止して分割することをお勧めします。
-            </p>
+            <p className="warning">{t('recorder.warning.size')}</p>
           )}
           <button className="btn primary" onClick={handleStop}>
-            停止
+            {t('recorder.stop')}
           </button>
         </div>
       )}
@@ -176,20 +169,20 @@ export default function Recorder({ onTranscribe }) {
       {phase === 'confirming' && result && (
         <div className="notice">
           <p>
-            録音時間 {formatDuration(result.durationMs)}（
-            {(result.blob.size / 1024 / 1024).toFixed(1)} MB）
+            {t('recorder.duration', { duration: formatDuration(result.durationMs) })}
+            {(result.blob.size / 1024 / 1024).toFixed(1)} MB
           </p>
           {oversize && (
-            <p className="warning">50MBを超えているため文字起こしできません。端末に保存して分割してください</p>
+            <p className="warning">{t('recorder.warning.overSize')}</p>
           )}
           <button className="btn secondary" onClick={handleSave}>
-            端末に保存
+            {t('recorder.confirm.save')}
           </button>
           <button className="btn primary" disabled={oversize} onClick={handleTranscribe}>
-            文字起こしする
+            {t('recorder.confirm.transcribe')}
           </button>
           <button className="btn secondary" onClick={handleDiscard}>
-            破棄
+            {t('recorder.confirm.discard2')}
           </button>
         </div>
       )}

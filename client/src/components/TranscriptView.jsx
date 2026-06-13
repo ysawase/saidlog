@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { requestSummary } from '../api.js';
 import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
 
@@ -12,14 +13,14 @@ function formatTime(ms) {
 }
 
 export default function TranscriptView({ result }) {
+  const { t } = useTranslation();
   const speakers = useMemo(
     () => [...new Set(result.utterances.map((u) => u.speaker))],
     [result]
   );
 
-  // 話者ラベル(A, B, ...)から表示名へのマップ。ユーザーが編集できる。
   const [names, setNames] = useState(() =>
-    Object.fromEntries(speakers.map((s) => [s, `話者${s}`]))
+    Object.fromEntries(speakers.map((s) => [s, t('transcript.speakerLabel', { s })]))
   );
   const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(null);
@@ -49,7 +50,7 @@ export default function TranscriptView({ result }) {
       setSummary(data.summary);
       setSummaryStatus('done');
     } catch (err) {
-      setSummary(`要約エラー: ${err.message}`);
+      setSummary(t('transcript.summaryError', { message: err.message }));
       setSummaryStatus('error');
     }
   };
@@ -85,7 +86,7 @@ export default function TranscriptView({ result }) {
   };
 
   if (result.utterances.length === 0) {
-    return <div className="notice">発言が検出されませんでした。</div>;
+    return <div className="notice">{t('transcript.noResult')}</div>;
   }
 
   const minutesExporting = exporting !== null && exporting !== 'raw';
@@ -100,23 +101,23 @@ export default function TranscriptView({ result }) {
               <input
                 value={names[s]}
                 onChange={(e) => setNames({ ...names, [s]: e.target.value })}
-                aria-label={`話者${s}の名前`}
+                aria-label={t('transcript.speakerLabel', { s })}
               />
               <span className="pen-icon" aria-hidden="true">
-                ✎
+                {t('transcript.editIcon')}
               </span>
             </label>
           ))}
         </div>
         <button className="btn secondary" onClick={copyTranscript}>
-          {copied ? 'コピーしました ✓' : 'テキストをコピー'}
+          {copied ? t('transcript.copied') : t('transcript.copy')}
         </button>
         <button
           className="btn secondary"
           onClick={exportRaw}
           disabled={exporting !== null}
         >
-          {exporting === 'raw' ? '生成中…' : '原文を保存'}
+          {exporting === 'raw' ? t('transcript.saving') : t('transcript.saveRaw')}
         </button>
       </div>
 
@@ -126,24 +127,24 @@ export default function TranscriptView({ result }) {
             value={summaryTemplate}
             onChange={(e) => setSummaryTemplate(e.target.value)}
             disabled={summaryStatus === 'loading'}
-            aria-label="要約テンプレート"
+            aria-label={t('transcript.summaryTemplate')}
           >
-            <option value="bullets">決定事項・アクションアイテム</option>
-            <option value="minutes">議事録形式</option>
+            <option value="bullets">{t('transcript.bullets')}</option>
+            <option value="minutes">{t('transcript.minutes')}</option>
           </select>
           <button
             className="btn secondary"
             onClick={generateSummary}
             disabled={summaryStatus === 'loading'}
           >
-            {summaryStatus === 'loading' ? '生成中…' : '要約を生成'}
+            {summaryStatus === 'loading' ? t('transcript.saving') : t('transcript.generateSummary')}
           </button>
         </div>
         {summaryStatus === 'error' && <div className="notice error">{summary}</div>}
         {summaryStatus === 'done' && (
           <>
             <p style={{ fontSize: '0.8rem', color: '#888' }}>
-              AIによる自動要約です。内容は必ずご確認ください。
+              {t('transcript.summaryNote')}
             </p>
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <button
@@ -154,7 +155,7 @@ export default function TranscriptView({ result }) {
                 }}
                 disabled={exporting !== null}
               >
-                {minutesExporting ? '生成中…' : '議事録を保存 ▼'}
+                {minutesExporting ? t('transcript.savingMinutes') : t('transcript.saveMinutes')}
               </button>
               {minutesOpen && (
                 <div

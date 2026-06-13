@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ACCEPT = '.mp3,.mp4,.wav,.m4a,.webm';
 const MAX_SIZE_MB = 50;
 
 export default function UploadForm({ onSubmit, processing }) {
+  const { t } = useTranslation();
   const [file, setFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [warning, setWarning] = useState('');
@@ -13,11 +15,11 @@ export default function UploadForm({ onSubmit, processing }) {
     if (!f) return;
     const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
     if (!ACCEPT.split(',').includes(ext)) {
-      setWarning('対応形式は mp3 / mp4 / wav / m4a / webm です');
+      setWarning(t('upload.errorFormat'));
       return;
     }
     if (f.size > MAX_SIZE_MB * 1024 * 1024) {
-      setWarning(`ファイルサイズの上限は ${MAX_SIZE_MB}MB です`);
+      setWarning(t('upload.errorSize', { max: MAX_SIZE_MB }));
       return;
     }
     setWarning('');
@@ -56,8 +58,8 @@ export default function UploadForm({ onSubmit, processing }) {
           </p>
         ) : (
           <>
-            <p className="dropzone-main">音声ファイルをドラッグ＆ドロップ</p>
-            <p className="dropzone-sub">またはクリックして選択（mp3 / mp4 / wav / m4a / webm）</p>
+            <p className="dropzone-main">{t('upload.dragDrop')}</p>
+            <p className="dropzone-sub">{t('upload.clickOrDrag')}</p>
           </>
         )}
       </div>
@@ -69,7 +71,7 @@ export default function UploadForm({ onSubmit, processing }) {
         disabled={!file || processing}
         onClick={() => onSubmit(file)}
       >
-        {processing ? '処理中…' : '文字起こしを開始'}
+        {processing ? t('upload.processing') : t('upload.start')}
       </button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import UploadForm from './components/UploadForm.jsx';
 import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
@@ -10,6 +11,7 @@ import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
 
 function AppInner() {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -50,7 +52,7 @@ function AppInner() {
     try {
       filePath = await uploadAudio(file, setUploadProgress);
     } catch (err) {
-      setError(`アップロードエラー: ${err.message}`);
+      setError(t('app.uploadError', { message: err.message }));
       setStatus('error');
       return;
     }
@@ -62,12 +64,11 @@ function AppInner() {
       setStatus('done');
       saveTranscript({ filename: file.name, result: data });
     } catch (err) {
-      setError(`文字起こしエラー: ${err.message}`);
+      setError(t('app.transcribeError', { message: err.message }));
       setStatus('error');
     }
   };
 
-  // 録音Blobをファイル化して、手動アップロードと同じ文字起こし経路に合流させる
   const handleRecordedTranscribe = (blob, mimeType) => {
     const file = new File([blob], recordingFileName(mimeType), { type: mimeType });
     setRecordedFile(file);
@@ -94,23 +95,23 @@ function AppInner() {
         <div className="header-auth">
           {user ? (
             <>
-              <button onClick={() => setShowHistory(!showHistory)}>履歴</button>
+              <button onClick={() => setShowHistory(!showHistory)}>{t('app.history')}</button>
               <span>{user.email}</span>
-              <button onClick={signOut}>ログアウト</button>
+              <button onClick={signOut}>{t('app.logout')}</button>
             </>
           ) : (
-            <button onClick={() => setShowAuthModal(true)}>ログイン / 登録</button>
+            <button onClick={() => setShowAuthModal(true)}>{t('app.login')}</button>
           )}
         </div>
-        <p className="tagline">会議音声をアップロードするだけで、話者ごとの議事録に</p>
+        <p className="tagline">{t('app.tagline')}</p>
       </header>
 
       {showHistory && user && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:900,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'80px'}}>
           <div style={{background:'#fff',borderRadius:'8px',padding:'1.5rem',width:'90%',maxWidth:'480px',maxHeight:'70vh',overflowY:'auto'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-              <h2 style={{margin:0}}>履歴</h2>
-              <button onClick={() => setShowHistory(false)}>閉じる</button>
+              <h2 style={{margin:0}}>{t('history.title')}</h2>
+              <button onClick={() => setShowHistory(false)}>{t('history.close')}</button>
             </div>
             <HistoryList onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }} />
           </div>
@@ -124,15 +125,15 @@ function AppInner() {
         {status === 'uploading' && (
           <div className="notice processing">
             <div className="spinner" />
-            <p>アップロード中… {uploadProgress}%</p>
+            <p>{t('app.uploading', { progress: uploadProgress })}</p>
           </div>
         )}
 
         {status === 'processing' && (
           <div className="notice processing">
             <div className="spinner" />
-            <p>文字起こし中です。音声の長さと同程度の時間がかかります（混雑時はさらにかかる場合があります）</p>
-            <p>処理中... {formatElapsed(processingElapsed)}</p>
+            <p>{t('app.processing')}</p>
+            <p>{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</p>
           </div>
         )}
 
@@ -140,13 +141,13 @@ function AppInner() {
 
         {status === 'done' && result && (
           <>
-            <p className="done-elapsed">文字起こし完了（所要時間：{formatElapsed(processingElapsed)}）</p>
+            <p className="done-elapsed">{t('app.done', { elapsed: formatElapsed(processingElapsed) })}</p>
             <button className="btn secondary" onClick={handleReset}>
-              ← 別のファイルを文字起こしする
+              ← {t('app.transcribeAnother')}
             </button>
             {recordedFile && (
               <button className="btn secondary" onClick={handleSaveRecording}>
-                録音を保存
+                {t('app.saveRecording')}
               </button>
             )}
             <TranscriptView result={result} />
@@ -156,21 +157,19 @@ function AppInner() {
       </main>
 
       <section className="usage-notes">
-        <p>ご利用にあたって</p>
+        <p>{t('app.usageNotes.title')}</p>
         <ul>
-          <li>各話者が15秒以上話すと識別精度が上がります</li>
-          <li>発言量が少ない話者は識別されにくい場合があります</li>
-          <li>話者名は右のペンアイコンから編集できます</li>
-          <li>
-            本サービスはAI処理に外部APIを使用しています。運営側に費用が発生します。長時間の録音は分割してご利用ください。
-          </li>
-          <li>アップロードできるファイルは50MBまでです。超える場合は分割してください</li>
-          <li>録音中は画面を開いたままにしてください（他のアプリへの切り替えや画面を閉じると録音が停止する場合があります）</li>
-          <li>録音データの保存はご自身の端末で行えます。サーバーには保存されません</li>
+          <li>{t('app.usageNotes.speakers')}</li>
+          <li>{t('app.usageNotes.quiet')}</li>
+          <li>{t('app.usageNotes.editName')}</li>
+          <li>{t('app.usageNotes.apiCost')}</li>
+          <li>{t('app.usageNotes.sizeLimit')}</li>
+          <li>{t('app.usageNotes.keepScreen')}</li>
+          <li>{t('app.usageNotes.noServer')}</li>
         </ul>
       </section>
 
-      <footer className="footer">SaidLog MVP — AI文字起こし・話者識別</footer>
+      <footer className="footer">{t('app.footer')}</footer>
     </div>
   );
 }

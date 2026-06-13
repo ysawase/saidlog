@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { fetchTranscripts, deleteTranscript } from '../lib/history.js'
 
 export function HistoryList({ onSelect }) {
+  const { t } = useTranslation()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -13,23 +15,23 @@ export function HistoryList({ onSelect }) {
   }, [])
 
   const handleDelete = async (id) => {
-    if (!confirm('この履歴を削除しますか？')) return
+    if (!confirm(t('history.confirmDelete'))) return
     const ok = await deleteTranscript(id)
     if (ok) setList(list.filter(t => t.id !== id))
   }
 
-  if (loading) return <p>読み込み中...</p>
-  if (list.length === 0) return <p>履歴がありません</p>
+  if (loading) return <p>{t('history.loading')}</p>
+  if (list.length === 0) return <p>{t('history.empty')}</p>
 
   return (
     <ul style={styles.list}>
-      {list.map(t => (
-        <li key={t.id} style={styles.item}>
-          <button onClick={() => onSelect(t.result)} style={styles.title}>
-            {t.filename ?? '無題'}<br />
-            <small>{new Date(t.created_at).toLocaleString('ja-JP')}</small>
+      {list.map(item => (
+        <li key={item.id} style={styles.item}>
+          <button onClick={() => onSelect(item.result)} style={styles.title}>
+            {item.filename ?? t('history.noName')}<br />
+            <small>{new Date(item.created_at).toLocaleString()}</small>
           </button>
-          <button onClick={() => handleDelete(t.id)} style={styles.del}>削除</button>
+          <button onClick={() => handleDelete(item.id)} style={styles.del}>{t('history.delete')}</button>
         </li>
       ))}
     </ul>

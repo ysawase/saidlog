@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 
 export function AuthModal({ onClose }) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,34 +31,34 @@ export function AuthModal({ onClose }) {
       <div style={styles.modal}>
         {done ? (
           <>
-            <p>確認メールを送信しました。メール内のリンクをクリックしてログインしてください。</p>
-            <button onClick={onClose}>閉じる</button>
+            <p>{t('auth.confirmEmail')}</p>
+            <button onClick={onClose}>{t('auth.close')}</button>
           </>
         ) : (
           <>
-            <h2>{mode === 'login' ? 'ログイン' : 'アカウント作成'}</h2>
+            <h2>{mode === 'login' ? t('auth.login') : t('auth.signup')}</h2>
             <input
               type="email"
-              placeholder="メールアドレス"
+              placeholder={t('auth.email')}
               value={email}
               onChange={e => setEmail(e.target.value)}
               style={styles.input}
             />
             <input
               type="password"
-              placeholder="パスワード"
+              placeholder={t('auth.password')}
               value={password}
               onChange={e => setPassword(e.target.value)}
               style={styles.input}
             />
             {error && <p style={styles.error}>{error}</p>}
             <button onClick={handleSubmit} disabled={loading} style={styles.button}>
-              {loading ? '処理中...' : mode === 'login' ? 'ログイン' : '登録'}
+              {loading ? t('auth.processing') : mode === 'login' ? t('auth.submit.login') : t('auth.submit.signup')}
             </button>
             <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} style={styles.link}>
-              {mode === 'login' ? 'アカウントを作成' : 'ログインに戻る'}
+              {mode === 'login' ? t('auth.switchToSignup') : t('auth.switchToLogin')}
             </button>
-            <button onClick={onClose} style={styles.link}>キャンセル</button>
+            <button onClick={onClose} style={styles.link}>{t('auth.cancel')}</button>
           </>
         )}
       </div>
