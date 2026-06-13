@@ -96,7 +96,7 @@ function AppInner() {
           {user ? (
             <>
               <button onClick={() => setShowHistory(!showHistory)}>{t('app.history')}</button>
-              <span>{user.email}</span>
+              <button onClick={() => setShowAuthModal(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit' }}>{user.email}</button>
               <button onClick={signOut}>{t('app.logout')}</button>
             </>
           ) : (
@@ -153,7 +153,7 @@ function AppInner() {
             <TranscriptView result={result} />
           </>
         )}
-        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} user={user} />}
       </main>
 
       <section className="usage-notes">

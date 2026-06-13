@@ -1,3 +1,5 @@
+import { supabase } from './lib/supabase.js';
+
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
 export { uploadAudio } from './lib/storage.js';
@@ -26,6 +28,21 @@ export async function requestSummary({ utterances, template, names }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ utterances, template, names }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+export async function deleteAccount() {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  const res = await fetch(`${API_BASE}/api/delete-account`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);

@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import transcribeRouter from './routes/transcribe.js';
 import summarizeRouter from './routes/summarize.js';
+import deleteAccountRouter from './routes/deleteAccount.js';
 import { supabaseConfigured } from './services/storage.js';
 import { cleanupOldFiles, runRetentionCleanup } from './services/cleanup.js';
 
@@ -46,6 +47,7 @@ app.post('/api/cleanup', handleCleanup);
 
 app.use('/api', transcribeRouter);
 app.use('/api', summarizeRouter);
+app.use('/api', deleteAccountRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

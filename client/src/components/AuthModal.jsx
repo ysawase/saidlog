@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext.jsx'
+import { deleteAccount } from '../api.js'
 
-export function AuthModal({ onClose }) {
+export function AuthModal({ onClose, user }) {
   const { t } = useTranslation()
+  const { signOut } = useAuth()
   const [mode, setMode] = useState('login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,6 +27,39 @@ export function AuthModal({ onClose }) {
       else setDone(true)
     }
     setLoading(false)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm(t('auth.deleteConfirm'))) return
+    setError(null)
+    setLoading(true)
+    try {
+      await deleteAccount()
+      await signOut()
+      onClose()
+    } catch (err) {
+      setError(t('auth.deleteError'))
+    }
+    setLoading(false)
+  }
+
+  if (user) {
+    return (
+      <div style={styles.overlay}>
+        <div style={styles.modal}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>{user.email}</p>
+          {error && <p style={styles.error}>{error}</p>}
+          <button
+            onClick={handleDeleteAccount}
+            disabled={loading}
+            style={styles.deleteButton}
+          >
+            {loading ? t('auth.deleting') : t('auth.deleteAccount')}
+          </button>
+          <button onClick={onClose} style={styles.link}>{t('auth.cancel')}</button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -83,6 +119,10 @@ const styles = {
   },
   button: {
     padding: '0.6rem', fontSize: '1rem', cursor: 'pointer',
+  },
+  deleteButton: {
+    padding: '0.6rem', fontSize: '1rem', cursor: 'pointer',
+    background: '#dc2626', color: '#fff', border: 'none', borderRadius: '4px',
   },
   error: {
     color: 'red', fontSize: '0.875rem',
