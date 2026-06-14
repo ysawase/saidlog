@@ -1,4 +1,4 @@
-# SaidLog 作業引き継ぎ（2026-06-13）
+# SaidLog 作業引き継ぎ（2026-06-14）
 
 ## アプリ概要
 - 名称：SaidLog（旧Meetlog）
@@ -41,7 +41,12 @@
 - テキストエクスポート（原文→TXT、議事録→TXT/DOCX/PDF）PDFはpdfmake v0.3 + NotoSansJP。竹以上対象（プラン制御は未実装）
 - アカウント削除機能（transcripts・audio_retention・Storage・Authを順番に全削除）
 - react-i18next導入・日英2言語対応（ブラウザ言語設定で自動切替）
+- PWA対応（vite-plugin-pwa・manifest.webmanifest・theme-color #4F46E5・アイコン192/512px）
+- 録音adapter層（client/src/lib/adapters/）：WebMediaRecorderAdapter・NativeRecorderAdapter・createRecordingAdapter()ファクトリ。Web環境は既存MediaRecorder継続、Capacitorネイティブ環境は@capgo/capacitor-audio-recorderをラップ（未インストール）
 - プライバシーポリシーページ（client/public/privacy.html・日英併記）
+- Capacitorネイティブ録音プラグイン（@capgo/capacitor-audio-recorder v8.2.1）インストール済み・NativeRecorderAdapter実装済み
+- AndroidManifest.xml に RECORD_AUDIO・FOREGROUND_SERVICE・FOREGROUND_SERVICE_MICROPHONE 権限追加済み
+- privacy.html 制定日（2026年6月16日）・問い合わせ先（saidlogapp@gmail.com）記入済み
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -128,9 +133,9 @@
 - ✅ コア機能・使い続けてもらう仕組みはすべて実装済み
 
 ### フェーズ3：リリース（現在）
-- 🔲 PWA対応（ホーム画面追加・無料・すぐできる）
+- ✅ PWA対応（ホーム画面追加・vite-plugin-pwa・アイコン・theme-color）
 - ✅ Capacitor導入・Androidプロジェクト生成
-- 🔲 Capacitorネイティブ録音プラグイン対応
+- ✅ Capacitorネイティブ録音プラグイン対応
 - 🔲 Google Play申請（$25・一回のみ）→ 申請前にprivacy.htmlの制定日・問い合わせ先を確定すること
 - 🔲 App Store申請（年$99）
 
@@ -182,6 +187,10 @@
   - 理由：CapacitorのWebViewはXHRがブロックされる場合があり、ReadableStreamをfetch bodyに渡す方法（duplex）も非対応
   - 進捗表示はアップロード開始時0%・完了時100%のみ（中間進捗なし）
 - ビルド手順：`npm --prefix client run build` → `npx cap sync android` → Android Studioでビルド
+- 録音はcreateRecordingAdapter()経由で呼ぶ（client/src/lib/adapters/index.js）
+- Web環境はWebMediaRecorderAdapter（既存recorder.jsラッパー）、ネイティブ環境はNativeRecorderAdapter（@capgo/capacitor-audio-recorder）
+- @capgo/capacitor-audio-recorderはまだ未インストール。インストール後はvite.config.jsのexternalから外す
+- 次のステップ：Android Studio実機テスト（10分・30分・画面ロック・バックグラウンド） → Google Play申請素材作成（説明文・スクショ・フィーチャーグラフィック） → Google Play申請
 
 ### ブレやすい注意点（毎回確認すること）
 - SaidLogは「軽い・速い・安い・シンプル」が売り
