@@ -12,9 +12,10 @@ CREATE TABLE IF NOT EXISTS public.user_entitlements (
 
 ALTER TABLE public.user_entitlements ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_select_own_entitlement"
-  ON public.user_entitlements FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "users_select_own_entitlement" ON public.user_entitlements FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Step 1-b: usage_periods
 CREATE TABLE IF NOT EXISTS public.usage_periods (
@@ -27,9 +28,10 @@ CREATE TABLE IF NOT EXISTS public.usage_periods (
 
 ALTER TABLE public.usage_periods ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_select_own_usage"
-  ON public.usage_periods FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "users_select_own_usage" ON public.usage_periods FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Step 1-c: profiles (create if not exists, then add column)
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -39,13 +41,15 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users_select_own_profile"
-  ON public.profiles FOR SELECT
-  USING (auth.uid() = id);
+DO $$ BEGIN
+  CREATE POLICY "users_select_own_profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE POLICY "users_update_own_profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
+DO $$ BEGIN
+  CREATE POLICY "users_update_own_profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS full_summary_used boolean NOT NULL DEFAULT false;

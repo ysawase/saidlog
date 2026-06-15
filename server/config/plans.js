@@ -2,7 +2,7 @@ export const PLANS = {
   ume: {
     id: 'ume',
     name: '梅',
-    monthlySeconds: 60 * 60,
+    monthlySeconds: 10800,
     historyLimit: 3,
     canExport: false,
     fullSummary: 'trial_only',

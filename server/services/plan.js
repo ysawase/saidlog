@@ -143,8 +143,9 @@ export async function getSummaryMode(userId, meetingId, durationSeconds, userCho
     .eq('id', userId)
     .maybeSingle();
 
+  const fullSummaryUsed = profile?.full_summary_used ?? false;
   if (
-    profile?.full_summary_used === false &&
+    fullSummaryUsed === false &&
     durationSeconds >= 180 &&
     userChoseFullTrial === true
   ) {

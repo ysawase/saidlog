@@ -89,11 +89,13 @@ router.post('/summarize', optionalAuth, async (req, res, next) => {
     const summary = message.content[0]?.text ?? '';
 
     if (userId && summaryMode === 'full' && userChoseFullTrial === true) {
-      await getSupabase()
-        .from('profiles')
-        .update({ full_summary_used: true })
-        .eq('id', userId)
-        .catch(console.error);
+      try {
+        await getSupabase()
+          .from('profiles')
+          .upsert({ id: userId, full_summary_used: true }, { onConflict: 'id' });
+      } catch (e) {
+        console.error('profiles upsert error:', e);
+      }
     }
 
     res.json({ summary, summaryType: summaryMode });
