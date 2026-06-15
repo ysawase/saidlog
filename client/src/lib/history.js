@@ -1,5 +1,7 @@
 import { supabase } from './supabase'
 
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+
 export async function saveTranscript({ filename, result }) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -18,17 +20,14 @@ export async function saveTranscript({ filename, result }) {
 }
 
 export async function fetchTranscripts() {
-  const { data, error } = await supabase
-    .from('transcripts')
-    .select('id, filename, created_at, result')
-    .order('created_at', { ascending: false })
-    .limit(30)
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return []
 
-  if (error) {
-    console.error('履歴取得エラー:', error)
-    return []
-  }
-  return data
+  const res = await fetch(`${API_BASE}/api/transcripts`, {
+    headers: { 'Authorization': `Bearer ${session.access_token}` },
+  })
+  if (!res.ok) return []
+  return res.json()
 }
 
 export async function deleteTranscript(id) {

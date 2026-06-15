@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchTranscripts, deleteTranscript } from '../lib/history.js'
 
-export function HistoryList({ onSelect }) {
+export function HistoryList({ onSelect, planId }) {
   const { t } = useTranslation()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -24,17 +24,24 @@ export function HistoryList({ onSelect }) {
   if (list.length === 0) return <p>{t('history.empty')}</p>
 
   return (
-    <ul style={styles.list}>
-      {list.map(item => (
-        <li key={item.id} style={styles.item}>
-          <button onClick={() => onSelect(item.result)} style={styles.title}>
-            {item.filename ?? t('history.noName')}<br />
-            <small>{new Date(item.created_at).toLocaleString()}</small>
-          </button>
-          <button onClick={() => handleDelete(item.id)} style={styles.del}>{t('history.delete')}</button>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul style={styles.list}>
+        {list.map(item => (
+          <li key={item.id} style={styles.item}>
+            <button onClick={() => onSelect(item.result)} style={styles.title}>
+              {item.filename ?? t('history.noName')}<br />
+              <small>{new Date(item.created_at).toLocaleString()}</small>
+            </button>
+            <button onClick={() => handleDelete(item.id)} style={styles.del}>{t('history.delete')}</button>
+          </li>
+        ))}
+      </ul>
+      {planId === 'ume' && (
+        <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.75rem' }}>
+          無料プランでは直近3件まで表示されます
+        </p>
+      )}
+    </>
   )
 }
 

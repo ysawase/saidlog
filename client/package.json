@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capgo/capacitor-audio-recorder": "^8.2.1",
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@supabase/supabase-js": "^2.108.1",
     "docx": "^9.7.1",

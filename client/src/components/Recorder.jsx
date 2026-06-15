@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createRecorder, recordingFileName, downloadBlob } from '../lib/recorder.js';
+import { createRecordingAdapter } from '../lib/adapters/index.js';
+import { recordingFileName, downloadBlob } from '../lib/recorder.js';
 import { listSessions, getSessionBlob, clearSession, cleanupStale } from '../lib/recordingDb.js';
 
 const MAX_SIZE_BYTES = 50 * 1024 * 1024;
@@ -49,7 +50,7 @@ export default function Recorder({ onTranscribe }) {
     setError('');
     setSizeWarning(false);
     setRecordingMs(0);
-    const recorder = createRecorder({ onSizeWarning: () => setSizeWarning(true) });
+    const recorder = createRecordingAdapter({ onSizeWarning: () => setSizeWarning(true) });
     try {
       await recorder.start();
     } catch (err) {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import UploadForm from './components/UploadForm.jsx';
 import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
-import { uploadAudio, requestTranscription } from './api.js';
+import { uploadAudio, requestTranscription, getAudioDuration, getAccountStatus } from './api.js';
 import { recordingFileName, downloadBlob } from './lib/recorder.js';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
@@ -21,7 +21,18 @@ function AppInner() {
   const [error, setError] = useState('');
   const [recordedFile, setRecordedFile] = useState(null);
   const [processingElapsed, setProcessingElapsed] = useState(0);
+  const [accountStatus, setAccountStatus] = useState(null);
+  const [summaryTrialPending, setSummaryTrialPending] = useState(false);
+  const [userChoseFullTrial, setUserChoseFullTrial] = useState(null);
   const processingTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!user) {
+      setAccountStatus(null);
+      return;
+    }
+    getAccountStatus().then(setAccountStatus).catch(() => setAccountStatus(null));
+  }, [user]);
 
   useEffect(() => {
     if (status === 'processing') {
@@ -42,9 +53,23 @@ function AppInner() {
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
+  const formatDuration = (sec) => {
+    if (sec < 60) return `${sec}秒`;
+    if (sec < 3600) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return s === 0 ? `${m}分` : `${m}分${s}秒`;
+    }
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    return m === 0 ? `${h}時間` : `${h}時間${m}分`;
+  };
+
   const handleTranscribe = async (file) => {
     setError('');
     setResult(null);
+
+    const durationSeconds = await getAudioDuration(file);
 
     setStatus('uploading');
     setUploadProgress(0);
@@ -59,10 +84,26 @@ function AppInner() {
 
     setStatus('processing');
     try {
-      const data = await requestTranscription(filePath);
+      const { transcriptId, ...data } = await requestTranscription(filePath, durationSeconds);
       setResult(data);
       setStatus('done');
-      saveTranscript({ filename: file.name, result: data });
+      if (!transcriptId) {
+        saveTranscript({ filename: file.name, result: data });
+      }
+      if (user) {
+        getAccountStatus().then((s) => {
+          setAccountStatus(s);
+          const eligible = (
+            s?.planId === 'ume' &&
+            s?.fullSummaryUsed === false &&
+            (data.audioDurationSec ?? 0) >= 180
+          );
+          setSummaryTrialPending(eligible);
+          if (!eligible) setUserChoseFullTrial(false);
+        }).catch(() => {});
+      } else {
+        setUserChoseFullTrial(false);
+      }
     } catch (err) {
       setError(t('app.transcribeError', { message: err.message }));
       setStatus('error');
@@ -84,6 +125,8 @@ function AppInner() {
     setResult(null);
     setError('');
     setRecordedFile(null);
+    setSummaryTrialPending(false);
+    setUserChoseFullTrial(null);
   };
 
   const busy = status === 'uploading' || status === 'processing';
@@ -107,17 +150,27 @@ function AppInner() {
       </header>
 
       {showHistory && user && (
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:900,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'80px'}}>
-          <div style={{background:'#fff',borderRadius:'8px',padding:'1.5rem',width:'90%',maxWidth:'480px',maxHeight:'70vh',overflowY:'auto'}}>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:900,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'80px'}} onClick={() => setShowHistory(false)}>
+          <div style={{background:'#fff',borderRadius:'8px',padding:'1.5rem',width:'90%',maxWidth:'480px',maxHeight:'70vh',overflowY:'auto'}} onClick={(e) => e.stopPropagation()}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
               <h2 style={{margin:0}}>{t('history.title')}</h2>
               <button onClick={() => setShowHistory(false)}>{t('history.close')}</button>
             </div>
-            <HistoryList onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }} />
+            <HistoryList
+              onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }}
+              planId={accountStatus?.planId}
+            />
           </div>
         </div>
       )}
       <main>
+        {user && accountStatus && (
+          <p className="account-status">
+            {accountStatus.planName}プラン | 今月の利用: {formatDuration(accountStatus.usedSeconds)} / {formatDuration(accountStatus.limitSeconds)}
+            {accountStatus.remainingSeconds <= 0 && ' | 今月の上限に達しています'}
+          </p>
+        )}
+
         {status !== 'done' && <UploadForm onSubmit={handleTranscribe} processing={busy} />}
 
         {status !== 'done' && !busy && <Recorder onTranscribe={handleRecordedTranscribe} />}
@@ -150,7 +203,30 @@ function AppInner() {
                 {t('app.saveRecording')}
               </button>
             )}
-            <TranscriptView result={result} />
+            {summaryTrialPending && (
+              <div style={{ margin: '1rem 0', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}>
+                <p style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>フルAI要約を試しますか？（無料で1回だけ）</p>
+                <button
+                  className="btn secondary"
+                  onClick={() => setUserChoseFullTrial(true)}
+                >
+                  フルAI要約を試す
+                </button>{' '}
+                <button
+                  className="btn secondary"
+                  onClick={() => setUserChoseFullTrial(false)}
+                >
+                  プレビューだけ見る
+                </button>
+              </div>
+            )}
+            <TranscriptView
+              result={result}
+              userChoseFullTrial={userChoseFullTrial}
+              canExport={accountStatus?.canExport ?? true}
+              summaryTrialPending={summaryTrialPending}
+              onSummaryStarted={() => setSummaryTrialPending(false)}
+            />
           </>
         )}
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} user={user} />}

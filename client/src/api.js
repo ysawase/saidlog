@@ -4,16 +4,38 @@ const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
 export { uploadAudio } from './lib/storage.js';
 
+/** 音声ファイルの長さを秒（切り上げ）で返す。取得失敗時は 0 を返す。 */
+export function getAudioDuration(file) {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    const url = URL.createObjectURL(file);
+    audio.addEventListener('loadedmetadata', () => {
+      URL.revokeObjectURL(url);
+      resolve(Math.ceil(audio.duration) || 0);
+    });
+    audio.addEventListener('error', () => {
+      URL.revokeObjectURL(url);
+      resolve(0);
+    });
+    audio.src = url;
+  });
+}
+
 /**
  * アップロード済みファイルのパスを渡して文字起こしを依頼する。
  * 音声データ本体はSupabase Storage経由でSTTプロバイダーに渡るため、ここを通らない。
  * 長い会議は処理に数分かかることがある。
  */
-export async function requestTranscription(filePath) {
+export async function requestTranscription(filePath, durationSeconds = 0) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = { 'Content-Type': 'application/json' };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
   const res = await fetch(`${API_BASE}/api/transcribe`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filePath }),
+    headers,
+    body: JSON.stringify({ filePath, durationSeconds }),
   });
 
   if (!res.ok) {
@@ -23,15 +45,31 @@ export async function requestTranscription(filePath) {
   return res.json();
 }
 
-export async function requestSummary({ utterances, template, names }) {
+export async function requestSummary({ utterances, template, names, userChoseFullTrial = false, audioDurationSec = 0 }) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = { 'Content-Type': 'application/json' };
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
   const res = await fetch(`${API_BASE}/api/summarize`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ utterances, template, names }),
+    headers,
+    body: JSON.stringify({ utterances, template, names, userChoseFullTrial, audioDurationSec }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
+}
+
+export async function getAccountStatus() {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers = {};
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`;
+  }
+  const res = await fetch(`${API_BASE}/api/account/status`, { headers });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 export async function deleteAccount() {

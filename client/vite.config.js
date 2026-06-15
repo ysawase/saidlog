@@ -37,6 +37,9 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {},
+  },
   server: {
     port: 5173,
     proxy: {

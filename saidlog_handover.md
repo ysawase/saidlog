@@ -208,6 +208,15 @@
 - 🔲 業種特化モード
 - 🔲 複数会議横断レポート
 
+### フェーズ3以降の検討事項（ソフトローンチ後）
+- 🔲 Googleログイン導入（Supabase Auth Google Provider）
+  - ソフトローンチ後・有料ユーザーが出始めてから検討
+  - スコープは openid / email / profile のみ
+  - Google Drive / Gmail / Calendar 等の権限は取らない
+  - メールログインとのアカウント重複挙動を事前確認すること
+  - App Store対応時はAppleログインも必須になる（App Storeガイドライン要件）
+  - Capacitor環境でのDeep Link設定が別途必要
+
 ## 常時ルール
 - 1指示1ファイル原則
 - 注意書き文面は実装前に承認を取る

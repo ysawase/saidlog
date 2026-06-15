@@ -1,5 +1,8 @@
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
+import { optionalAuth } from '../middleware/auth.js';
+import { getSummaryMode } from '../services/plan.js';
+import { getSupabase } from '../services/storage.js';
 
 const router = express.Router();
 
@@ -41,9 +44,16 @@ const PROMPTS = {
 補足・免責・品質評価の文言は禁止。`,
 };
 
-router.post('/summarize', async (req, res, next) => {
+router.post('/summarize', optionalAuth, async (req, res, next) => {
   try {
-    const { utterances, template = 'bullets', names = {} } = req.body;
+    const {
+      utterances,
+      template = 'bullets',
+      names = {},
+      userChoseFullTrial = false,
+      audioDurationSec = 0,
+    } = req.body;
+    const userId = req.userId;
 
     if (!utterances || utterances.length === 0) {
       return res.status(400).json({ error: '文字起こしデータがありません' });
@@ -54,9 +64,12 @@ router.post('/summarize', async (req, res, next) => {
       return res.status(500).json({ error: 'ANTHROPIC_API_KEY が設定されていません' });
     }
 
+    const summaryMode = userId
+      ? await getSummaryMode(userId, null, audioDurationSec, userChoseFullTrial)
+      : 'preview';
+
     const prompt = PROMPTS[template] ?? PROMPTS.bullets;
 
-    // utterancesを話者名付きテキストに変換
     const transcript = utterances
       .map((u) => `${names[u.speaker] ?? `話者${u.speaker}`}：${u.text}`)
       .join('\n');
@@ -74,7 +87,16 @@ router.post('/summarize', async (req, res, next) => {
     });
 
     const summary = message.content[0]?.text ?? '';
-    res.json({ summary });
+
+    if (userId && summaryMode === 'full' && userChoseFullTrial === true) {
+      await getSupabase()
+        .from('profiles')
+        .update({ full_summary_used: true })
+        .eq('id', userId)
+        .catch(console.error);
+    }
+
+    res.json({ summary, summaryType: summaryMode });
   } catch (err) {
     next(err);
   }
