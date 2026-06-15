@@ -47,6 +47,15 @@
 - Capacitorネイティブ録音プラグイン（@capgo/capacitor-audio-recorder v8.2.1）インストール済み・NativeRecorderAdapter実装済み
 - AndroidManifest.xml に RECORD_AUDIO・FOREGROUND_SERVICE・FOREGROUND_SERVICE_MICROPHONE 権限追加済み
 - privacy.html 制定日（2026年6月16日）・問い合わせ先（saidlogapp@gmail.com）記入済み
+- user_entitlements・usage_periods・profiles.full_summary_used によるプラン制御（DB・サーバー・フロント）
+- 利用状況表示（梅：x秒/1時間・竹：x時間/10時間）
+- 初回フル要約選択UI（梅プラン・3分以上・未使用時のみ表示）
+- AI要約プレビュー表示（梅プラン2回目以降）
+- エクスポート制限UI（梅プランはグレーアウト・制限メッセージ）
+- 履歴件数制限（梅：3件・竹：30件・サーバー側で制御）
+- 履歴モーダル外クリックで閉じる
+- transcript重複INSERT修正（サーバーがINSERTしたIDをクライアントに返却）
+- 録音時間表示の秒数フォーマット改善（formatDuration関数）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -191,7 +200,10 @@
 - ✅ Capacitor導入・Androidプロジェクト生成
 - ✅ Capacitorネイティブ録音プラグイン対応
 - 🔲 AssemblyAI品質テスト（4本・人間読み上げ）
-- 🔲 プラン制御実装（梅・竹）
+- ✅ プラン制御実装（梅・竹）
+- 🔲 録音中の音声レベルメーター（Web Audio API）
+- 🔲 文字起こし処理中のスピナー・点滅アニメーション追加
+- 🔲 録音時間表示の（）修正
 - 🔲 ソフトローンチ（少人数検証・有効録音10件基準）
 - 🔲 Google Play申請（$25・一回のみ）→ 申請前にprivacy.htmlの制定日・問い合わせ先を確定すること
 - 🔲 App Store申請（年$99）
