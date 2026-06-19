@@ -96,10 +96,10 @@ function AppInner() {
           const eligible = (
             s?.planId === 'ume' &&
             s?.fullSummaryUsed === false &&
-            (data.audioDurationSec ?? 0) >= 180
+            (data.audioDurationSec ?? 0) >= 300
           );
           setSummaryTrialPending(eligible);
-          if (!eligible) setUserChoseFullTrial(false);
+          if (!eligible) setUserChoseFullTrial(null);
         }).catch(() => {});
       } else {
         setUserChoseFullTrial(false);
@@ -185,7 +185,7 @@ function AppInner() {
         {status === 'processing' && (
           <div className="notice processing">
             <div className="spinner" />
-            <p>{t('app.processing')}</p>
+            <p className="blink">{t('app.processing')}</p>
             <p>{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</p>
           </div>
         )}

@@ -20,7 +20,8 @@
     "pdfmake": "^0.3.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-i18next": "^17.0.8"
+    "react-i18next": "^17.0.8",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

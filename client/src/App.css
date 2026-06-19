@@ -155,6 +155,15 @@ body {
   }
 }
 
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
 /* 文字起こし結果 */
 .transcript {
   background: #fff;

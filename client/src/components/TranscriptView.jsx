@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
 import { requestSummary } from '../api.js';
 import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
 
@@ -30,6 +31,8 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [summaryType, setSummaryType] = useState('full');
   const [summaryStatus, setSummaryStatus] = useState('idle'); // idle | loading | done | error
   const [exportError, setExportError] = useState('');
+
+  const longEnough = (result.audioDurationSec ?? 0) >= 300;
 
   const colorOf = (speaker) =>
     SPEAKER_COLORS[speakers.indexOf(speaker) % SPEAKER_COLORS.length];
@@ -64,11 +67,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   // 選択UIでどちらかのボタンが押されたら（null→値への遷移）即座に要約生成を開始する
   const prevChoiceRef = useRef(userChoseFullTrial);
   useEffect(() => {
-    if (prevChoiceRef.current === null && userChoseFullTrial !== null) {
+    if (prevChoiceRef.current === null && userChoseFullTrial !== null && longEnough) {
       generateSummary();
     }
     prevChoiceRef.current = userChoseFullTrial;
-  }, [userChoseFullTrial, generateSummary]);
+  }, [userChoseFullTrial, generateSummary, longEnough]);
 
   const exportRaw = async () => {
     if (!canExport) {
@@ -120,6 +123,14 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
 
   const minutesExporting = exporting !== null && exporting !== 'raw';
 
+  const markdownComponents = {
+    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.5rem 0' }}>{children}</p>,
+    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.5rem 0' }}>{children}</p>,
+    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.95rem', margin: '0.25rem 0' }}>{children}</p>,
+    ul: ({ children }) => <ul style={{ margin: '0.25rem 0', paddingLeft: '1.25rem', lineHeight: '1.4' }}>{children}</ul>,
+    li: ({ children }) => <li style={{ margin: '0' }}>{children}</li>,
+  };
+
   return (
     <div className="transcript">
       <div className="transcript-toolbar">
@@ -144,15 +155,26 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         <button
           className="btn secondary"
           onClick={exportRaw}
-          disabled={exporting !== null}
-          style={!canExport ? { opacity: 0.5 } : undefined}
+          disabled={exporting !== null || !canExport}
+          title={!canExport ? '竹プランで利用できます' : undefined}
         >
           {exporting === 'raw' ? t('transcript.saving') : t('transcript.saveRaw')}
         </button>
-        {exportError && <span style={{ color: '#dc2626', fontSize: '0.8rem', marginLeft: '0.5rem' }}>{exportError}</span>}
+        {!canExport && <span style={{ color: '#6b7280', fontSize: '0.8rem', marginLeft: '0.5rem' }}>エクスポートは竹プランで利用できます</span>}
+        {canExport && exportError && <span style={{ color: '#dc2626', fontSize: '0.8rem', marginLeft: '0.5rem' }}>{exportError}</span>}
       </div>
 
       <div className="summary-section">
+        {!longEnough ? (
+          <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', lineHeight: '1.8' }}>
+            <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>音声が短いです。5分以上の音声であれば、『AI議事録ツール』機能が解放されます。</p>
+            <p style={{ margin: '0 0 1.25rem', fontSize: '0.9rem', color: '#4b5563' }}>決定事項・次にやることをAIが自動で整理します。</p>
+            <hr style={{ margin: '0 0 1.25rem', border: 'none', borderTop: '1px solid #d1d5db' }} />
+            <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>さらに竹プランにアップグレードすると、『詳細議事録・エクスポート』機能が解放されます。</p>
+            <p style={{ margin: '0', fontSize: '0.9rem', color: '#4b5563' }}>月額880円で、詳細な議事録の生成・テキストエクスポート・履歴30件保存が使えます。</p>
+          </div>
+        ) : (
+        <>
         {!(summaryStatus === 'done' && summaryType === 'preview') && <div className="summary-controls">
           <select
             value={summaryTemplate}
@@ -176,7 +198,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         {summaryStatus === 'done' && summaryType === 'preview' && (
           <>
             <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 0.5rem' }}>AI要約プレビュー</p>
-            <div className="summary-result">{summary.split('\n\n')[0]}</div>
+            <div className="summary-result"><ReactMarkdown components={markdownComponents}>{summary.split('\n\n')[0]}</ReactMarkdown></div>
             <p style={{ fontSize: '0.8rem', color: '#888', margin: '0.75rem 0 0.25rem' }}>
               詳細な要約・決定事項・次にやることは竹プランで利用できます。
             </p>
@@ -232,8 +254,10 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
                 </div>
               )}
             </div>
-            <div className="summary-result">{summary}</div>
+            <div className="summary-result"><ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown></div>
           </>
+        )}
+        </>
         )}
       </div>
 
