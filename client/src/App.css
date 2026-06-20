@@ -346,70 +346,13 @@ body {
 }
 
 /* 竹プランblur演出 */
-.summary-blur-wrapper {
-  position: relative;
-  margin-top: 0.25rem;
-  overflow: hidden;
-}
-
-.summary-blur-content {
-  filter: blur(4px);
-  user-select: none;
-  pointer-events: none;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #374151;
-}
-
-.summary-blur-content ul {
-  margin: 0.1rem 0;
-  padding-left: 1.25rem;
-  line-height: 1.4;
-}
-
-.summary-blur-content li {
-  margin: 0;
-  line-height: 1.4;
-}
-
-.summary-blur-content p {
-  margin: 0.1rem 0;
-}
-
-.summary-blur-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(248,248,248,0.15);
-}
-
-.summary-upgrade-message {
-  font-size: 0.875rem;
-  color: #374151;
-  text-align: center;
-  margin: 0;
-  padding: 0 1rem;
-  font-weight: 500;
-}
-
-.summary-upgrade-btn {
-  font-size: 0.95rem;
-  padding: 10px 28px;
-  background: #4F46E5;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.summary-upgrade-btn:hover {
-  background: #4338CA;
-}
+.summary-blur-wrapper { position: relative; overflow: hidden; max-height: 160px; }
+.summary-blur-content { filter: blur(3px); user-select: none; pointer-events: none; line-height: 1.4; }
+.summary-blur-content .dp-heading { font-size: 0.72rem; font-weight: bold; margin: 0.3rem 0 0.1rem; }
+.summary-blur-content .dp-line { font-size: 0.72rem; margin: 0 0 0.1rem; }
+.summary-blur-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 1rem; background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.85) 50%); }
+.summary-upgrade-message { font-size: 0.78rem; margin: 0 0 0.5rem; }
+.summary-upgrade-btn { font-size: 0.82rem; padding: 0.4rem 1.2rem; }
 
 /* AI要約unavailable */
 .summary-unavailable {
