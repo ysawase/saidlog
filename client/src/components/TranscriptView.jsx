@@ -6,6 +6,39 @@ import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
 
 const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 
+const DUMMY_PREVIEW = {
+  bullets: `## 決定事項
+- A案をベースに進める
+- 外部パートナーとの調整窓口は話者Aが担当し、来週水曜までに初回連絡を完了させる
+- 予算上限は経理部門に確認し、次回会議までに回答を得る
+- 関係者への情報共有は今週金曜までに完了させることを全員で確認した
+- 次回定例は来週水曜14時から実施
+- 資料は前日火曜18時までに全参加者へ送付する
+
+## アクションアイテム
+- 話者A：比較資料まとめ（来週月曜まで）
+- 話者B：関係部署への連絡と日程調整・出欠確認（今週中）
+- 話者A：次回会議アジェンダを作成し木曜18時までに共有する
+- 話者C：外部ベンダー3社への初回コンタクトと条件ヒアリング（来週中）
+- 話者B：議事録展開と関係者確認（今週金曜まで）
+- 話者A：予算上限を経理に確認し来週火曜までに結果を共有する`,
+
+  minutes: `## 主な議題と議論
+A案とB案を比較検討した結果、コストと実現性の観点からA案で進める方針で合意した。外部との調整については話者Aが窓口となる。一部タスクで遅延が見られたが来週中に挽回できる見込み。
+
+## 決定事項
+- A案をベースに進める
+- 外部調整の担当者を話者Aとする
+- 来週中に進捗共有の場を設ける
+- 予算上限は次回会議までに再確認する
+
+## 次のアクション
+- 話者A：費用感の確認と比較資料まとめ（来週月曜まで）
+- 話者B：関係者への連絡と日程調整（今週中）
+- 話者A：次回会議アジェンダの事前共有（木曜まで）
+- 話者C：外部ベンダーへの初回コンタクト（来週中）`,
+};
+
 function formatTime(ms) {
   const totalSec = Math.floor(ms / 1000);
   const m = Math.floor(totalSec / 60);
@@ -214,22 +247,20 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           </div>
         )}
         {summaryStatus === 'done' && summaryType === 'preview' && (
-          <>
-            <div className="summary-result">
-              <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
-            </div>
-            {lockedSections.length > 0 && (
-              <div className="summary-lock-card">
-                {lockedSections.map((section) => (
-                  <p key={section} className="summary-lock-item">🔒 {section}</p>
-                ))}
+          <div className="summary-result">
+            <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
+            <div className="summary-blur-wrapper">
+              <div className="summary-blur-content" aria-hidden="true">
+                <ReactMarkdown components={markdownComponents}>{DUMMY_PREVIEW[summaryTemplate] ?? DUMMY_PREVIEW.bullets}</ReactMarkdown>
+              </div>
+              <div className="summary-blur-overlay">
                 {upgradeMessage && (
                   <p className="summary-upgrade-message">{upgradeMessage}</p>
                 )}
                 <button className="btn summary-upgrade-btn">竹プランを見る</button>
               </div>
-            )}
-          </>
+            </div>
+          </div>
         )}
         {summaryStatus === 'done' && summaryType === 'full' && (
           <>
