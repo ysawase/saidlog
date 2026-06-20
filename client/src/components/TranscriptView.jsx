@@ -177,12 +177,12 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   };
 
   const blurMarkdownComponents = {
-    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>{children}</p>,
-    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>{children}</p>,
-    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.72rem', margin: '0.1rem 0 0' }}>{children}</p>,
-    ul: ({ children }) => <ul style={{ margin: '0', paddingLeft: '1rem', lineHeight: '1.2' }}>{children}</ul>,
-    li: ({ children }) => <li style={{ margin: '0', lineHeight: '1.2', fontSize: '0.75rem' }}>{children}</li>,
-    p: ({ children }) => <p style={{ margin: '0', fontSize: '0.75rem', lineHeight: '1.2' }}>{children}</p>,
+    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.15rem 0 0' }}>{children}</p>,
+    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.15rem 0 0' }}>{children}</p>,
+    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.72rem', margin: '0.05rem 0 0' }}>{children}</p>,
+    ul: ({ children }) => <ul style={{ margin: '0', paddingLeft: '1rem', lineHeight: '1.1' }}>{children}</ul>,
+    li: ({ children }) => <li style={{ margin: '0', lineHeight: '1.1', fontSize: '0.75rem' }}>{children}</li>,
+    p: ({ children }) => <p style={{ margin: '0', fontSize: '0.75rem', lineHeight: '1.1' }}>{children}</p>,
   };
 
   return (
