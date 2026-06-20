@@ -8,20 +8,20 @@ const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '
 
 const DUMMY_PREVIEW = {
   bullets: `## 決定事項
-- A案をベースに進める
+- A案で進める
 - 外部パートナーとの調整窓口は話者Aが担当し、来週水曜までに初回連絡を完了させる
-- 予算上限は経理部門に確認し、次回会議までに回答を得る
+- 予算上限は経理に確認し次回会議までに回答を得る
 - 関係者への情報共有は今週金曜までに完了させることを全員で確認した
-- 次回定例は来週水曜14時から実施
-- 資料は前日火曜18時までに全参加者へ送付する
+- 次回定例は来週水曜14時
+- 資料は前日火曜18時までに全参加者へ送付すること
 
 ## アクションアイテム
-- 話者A：比較資料まとめ（来週月曜まで）
-- 話者B：関係部署への連絡と日程調整・出欠確認（今週中）
-- 話者A：次回会議アジェンダを作成し木曜18時までに共有する
+- 話者A：資料まとめ（月曜まで）
+- 話者B：関係部署への連絡と日程調整・出欠確認を今週中に完了させる
+- 話者A：次回会議アジェンダを作成し木曜18時までに全員へ共有する
 - 話者C：外部ベンダー3社への初回コンタクトと条件ヒアリング（来週中）
-- 話者B：議事録展開と関係者確認（今週金曜まで）
-- 話者A：予算上限を経理に確認し来週火曜までに結果を共有する`,
+- 話者B：議事録展開と確認依頼（金曜まで）
+- 話者A：予算上限を経理に確認し来週火曜までに結果を全員へ共有する`,
 
   minutes: `## 主な議題と議論
 A案とB案を比較検討した結果、コストと実現性の観点からA案で進める方針で合意した。外部との調整については話者Aが窓口となる。一部タスクで遅延が見られたが来週中に挽回できる見込み。
@@ -177,12 +177,12 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   };
 
   const blurMarkdownComponents = {
-    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.85rem', margin: '0.1rem 0' }}>{children}</p>,
-    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.85rem', margin: '0.1rem 0' }}>{children}</p>,
-    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.8rem', margin: '0.1rem 0' }}>{children}</p>,
-    ul: ({ children }) => <ul style={{ margin: '0', paddingLeft: '1.25rem', lineHeight: '1.3' }}>{children}</ul>,
-    li: ({ children }) => <li style={{ margin: '0', lineHeight: '1.3' }}>{children}</li>,
-    p: ({ children }) => <p style={{ margin: '0.1rem 0', fontSize: '0.85rem', lineHeight: '1.3' }}>{children}</p>,
+    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>{children}</p>,
+    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.75rem', margin: '0.2rem 0 0' }}>{children}</p>,
+    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.72rem', margin: '0.1rem 0 0' }}>{children}</p>,
+    ul: ({ children }) => <ul style={{ margin: '0', paddingLeft: '1rem', lineHeight: '1.2' }}>{children}</ul>,
+    li: ({ children }) => <li style={{ margin: '0', lineHeight: '1.2', fontSize: '0.75rem' }}>{children}</li>,
+    p: ({ children }) => <p style={{ margin: '0', fontSize: '0.75rem', lineHeight: '1.2' }}>{children}</p>,
   };
 
   return (
