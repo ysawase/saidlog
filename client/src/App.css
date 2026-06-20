@@ -31,7 +31,7 @@ body {
   margin-top: 6px;
 }
 
-/* 繧｢繝・・繝ｭ繝ｼ繝・*/
+/* アップロード */
 .upload-form {
   display: flex;
   flex-direction: column;
@@ -79,7 +79,7 @@ body {
   font-size: 0.875rem;
 }
 
-/* 繝懊ち繝ｳ */
+/* ボタン */
 .btn {
   border: none;
   border-radius: 8px;
@@ -117,7 +117,7 @@ body {
   background: #f9fafb;
 }
 
-/* 騾夂衍 */
+/* 通知 */
 .notice {
   margin-top: 20px;
   padding: 16px;
@@ -184,7 +184,7 @@ body {
   animation: blink 1.5s ease-in-out infinite;
 }
 
-/* 譁・ｭ苓ｵｷ縺薙＠邨先棡 */
+/* 文字起こし結果 */
 .transcript {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -290,7 +290,7 @@ body {
   font-size: 0.8rem;
 }
 
-/* AI隕∫ｴ・そ繧ｯ繧ｷ繝ｧ繝ｳ */
+/* AI要約セクション */
 .summary-section {
   margin: 1.5rem 0;
 }
@@ -320,7 +320,7 @@ body {
   line-height: 1.5;
 }
 
-/* 豕ｨ諢乗嶌縺搾ｼ育判髱｢荳矩Κ繝ｻ繝励Ξ繝ｼ繝ｳ繝・く繧ｹ繝茨ｼ・*/
+/* 注意書き（画面下部・プレーンテキスト） */
 .usage-notes {
   margin-top: 40px;
   color: #6b7280;
@@ -350,7 +350,6 @@ body {
   position: relative;
   margin-top: 0.25rem;
   overflow: hidden;
-  max-height: 400px;
 }
 
 .summary-blur-content {
@@ -383,10 +382,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 1.5rem;
+  justify-content: center;
   gap: 10px;
-  background: linear-gradient(to bottom, transparent 0%, rgba(248,248,248,0.6) 40%, rgba(248,248,248,0.97) 65%);
+  background: rgba(248,248,248,0.15);
 }
 
 .summary-upgrade-message {
