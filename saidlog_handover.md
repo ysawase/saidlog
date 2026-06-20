@@ -63,6 +63,10 @@
 - 履歴モーダル外クリックで閉じる
 - transcript重複INSERT修正（サーバーがINSERTしたIDをクライアントに返却）
 - 録音時間表示の秒数フォーマット改善（formatDuration関数）
+- 竹プランマスクUI v1（サーバー側でpreview/full出し分け・blur演出・DUMMY_PREVIEW）
+- transcript_full_summariesテーブル追加（summary_full別テーブル管理・RLS無効でserver経由のみ）
+- transcriptsテーブルにsummary_preview・summary_typeカラム追加・RLS有効化
+- POST /summarize/full エンドポイント追加（竹加入後オンデマンド全文要約生成）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -248,6 +252,7 @@
 - 竹プランマスクUI未実装（ボカシUI検討中）
 - AmiVoice 404エラー原因未調査
 - 竹プラン誘導エリアのデザイン強化未実装
+- blur演出の調整中（次回プレーンHTMLに切り替え予定・Markdownレンダリング経由だと行間・余白のコントロールが難しい）
 
 ## 常時ルール
 - 1指示1ファイル原則
@@ -262,6 +267,9 @@
 - Claude Codeへの指示文末尾には「作業完了後、〇〇をクリップボードにコピーすること」を必ず入れる（コード修正系→変更ファイル一覧＋要約、設計系→指示文全体、複数ファイル系→全変更ファイルの全文）
 - Google Play申請前にprivacy.htmlの制定日（2026年XX月XX日）を確定すること
 - Google Play申請前にprivacy.htmlの問い合わせ先メールを記載すること
+- Claude Codeへの指示には必ず末尾にgit add・commit・pushを入れること
+- ファイルを複数回修正した場合、セッション終了前に全文確認・ノイズ除去・整理commitを行うこと
+- PowerShellのAdd-Contentを使うと文字化け・BOMが発生するため、ファイル追記はClaude Code側でstr_replaceまたはファイル直接編集で行うこと
 
 ## 引き継ぎMDの運用ルール
 - 毎セッション終了時に必ず更新版を出力する
