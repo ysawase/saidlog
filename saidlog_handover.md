@@ -5,7 +5,7 @@
 - リアル会議向け・話者識別付き音声文字起こしWebアプリ
 - URL：https://saidlog.vercel.app/
 - GitHub：https://github.com/ysawase/saidlog
-- プロジェクトフォルダ：C:\Users\ysawa\saidlog（自宅）/ C:\Users\sawase\OneDrive\Desktop\meetlog（職場A）/ C:\Users\sawase\work\saidlog（職場B・会社中央）
+- プロジェクトフォルダ：C:\Users\ysawa\repos\saidlog（自宅）/ C:\Users\sawase\saidlog（職場A・通常）/ C:\Users\sawase\repos\saidlog（職場B・会社中央）
 
 ## 技術スタック
 - フロントエンド：React + Vite（client/）ポート5173
@@ -57,8 +57,9 @@
 - profiles.full_summary_used によるフラグ管理（upsert対応済み）
 - 5分未満の音源に対する機能解放メッセージUI（竹プラン誘導含む）
 - AI要約のMarkdownレンダリング（react-markdown・見出し・行間調整済み）
-- 文字起こし処理中の点滅アニメーション（「処理中…」テキストのみ・※現在逆になっているバグあり）
+- 文字起こし処理中の点滅アニメーション（※現在逆になっているバグあり→未修正）
 - 「原文を保存」ボタンのグレーアウト・ツールチップ（梅プラン時・竹プランで利用できます）
+- 自動プレビュー走らないバグ修正（userChoseFullTrial=nullに変更）
 - 履歴モーダル外クリックで閉じる
 - transcript重複INSERT修正（サーバーがINSERTしたIDをクライアントに返却）
 - 録音時間表示の秒数フォーマット改善（formatDuration関数）
