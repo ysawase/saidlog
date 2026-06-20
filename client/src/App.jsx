@@ -184,9 +184,14 @@ function AppInner() {
 
         {status === 'processing' && (
           <div className="notice processing">
-            <div className="spinner" />
-            <p className="blink">{t('app.processing')}</p>
-            <p>{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</p>
+            <div className="processing-left">
+              <div className="spinner" />
+              <p>{t('app.processing')}<br />{t('app.processingNote')}</p>
+            </div>
+            <div className="processing-right">
+              <span className="blink">{t('app.processingLabel')}</span>
+              <span>{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</span>
+            </div>
           </div>
         )}
 
