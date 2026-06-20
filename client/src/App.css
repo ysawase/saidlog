@@ -350,7 +350,7 @@ body {
   position: relative;
   margin-top: 0.25rem;
   overflow: hidden;
-  max-height: 220px;
+  max-height: 320px;
 }
 
 .summary-blur-content {
