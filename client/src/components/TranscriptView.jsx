@@ -169,10 +169,10 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const minutesExporting = exporting !== null && exporting !== 'raw';
 
   const markdownComponents = {
-    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.5rem 0' }}>{children}</p>,
-    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.5rem 0' }}>{children}</p>,
-    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.95rem', margin: '0.25rem 0' }}>{children}</p>,
-    ul: ({ children }) => <ul style={{ margin: '0.25rem 0', paddingLeft: '1.25rem', lineHeight: '1.4' }}>{children}</ul>,
+    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.25rem 0 0' }}>{children}</p>,
+    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: '0.25rem 0 0' }}>{children}</p>,
+    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.95rem', margin: '0.15rem 0 0' }}>{children}</p>,
+    ul: ({ children }) => <ul style={{ margin: '0.1rem 0', paddingLeft: '1.25rem', lineHeight: '1.4' }}>{children}</ul>,
     li: ({ children }) => <li style={{ margin: '0' }}>{children}</li>,
   };
 
