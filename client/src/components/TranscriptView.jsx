@@ -176,6 +176,15 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
     li: ({ children }) => <li style={{ margin: '0' }}>{children}</li>,
   };
 
+  const blurMarkdownComponents = {
+    h1: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.85rem', margin: '0.1rem 0' }}>{children}</p>,
+    h2: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.85rem', margin: '0.1rem 0' }}>{children}</p>,
+    h3: ({ children }) => <p style={{ fontWeight: 'bold', fontSize: '0.8rem', margin: '0.1rem 0' }}>{children}</p>,
+    ul: ({ children }) => <ul style={{ margin: '0', paddingLeft: '1.25rem', lineHeight: '1.3' }}>{children}</ul>,
+    li: ({ children }) => <li style={{ margin: '0', lineHeight: '1.3' }}>{children}</li>,
+    p: ({ children }) => <p style={{ margin: '0.1rem 0', fontSize: '0.85rem', lineHeight: '1.3' }}>{children}</p>,
+  };
+
   return (
     <div className="transcript">
       <div className="transcript-toolbar">
@@ -251,7 +260,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
             <div className="summary-blur-wrapper">
               <div className="summary-blur-content" aria-hidden="true">
-                <ReactMarkdown components={markdownComponents}>{DUMMY_PREVIEW[summaryTemplate] ?? DUMMY_PREVIEW.bullets}</ReactMarkdown>
+                <ReactMarkdown components={blurMarkdownComponents}>{DUMMY_PREVIEW[summaryTemplate] ?? DUMMY_PREVIEW.bullets}</ReactMarkdown>
               </div>
               <div className="summary-blur-overlay">
                 {upgradeMessage && (
