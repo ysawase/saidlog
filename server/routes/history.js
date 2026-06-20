@@ -14,7 +14,7 @@ router.get('/transcripts', optionalAuth, async (req, res, next) => {
 
     const { data, error } = await getSupabase()
       .from('transcripts')
-      .select('id, filename, created_at, result')
+      .select('id, filename, created_at, result, summary_preview, summary_type')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(limit);

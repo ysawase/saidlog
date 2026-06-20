@@ -45,7 +45,7 @@ export async function requestTranscription(filePath, durationSeconds = 0) {
   return res.json();
 }
 
-export async function requestSummary({ utterances, template, names, userChoseFullTrial = false, audioDurationSec = 0 }) {
+export async function requestSummary({ utterances, template, names, userChoseFullTrial = false, audioDurationSec = 0, transcriptId = null }) {
   const { data: { session } } = await supabase.auth.getSession();
   const headers = { 'Content-Type': 'application/json' };
   if (session?.access_token) {
@@ -54,7 +54,7 @@ export async function requestSummary({ utterances, template, names, userChoseFul
   const res = await fetch(`${API_BASE}/api/summarize`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ utterances, template, names, userChoseFullTrial, audioDurationSec }),
+    body: JSON.stringify({ utterances, template, names, userChoseFullTrial, audioDurationSec, transcriptId }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);

@@ -344,3 +344,50 @@ body {
   color: #9ca3af;
   font-size: 0.8rem;
 }
+
+/* 竹プランロックカード */
+.summary-lock-card {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.summary-lock-item {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.summary-upgrade-message {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.summary-upgrade-btn {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  padding: 6px 16px;
+}
+
+/* AI要約unavailable */
+.summary-unavailable {
+  padding: 1rem 1.25rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  line-height: 1.8;
+}
+
+.summary-unavailable-title {
+  margin: 0 0 0.25rem;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.summary-unavailable-sub {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}

@@ -31,6 +31,9 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [summaryType, setSummaryType] = useState('full');
   const [summaryStatus, setSummaryStatus] = useState('idle'); // idle | loading | done | error
   const [exportError, setExportError] = useState('');
+  const [lockedSections, setLockedSections] = useState([]);
+  const [upgradeMessage, setUpgradeMessage] = useState('');
+  const [unavailableMessage, setUnavailableMessage] = useState('');
 
   const longEnough = (result.audioDurationSec ?? 0) >= 300;
 
@@ -54,9 +57,18 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         names,
         userChoseFullTrial: userChoseFullTrial ?? false,
         audioDurationSec: result.audioDurationSec ?? 0,
+        transcriptId: result.transcriptId ?? null,
       });
+      if (data.summaryType === 'unavailable') {
+        setUnavailableMessage(data.message ?? 'AI要約にはもう少し内容が必要です');
+        setSummaryType('unavailable');
+        setSummaryStatus('done');
+        return;
+      }
       setSummary(data.summary ?? '');
       setSummaryType(data.summaryType ?? 'full');
+      setLockedSections(data.lockedSections ?? []);
+      setUpgradeMessage(data.upgradeMessage ?? '');
       setSummaryStatus('done');
     } catch (err) {
       setSummary(t('transcript.summaryError', { message: err.message }));
@@ -195,17 +207,28 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           )}
         </div>}
         {summaryStatus === 'error' && <div className="notice error">{summary}</div>}
+        {summaryStatus === 'done' && summaryType === 'unavailable' && (
+          <div className="summary-unavailable">
+            <p className="summary-unavailable-title">{unavailableMessage}</p>
+            <p className="summary-unavailable-sub">録音内容が短いため、決定事項やTODOを十分に整理できませんでした</p>
+          </div>
+        )}
         {summaryStatus === 'done' && summaryType === 'preview' && (
           <>
-            <p style={{ fontSize: '0.75rem', color: '#888', margin: '0 0 0.5rem' }}>AI要約プレビュー</p>
-            <div className="summary-result"><ReactMarkdown components={markdownComponents}>{summary.split('\n\n')[0]}</ReactMarkdown></div>
-            <p style={{ fontSize: '0.8rem', color: '#888', margin: '0.75rem 0 0.25rem' }}>
-              詳細な要約・決定事項・次にやることは竹プランで利用できます。
-            </p>
-            <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '0.25rem 0' }}>決定事項 🔒</p>
-            <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '0.25rem 0' }}>次にやること 🔒</p>
-            <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '0.25rem 0' }}>エクスポート 🔒</p>
-            <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.5rem' }}>竹プランで利用する（※現在準備中）</p>
+            <div className="summary-result">
+              <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
+            </div>
+            {lockedSections.length > 0 && (
+              <div className="summary-lock-card">
+                {lockedSections.map((section) => (
+                  <p key={section} className="summary-lock-item">🔒 {section}</p>
+                ))}
+                {upgradeMessage && (
+                  <p className="summary-upgrade-message">{upgradeMessage}</p>
+                )}
+                <button className="btn summary-upgrade-btn">竹プランを見る</button>
+              </div>
+            )}
           </>
         )}
         {summaryStatus === 'done' && summaryType === 'full' && (
