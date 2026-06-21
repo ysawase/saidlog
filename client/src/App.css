@@ -311,7 +311,7 @@ body {
 
 .summary-result {
   margin-top: 1rem;
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
   background: #f8f8f8;
   border-left: 3px solid #2563eb;
   white-space: pre-wrap;
