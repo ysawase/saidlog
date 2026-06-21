@@ -318,6 +318,7 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   line-height: 1.4;
+  margin-bottom: 0;
 }
 
 /* 注意書き（画面下部・プレーンテキスト） */
