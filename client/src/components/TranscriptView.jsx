@@ -223,16 +223,16 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           </div>
         )}
         {summaryStatus === 'done' && summaryType === 'preview' && (
-          <div className="summary-blur-wrapper">
-            <div className="summary-blur-content" aria-hidden="true">
-              <div style={{ filter: 'none', marginBottom: '0.75rem' }}>
-                <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
-              </div>
-              <div dangerouslySetInnerHTML={{ __html: DUMMY_PREVIEW_HTML }} />
+          <div>
+            <div className="summary-result">
+              <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
             </div>
-            <div className="summary-blur-overlay">
-              {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-              <button className="btn summary-upgrade-btn">竹プランを見る</button>
+            <div className="summary-blur-wrapper">
+              <div className="summary-blur-content" aria-hidden="true" dangerouslySetInnerHTML={{ __html: DUMMY_PREVIEW_HTML }} />
+              <div className="summary-blur-overlay">
+                {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
+                <button className="btn summary-upgrade-btn">竹プランを見る</button>
+              </div>
             </div>
           </div>
         )}
