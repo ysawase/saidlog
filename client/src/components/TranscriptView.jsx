@@ -223,10 +223,8 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           </div>
         )}
         {summaryStatus === 'done' && summaryType === 'preview' && (
-          <div>
-            <div className="summary-result">
-              <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
-            </div>
+          <div className="summary-result">
+            <ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown>
             <div className="summary-blur-wrapper">
               <div className="summary-blur-content" aria-hidden="true" dangerouslySetInnerHTML={{ __html: DUMMY_PREVIEW_HTML }} />
               <div className="summary-blur-overlay">
