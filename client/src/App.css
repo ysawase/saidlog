@@ -353,7 +353,7 @@ body {
 }
 
 .summary-blur-content {
-  filter: blur(4px);
+  opacity: 0.15;
   user-select: none;
   pointer-events: none;
   line-height: 1.3;
