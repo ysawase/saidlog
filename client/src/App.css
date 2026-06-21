@@ -349,7 +349,8 @@ body {
 .summary-blur-wrapper {
   position: relative;
   overflow: hidden;
-  max-height: 280px;
+  max-height: 260px;
+  margin-top: 12px;
 }
 
 .summary-blur-content {
