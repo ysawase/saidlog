@@ -230,8 +230,10 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <div className="summary-blur-wrapper">
               <div className="summary-blur-content" aria-hidden="true" dangerouslySetInnerHTML={{ __html: DUMMY_PREVIEW_HTML }} />
               <div className="summary-blur-overlay">
-                {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-                <button className="btn summary-upgrade-btn">竹プランを見る</button>
+                <div className="summary-upgrade-card">
+                  {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
+                  <button className="btn summary-upgrade-btn">竹プランを見る</button>
+                </div>
               </div>
             </div>
           </div>
