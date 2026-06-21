@@ -321,6 +321,10 @@ body {
   margin-bottom: 0;
 }
 
+.summary-result p:last-child {
+  margin-bottom: 0;
+}
+
 /* 注意書き（画面下部・プレーンテキスト） */
 .usage-notes {
   margin-top: 40px;
