@@ -316,8 +316,12 @@ body {
   border-left: 3px solid #2563eb;
   font-family: inherit;
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.8;
   margin-bottom: 0;
+}
+
+.summary-result p {
+  margin-bottom: 0.75rem;
 }
 
 .summary-result p:last-child {
