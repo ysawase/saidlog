@@ -395,7 +395,8 @@ body {
   align-items: center;
   gap: 10px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.10);
-  width: 60%;
+  width: 80%;
+  max-width: 400px;
 }
 
 .summary-upgrade-message {
