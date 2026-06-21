@@ -67,6 +67,8 @@
 - transcript_full_summariesテーブル追加（summary_full別テーブル管理・RLS無効でserver経由のみ）
 - transcriptsテーブルにsummary_preview・summary_typeカラム追加・RLS有効化
 - POST /summarize/full エンドポイント追加（竹加入後オンデマンド全文要約生成）
+- 竹プランマスクUI完成（白カード＋青ボタン・blur4px・overlay10%・スマホ対応・青線統一・ダミーテキスト長文化で途中切れ演出）
+- ノイズ除去（未使用CSS: .account-status/.done-elapsed/.dp-heading/.dp-line、未使用state: lockedSections）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -217,7 +219,7 @@
 - ✅ Capacitorネイティブ録音プラグイン対応
 - 🔲 AssemblyAI品質テスト（4本・人間読み上げ）
 - ✅ プラン制御実装（梅・竹）→ 梅プランUI完了
-- 🔲 竹プランマスクUI（ボカシUI・決定事項は見える・次にやること・エクスポートはボカシ）
+- ✅ 竹プランマスクUI（白カード＋青ボタン・blur・スマホ対応完了）
 - 🔲 Google Play Billing実装（Capacitorプラグイン・購入フロー・サーバー側検証・user_entitlements連携）
 - 🔲 録音中の音声レベルメーター（Web Audio API）
 - 🔲 文字起こし処理中のスピナー・点滅アニメーション追加
@@ -249,10 +251,7 @@
 
 ## 残バグ・未実装
 - 点滅アニメーションが逆（経過時間が点滅・処理中…が点滅しない）→未修正
-- 竹プランマスクUI未実装（ボカシUI検討中）
 - AmiVoice 404エラー原因未調査
-- 竹プラン誘導エリアのデザイン強化未実装
-- blur演出の調整中（次回プレーンHTMLに切り替え予定・Markdownレンダリング経由だと行間・余白のコントロールが難しい）
 
 ## 常時ルール
 - 1指示1ファイル原則
@@ -264,12 +263,14 @@
 - APIや外部サービス導入時はコスト情報を必ず明示（無料も含む）
 - セッション終了時にsaidlog_handover.mdを更新してgit commit・pushすること（コミットメッセージ：docs: 引き継ぎMD更新）
 - 実装・修正のたびに不要なコード（コメントアウト・未使用import・未使用変数）を除去すること
-- Claude Codeへの指示文末尾には「作業完了後、〇〇をクリップボードにコピーすること」を必ず入れる（コード修正系→変更ファイル一覧＋要約、設計系→指示文全体、複数ファイル系→全変更ファイルの全文）
+- Claude Codeへの指示には必ず末尾に Set-Clipboard を入れる。中身は次のターンでClaudeが必要とする情報（修正後のファイル内容・確認結果など）を入れる。完了報告文や指示文の繰り返しは入れない。
 - Google Play申請前にprivacy.htmlの制定日（2026年XX月XX日）を確定すること
 - Google Play申請前にprivacy.htmlの問い合わせ先メールを記載すること
 - Claude Codeへの指示には必ず末尾にgit add・commit・pushを入れること
 - ファイルを複数回修正した場合、セッション終了前に全文確認・ノイズ除去・整理commitを行うこと
 - PowerShellのAdd-Contentを使うと文字化け・BOMが発生するため、ファイル追記はClaude Code側でstr_replaceまたはファイル直接編集で行うこと
+- CSS数値微調整が必要な場面では、git push往復の前にArtifactでスライダーUIを作って検証してから最終値を確定する
+- デザイン案の比較検討が必要な場面では、ArtifactでA/B/C/D案を並べた比較ウィジェットを作る
 
 ## 引き継ぎMDの運用ルール
 - 毎セッション終了時に必ず更新版を出力する
