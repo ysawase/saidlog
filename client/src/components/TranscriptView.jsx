@@ -40,7 +40,6 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [summaryType, setSummaryType] = useState('full');
   const [summaryStatus, setSummaryStatus] = useState('idle'); // idle | loading | done | error
   const [exportError, setExportError] = useState('');
-  const [lockedSections, setLockedSections] = useState([]);
   const [upgradeMessage, setUpgradeMessage] = useState('');
   const [unavailableMessage, setUnavailableMessage] = useState('');
 
@@ -76,7 +75,6 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
       }
       setSummary(data.summary ?? '');
       setSummaryType(data.summaryType ?? 'full');
-      setLockedSections(data.lockedSections ?? []);
       setUpgradeMessage(data.upgradeMessage ?? '');
       setSummaryStatus('done');
     } catch (err) {
