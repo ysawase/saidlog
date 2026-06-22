@@ -111,7 +111,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const exportMinutes = async (format) => {
     setMinutesOpen(false);
     if (!canExport) {
-      setExportError('エクスポートは竹プランで利用できます');
+      setShowCopyModal(true);
       return;
     }
     setExportError('');
