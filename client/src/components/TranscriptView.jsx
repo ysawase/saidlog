@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { requestSummary } from '../api.js';
 import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
+import { purchaseTake } from '../lib/billing';
 
 const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 const SPEAKER_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -177,7 +178,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           <p style={{ fontSize: '0.9rem', color: '#4b5563', marginBottom: '1.25rem' }}>
             文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。
           </p>
-          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }}>
+          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }} onClick={purchaseTake}>
             竹プランを見る
           </button>
           <br />
@@ -268,7 +269,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
               <div className="summary-blur-overlay">
                 <div className="summary-upgrade-card">
                   {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-                  <button className="btn summary-upgrade-btn">竹プランを見る</button>
+                  <button className="btn summary-upgrade-btn" onClick={purchaseTake}>竹プランを見る</button>
                 </div>
               </div>
             </div>

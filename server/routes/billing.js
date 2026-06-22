@@ -1,0 +1,81 @@
+import express from 'express';
+import { createClient } from '@supabase/supabase-js';
+
+const router = express.Router();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+/**
+ * POST /api/billing/verify
+ * Google Playレシート検証・エンタイトルメント更新
+ * body: { purchase_token: string, user_id: string }
+ */
+router.post('/verify', async (req, res) => {
+  const { purchase_token, user_id } = req.body;
+
+  if (!purchase_token || !user_id) {
+    return res.status(400).json({ error: 'purchase_token and user_id are required' });
+  }
+
+  try {
+    // TODO: Google Play Developer API でトークン検証（実装は後続タスク）
+    // 現時点ではトークンをDBに保存してstatusをactiveにする仮実装
+
+    const now = new Date();
+    const periodEnd = new Date(now);
+    periodEnd.setMonth(periodEnd.getMonth() + 1);
+
+    const { error } = await supabase
+      .from('user_entitlements')
+      .upsert({
+        user_id,
+        plan_id: 'take',
+        status: 'active',
+        provider: 'google_play',
+        purchase_token,
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        updated_at: now.toISOString(),
+      }, { onConflict: 'user_id' });
+
+    if (error) throw error;
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('[billing/verify]', err);
+    return res.status(500).json({ error: 'internal error' });
+  }
+});
+
+/**
+ * POST /api/billing/webhook
+ * Google Play RTDN（Real-time Developer Notifications）受信
+ * body: Pub/Subメッセージ形式
+ */
+router.post('/webhook', async (req, res) => {
+  try {
+    const message = req.body?.message;
+    if (!message?.data) {
+      return res.status(400).json({ error: 'invalid message' });
+    }
+
+    const decoded = Buffer.from(message.data, 'base64').toString('utf8');
+    const notification = JSON.parse(decoded);
+
+    console.log('[billing/webhook] received:', JSON.stringify(notification));
+
+    // TODO: subscriptionNotification.notificationTypeに応じた処理
+    // 1=RECOVERED, 2=RENEWED, 3=CANCELED, 4=PURCHASED, 12=EXPIRED
+    // 現時点はログのみ・200を返してGoogle側にエラーを出さない
+
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error('[billing/webhook]', err);
+    return res.status(500).json({ error: 'internal error' });
+  }
+});
+
+export default router;
