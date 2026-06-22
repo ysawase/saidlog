@@ -1,4 +1,4 @@
-# SaidLog 作業引き継ぎ（2026-06-20）
+# SaidLog 作業引き継ぎ（2026-06-22更新）
 
 ## アプリ概要
 - 名称：SaidLog（旧Meetlog）
@@ -10,7 +10,7 @@
 ## 技術スタック
 - フロントエンド：React + Vite（client/）ポート5173
 - バックエンド：Node.js + Express（server/）ポート3000
-- STT：AmiVoice（抽象化層経由・差し替え可能）
+- STT：Groq（Whisper v3 Turbo）・抽象化層経由
 - ストレージ：Supabase Storage（audio-uploads・非公開・50MB上限）
 - デプロイ：Vercel
 
@@ -75,6 +75,7 @@
 - 梅プランのコピー・エクスポート制限をモーダルCTAに統一（竹プラン680円/月への誘導）
 - privacy.htmlにGroq利用を明記（日英両方）
 - 竹プラン表示文言を680円・月10時間に更新
+- capacitor-plugin-cdv-purchase（v13.17.2）導入済み（Google Play Billing用）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -228,6 +229,12 @@
 - 有効録音10件・うち15分以上が5件を達成するまで様子を見る
 - 達成後に問題なければ本格告知
 
+### Google Play公開準備（別管理）
+- 事業・申請準備は knowledge-base/40_business/Google Play公開準備_SaidLog.md で管理
+- 個人事業主として組織アカウントで進める方針（屋号決定後にPlayConsoleアカウント作成）
+- 審査対応として将来的にプライバシーポリシー・データセーフティ・特商法・サブスク表記の実装が必要
+- コード変更は別途指示があるまで不要
+
 ## 今後のフェーズ
 
 ### フェーズ1・2：完了
@@ -240,10 +247,12 @@
 - ✅ STT品質テスト完了（Groq採用方針に変更・実音声4本で仮説検証済み）
 - ✅ Groq STT組み込み実装（STT抽象化層経由）
 - ✅ プライバシーポリシーへのGroq利用明記
+- ✅ STTをGroqに切り替え（Vercel本番環境変数変更済み）
+- ✅ usage_periods月間上限修正（梅60分・竹10時間）
 - 🔲 訴求文言・プラン設計・UIの見直し（話者分離なし前提）
 - ✅ プラン制御実装（梅・竹）→ 梅プランUI完了
 - ✅ 竹プランマスクUI（白カード＋青ボタン・blur・スマホ対応完了）
-- 🔲 Google Play Billing実装（Capacitorプラグイン・購入フロー・サーバー側検証・user_entitlements連携）
+- 🔲 Google Play Billing実装（capacitor-plugin-cdv-purchase導入済み・フロント・サーバー未実装）
 - 🔲 録音中の音声レベルメーター（Web Audio API）
 - 🔲 文字起こし処理中のスピナー・点滅アニメーション追加
 - 🔲 録音時間表示の（）修正
@@ -395,3 +404,12 @@
 ### 基本思想
 
 ユーザーが求めているのはAIではない。会話後の頭の中が片づき、次にやることが見える状態である。その状態を、個人や小規模な現場でも使える価格と軽さで提供する。
+
+## Google Play Billing 実装状況（2026-06-22時点）
+- ✅ capacitor-plugin-cdv-purchase（v13.17.2）導入・cap sync済み
+- 🔲 client/src/lib/billing.js 作成
+- 🔲 TranscriptView.jsx「竹プランを見る」ボタン×2にonClick接続
+- 🔲 server/routes/billing.js（レシート検証・user_entitlements更新）
+- 🔲 Google Play Webhook（RTDN）受信エンドポイント
+- 商品ID予定：take_monthly_680
+- Billingライブラリ：capacitor-plugin-cdv-purchase（MIT・無料・週8,276DL・Capacitor8対応）
