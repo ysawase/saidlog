@@ -79,7 +79,7 @@
 - Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理・grace_period対応・購入完了後UI更新・購入復元ボタン）
 - user_entitlementsにpurchase_tokenカラム追加（マイグレーション済み）
 - 録音中の音声レベルメーター（Web Audio API・AnalyserNode・リアルタイムバー表示）
-- 未ログインゲスト制限（1回・15分・guest_usageテーブル・guest_id発行・エクスポート不可・2回目以降ログイン誘導）
+- 未ログインゲスト制限（1回・15分・guest_usageテーブル・guest_id発行・エクスポート不可・2回目以降ログイン誘導・クライアント/サーバー二重チェック）
 - 未ログイン時のエクスポートボタン押下でAuthModalをサインアップ優先で開く
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
