@@ -230,7 +230,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <p style={{ margin: '0 0 1.25rem', fontSize: '0.9rem', color: '#4b5563' }}>決定事項・次にやることをAIが自動で整理します。</p>
             <hr style={{ margin: '0 0 1.25rem', border: 'none', borderTop: '1px solid #d1d5db' }} />
             <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>さらに竹プランにアップグレードすると、『詳細議事録・エクスポート』機能が解放されます。</p>
-            <p style={{ margin: '0', fontSize: '0.9rem', color: '#4b5563' }}>月額880円で、詳細な議事録の生成・テキストエクスポート・履歴30件保存が使えます。</p>
+            <p style={{ margin: '0', fontSize: '0.9rem', color: '#4b5563' }}>月額680円で、詳細な議事録の生成・テキストエクスポート・履歴30件保存が使えます。月10時間まで利用可能。</p>
           </div>
         ) : (
         <>
