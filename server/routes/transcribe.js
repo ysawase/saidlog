@@ -18,6 +18,7 @@ const FILE_PATH_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9
 router.post('/transcribe', optionalAuth, async (req, res, next) => {
   try {
     const { filePath, durationSeconds } = req.body ?? {};
+    const guestId = req.body.guestId ?? null;
     const userId = req.userId; // optionalAuth で検証済み（未認証時は null）
 
     if (typeof filePath !== 'string' || !FILE_PATH_PATTERN.test(filePath)) {
@@ -33,6 +34,25 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
       : 'ASSEMBLYAI_API_KEY';
     if (!process.env[requiredKey]) {
       return res.status(500).json({ error: `サーバーに ${requiredKey} が設定されていません` });
+    }
+
+    const GUEST_TRIAL_MAX_MINUTES = parseInt(process.env.GUEST_TRIAL_MAX_MINUTES ?? '15', 10);
+    const GUEST_TRIAL_MAX_SECONDS = GUEST_TRIAL_MAX_MINUTES * 60;
+
+    if (!userId && guestId) {
+      const { data: guestData } = await getSupabase()
+        .from('guest_usage')
+        .select('transcribe_count, used_seconds')
+        .eq('guest_id', guestId)
+        .maybeSingle();
+
+      if (guestData && guestData.transcribe_count >= 1) {
+        return res.status(403).json({ error: 'GUEST_TRIAL_USED' });
+      }
+
+      if ((durationSeconds ?? 0) > GUEST_TRIAL_MAX_SECONDS) {
+        return res.status(403).json({ error: 'GUEST_TRIAL_TOO_LONG' });
+      }
     }
 
     // プランゲート（認証済みの場合のみ）
@@ -109,6 +129,18 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
 
       insertedId = inserted?.id ?? null;
       await recordTranscriptionSuccess(userId, insertedId, actualSeconds).catch(console.error);
+    }
+
+    if (!userId && guestId) {
+      const usedSec = result.audioDurationSec ?? durationSeconds ?? 0;
+      await getSupabase()
+        .from('guest_usage')
+        .upsert({
+          guest_id: guestId,
+          transcribe_count: 1,
+          used_seconds: usedSec,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'guest_id' });
     }
 
     // piggyback掃除：削除に失敗した過去ファイルの残骸を回収（同上の理由でawait）
