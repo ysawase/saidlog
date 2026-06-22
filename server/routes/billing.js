@@ -75,6 +75,8 @@ router.post('/webhook', async (req, res) => {
         2: 'active',
         3: 'canceled',
         4: 'active',
+        5: 'grace_period',
+        6: 'grace_period',
         12: 'expired',
       };
       const newStatus = statusMap[notificationType];
