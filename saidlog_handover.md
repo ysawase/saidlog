@@ -78,6 +78,7 @@
 - capacitor-plugin-cdv-purchase（v13.17.2）導入済み（Google Play Billing用）
 - Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理実装済み）
 - user_entitlementsにpurchase_tokenカラム追加（マイグレーション済み）
+- 録音中の音声レベルメーター（Web Audio API・AnalyserNode・リアルタイムバー表示）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -255,7 +256,7 @@
 - ✅ プラン制御実装（梅・竹）→ 梅プランUI完了
 - ✅ 竹プランマスクUI（白カード＋青ボタン・blur・スマホ対応完了）
 - 🔲 Google Play Billing実装（capacitor-plugin-cdv-purchase導入済み・フロント・サーバー未実装）
-- 🔲 録音中の音声レベルメーター（Web Audio API）
+- ✅ 録音中の音声レベルメーター（Web Audio API）
 - 🔲 文字起こし処理中のスピナー・点滅アニメーション追加
 - 🔲 録音時間表示の（）修正
 - 🔲 ソフトローンチ（少人数検証・有効録音10件基準）

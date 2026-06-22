@@ -28,6 +28,10 @@ export default function Recorder({ onTranscribe }) {
   const [error, setError] = useState('');
   const recorderRef = useRef(null);
   const timerRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animFrameRef = useRef(null);
+  const barsRef = useRef([]);
+  const meterStreamRef = useRef(null);
 
   useEffect(() => {
     cleanupStale().catch(() => {});
@@ -40,6 +44,38 @@ export default function Recorder({ onTranscribe }) {
       .catch(() => {});
     return () => clearInterval(timerRef.current);
   }, []);
+
+  const startMeter = async (stream) => {
+    const audioCtx = new AudioContext();
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    source.connect(analyser);
+    analyserRef.current = analyser;
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const tick = () => {
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((s, v) => s + v, 0) / data.length;
+      barsRef.current.forEach((bar, i) => {
+        if (!bar) return;
+        const h = Math.max(4, Math.round((data[i % data.length] / 255) * 36));
+        const level = h / 36;
+        const r = Math.round(62 + level * 180);
+        const g = Math.round(75 + (1 - level) * 100);
+        bar.style.height = h + 'px';
+        bar.style.background = `rgb(${r},${g},74)`;
+      });
+      animFrameRef.current = requestAnimationFrame(tick);
+    };
+    tick();
+  };
+
+  const stopMeter = () => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (analyserRef.current) analyserRef.current.disconnect();
+    analyserRef.current = null;
+  };
 
   const startTimer = () => {
     const startedAt = Date.now();
@@ -61,12 +97,19 @@ export default function Recorder({ onTranscribe }) {
       );
       return;
     }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      meterStreamRef.current = stream;
+      startMeter(stream);
+    }).catch(() => {});
     recorderRef.current = recorder;
     startTimer();
     setPhase('recording');
   };
 
   const handleStop = async () => {
+    stopMeter();
+    meterStreamRef.current?.getTracks().forEach((t) => t.stop());
+    meterStreamRef.current = null;
     clearInterval(timerRef.current);
     try {
       const res = await recorderRef.current.stop();
@@ -155,6 +198,15 @@ export default function Recorder({ onTranscribe }) {
       {phase === 'recording' && (
         <div className="notice">
           <p>{t('recorder.recording', { duration: formatDuration(recordingMs) })}</p>
+          <div style={{display:'flex', alignItems:'flex-end', gap:'3px', height:'36px', marginLeft:'10px'}}>
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                ref={el => barsRef.current[i] = el}
+                style={{width:'5px', borderRadius:'3px', height:'4px', background:'var(--color-border-tertiary)', transition:'height 0.08s'}}
+              />
+            ))}
+          </div>
           {recordingMs > LONG_RECORDING_MS && (
             <p className="warning">{t('recorder.warning.long')}</p>
           )}
