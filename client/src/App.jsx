@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
-import { initBilling } from './lib/billing';
+import { initBilling, restorePurchases } from './lib/billing';
 
 function AppInner() {
   const { t } = useTranslation();
@@ -142,6 +142,7 @@ function AppInner() {
           {user ? (
             <>
               <button onClick={() => setShowHistory(!showHistory)}>{t('app.history')}</button>
+              <button onClick={restorePurchases}>購入を復元</button>
               <button onClick={() => setShowAuthModal(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit' }}>{user.email}</button>
               <button onClick={signOut}>{t('app.logout')}</button>
             </>

@@ -76,7 +76,7 @@
 - privacy.htmlにGroq利用を明記（日英両方）
 - 竹プラン表示文言を680円・月10時間に更新
 - capacitor-plugin-cdv-purchase（v13.17.2）導入済み（Google Play Billing用）
-- Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理実装済み）
+- Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理・grace_period対応・購入完了後UI更新・購入復元ボタン）
 - user_entitlementsにpurchase_tokenカラム追加（マイグレーション済み）
 - 録音中の音声レベルメーター（Web Audio API・AnalyserNode・リアルタイムバー表示）
 
@@ -270,7 +270,7 @@
 - 🔲 App Store申請（年$99）
 
 ### フェーズ4：収益化
-- 🔲 アプリ内課金実装（基盤完了・Google Play Developer APIによるレシート検証が残タスク）
+- 🔲 アプリ内課金実装（基盤ほぼ完了・Google Play Developer APIによるレシート検証が残タスク・UIとデザインはGoogle Play Console準備後に調整）
 - 🔲 松竹梅プラン実装（App Store対応）
 
 ### フェーズ5：差別化強化・残タスク
