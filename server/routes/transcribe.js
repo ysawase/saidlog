@@ -96,7 +96,13 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
           result,
           transcription_status: 'transcribing',
           stt_provider: provider,
+          stt_model: provider === 'groq' ? 'whisper-large-v3-turbo'
+            : provider === 'amivoice' ? 'a-general'
+            : 'universal-3-pro',
           audio_duration_seconds: actualSeconds,
+          stt_cost_estimate: provider === 'groq' ? Math.round(actualSeconds / 60 * 0.004 * 150) / 100
+            : provider === 'amivoice' ? Math.round(actualSeconds / 60 * 0.044 * 100) / 100
+            : Math.round(actualSeconds / 60 * 0.007 * 100) / 100,
         })
         .select('id')
         .single();
