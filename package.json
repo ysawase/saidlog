@@ -16,6 +16,7 @@
     "@capacitor/core": "^8.4.0",
     "@supabase/supabase-js": "^2.108.1",
     "assemblyai": "^4.9.0",
+    "capacitor-plugin-cdv-purchase": "^13.17.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
