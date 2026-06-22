@@ -109,7 +109,15 @@ function AppInner() {
         setUserChoseFullTrial(false);
       }
     } catch (err) {
-      setError(t('app.transcribeError', { message: err.message }));
+      if (err.message === 'GUEST_TRIAL_USED') {
+        setError('ゲストの無料体験は1回までです。続けてご利用いただくには無料登録をしてください。');
+        setAuthModalInitialMode('signup');
+        setShowAuthModal(true);
+      } else if (err.message === 'GUEST_TRIAL_TOO_LONG') {
+        setError('ゲストの無料体験は15分以内の音声のみ対応しています。無料登録するとより長い音声も文字起こしできます。');
+      } else {
+        setError(t('app.transcribeError', { message: err.message }));
+      }
       setStatus('error');
     }
   };
