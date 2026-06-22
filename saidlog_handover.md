@@ -79,6 +79,8 @@
 - Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理・grace_period対応・購入完了後UI更新・購入復元ボタン）
 - user_entitlementsにpurchase_tokenカラム追加（マイグレーション済み）
 - 録音中の音声レベルメーター（Web Audio API・AnalyserNode・リアルタイムバー表示）
+- 未ログインゲスト制限（1回・15分・guest_usageテーブル・guest_id発行・エクスポート不可・2回目以降ログイン誘導）
+- 未ログイン時のエクスポートボタン押下でAuthModalをサインアップ優先で開く
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -113,6 +115,15 @@
 - 竹が主戦場：「普通の社会人が会議で本当に必要なもの全部入り・安い」
 - 松はこだわりたい人向け・金持ち目当て
 - 価格は竹400〜500円、松900〜1,000円想定（要調整）
+
+### 未ログインユーザー方針（2026-06-23 確定）
+- 未ログインは「梅プラン相当」ではなく「短時間の価値体験」として扱う
+- 1回のみ・15分まで（GUEST_TRIAL_MAX_MINUTES環境変数で変更可能）
+- エクスポート不可・保存不可・AI要約はプレビュー表示
+- 2回目以降はログイン誘導（AuthModalをサインアップ優先で開く）
+- guest_usageテーブルでサーバー側管理（ローカルはUX補助のみ）
+- コピー制限は見送り（技術的に止められないため）
+- 梅プランの仕様は現状維持（未ログイン制限とは別議題）
 
 ### アプリ化方針
 - 最終目標はApp Store / Google Playへの配布
