@@ -15,6 +15,7 @@ function AppInner() {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalInitialMode, setAuthModalInitialMode] = useState('login');
   const [showHistory, setShowHistory] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -232,16 +233,18 @@ function AppInner() {
             <TranscriptView
               result={result}
               userChoseFullTrial={userChoseFullTrial}
-              canExport={accountStatus?.canExport ?? true}
+              canExport={accountStatus?.canExport ?? false}
               summaryTrialPending={summaryTrialPending}
               onSummaryStarted={() => setSummaryTrialPending(false)}
               onPurchaseComplete={() => {
                 getAccountStatus().then(setAccountStatus).catch(() => {});
               }}
+              isLoggedIn={!!user}
+              onOpenAuthModal={() => { setAuthModalInitialMode('signup'); setShowAuthModal(true); }}
             />
           </>
         )}
-        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} user={user} />}
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} user={user} initialMode={authModalInitialMode} />}
       </main>
 
       <section className="usage-notes">

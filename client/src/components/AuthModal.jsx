@@ -4,10 +4,10 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
 import { deleteAccount } from '../api.js'
 
-export function AuthModal({ onClose, user }) {
+export function AuthModal({ onClose, user, initialMode }) {
   const { t } = useTranslation()
   const { signOut } = useAuth()
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
+  const [mode, setMode] = useState(initialMode ?? 'login') // 'login' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)

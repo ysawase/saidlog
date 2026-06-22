@@ -24,7 +24,7 @@ function formatTime(ms) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, onPurchaseComplete }) {
+export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, onPurchaseComplete, isLoggedIn, onOpenAuthModal }) {
   const { t } = useTranslation();
   const speakers = useMemo(
     () => [...new Set(result.utterances.map((u) => u.speaker))],
@@ -174,21 +174,21 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <p style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>竹プランで利用できます</p>
-          <p style={{ fontSize: '0.9rem', color: '#4b5563', marginBottom: '1.25rem' }}>
-            文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。
-          </p>
-          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }} onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>
-            竹プランを見る
-          </button>
-          <br />
-          <button
-            className="btn secondary"
-            style={{ fontSize: '0.85rem' }}
-            onClick={() => setShowCopyModal(false)}
-          >
-            閉じる
-          </button>
+          {!isLoggedIn ? (
+            <>
+              <p>無料登録するとエクスポートできます</p>
+              <button className="btn primary" onClick={() => { setShowCopyModal(false); onOpenAuthModal(); }}>
+                無料登録 / ログイン
+              </button>
+              <button className="btn secondary" onClick={() => setShowCopyModal(false)}>閉じる</button>
+            </>
+          ) : (
+            <>
+              <p>文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。</p>
+              <button className="btn primary" onClick={purchaseTake}>竹プランを見る</button>
+              <button className="btn secondary" onClick={() => setShowCopyModal(false)}>閉じる</button>
+            </>
+          )}
         </div>
       </div>
     )}
