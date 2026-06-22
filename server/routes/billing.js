@@ -65,8 +65,6 @@ router.post('/webhook', async (req, res) => {
     const decoded = Buffer.from(message.data, 'base64').toString('utf8');
     const notification = JSON.parse(decoded);
 
-    console.log('[billing/webhook] received:', JSON.stringify(notification));
-
     const sub = notification.subscriptionNotification;
     if (sub?.purchaseToken) {
       const { notificationType, purchaseToken } = sub;
@@ -90,8 +88,6 @@ router.post('/webhook', async (req, res) => {
           .eq('purchase_token', purchaseToken);
         if (updateError) {
           console.error('[billing/webhook] update error:', updateError);
-        } else {
-          console.log(`[billing/webhook] status updated to ${newStatus} for token: ${purchaseToken}`);
         }
       }
     }

@@ -56,7 +56,6 @@ export default function Recorder({ onTranscribe }) {
     const data = new Uint8Array(analyser.frequencyBinCount);
     const tick = () => {
       analyser.getByteFrequencyData(data);
-      const avg = data.reduce((s, v) => s + v, 0) / data.length;
       barsRef.current.forEach((bar, i) => {
         if (!bar) return;
         const h = Math.max(4, Math.round((data[i % data.length] / 255) * 36));
