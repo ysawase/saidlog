@@ -10,6 +10,7 @@ import { AuthModal } from './components/AuthModal.jsx';
 import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
 import { initBilling, restorePurchases } from './lib/billing';
+import { getOrCreateGuestId } from './lib/guestId';
 
 function AppInner() {
   const { t } = useTranslation();
@@ -71,6 +72,18 @@ function AppInner() {
 
   const handleTranscribe = async (file) => {
     setError('');
+
+    if (!user) {
+      const guestId = getOrCreateGuestId();
+      const usedKey = `saidlog_guest_used_${guestId}`;
+      if (localStorage.getItem(usedKey)) {
+        setError('ゲストの無料体験は1回までです。続けてご利用いただくには無料登録をしてください。');
+        setAuthModalInitialMode('signup');
+        setShowAuthModal(true);
+        return;
+      }
+    }
+
     setResult(null);
 
     const durationSeconds = await getAudioDuration(file);
@@ -91,6 +104,11 @@ function AppInner() {
       const { transcriptId, ...data } = await requestTranscription(filePath, durationSeconds);
       setResult(data);
       setStatus('done');
+      if (!user) {
+        const guestId = getOrCreateGuestId();
+        const usedKey = `saidlog_guest_used_${guestId}`;
+        localStorage.setItem(usedKey, '1');
+      }
       if (!transcriptId) {
         saveTranscript({ filename: file.name, result: data });
       }
