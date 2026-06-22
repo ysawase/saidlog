@@ -5,6 +5,7 @@ import { requestSummary } from '../api.js';
 import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
 
 const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '#0891b2'];
+const SPEAKER_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 const DUMMY_PREVIEW_HTML = `
 <div class="preview-section">
@@ -30,7 +31,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   );
 
   const [names, setNames] = useState(() =>
-    Object.fromEntries(speakers.map((s) => [s, t('transcript.speakerLabel', { s })]))
+    Object.fromEntries(speakers.map((s, i) => [s, SPEAKER_LABELS[i] ?? String(i + 1)]))
   );
   const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(null);
@@ -153,21 +154,23 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   return (
     <div className="transcript">
       <div className="transcript-toolbar">
-        <div className="speaker-legend">
-          {speakers.map((s) => (
-            <label key={s} className="speaker-chip" style={{ borderColor: colorOf(s) }}>
-              <span className="speaker-dot" style={{ background: colorOf(s) }} />
-              <input
-                value={names[s]}
-                onChange={(e) => setNames({ ...names, [s]: e.target.value })}
-                aria-label={t('transcript.speakerLabel', { s })}
-              />
-              <span className="pen-icon" aria-hidden="true">
-                {t('transcript.editIcon')}
-              </span>
-            </label>
-          ))}
-        </div>
+        {speakers.length > 1 && (
+          <div className="speaker-legend">
+            {speakers.map((s) => (
+              <label key={s} className="speaker-chip" style={{ borderColor: colorOf(s) }}>
+                <span className="speaker-dot" style={{ background: colorOf(s) }} />
+                <input
+                  value={names[s]}
+                  onChange={(e) => setNames({ ...names, [s]: e.target.value })}
+                  aria-label={t('transcript.speakerLabel', { s })}
+                />
+                <span className="pen-icon" aria-hidden="true">
+                  {t('transcript.editIcon')}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
         <button className="btn secondary" onClick={copyTranscript}>
           {copied ? t('transcript.copied') : t('transcript.copy')}
         </button>
@@ -291,9 +294,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         {result.utterances.map((u, i) => (
           <li key={i} className="utterance">
             <span className="timestamp">{formatTime(u.startMs)}</span>
-            <span className="speaker-name" style={{ color: colorOf(u.speaker) }}>
-              {names[u.speaker]}：
-            </span>
+            {speakers.length > 1 && (
+              <span className="speaker-name" style={{ color: colorOf(u.speaker) }}>
+                {names[u.speaker]}：
+              </span>
+            )}
             <span className="utterance-text">{u.text}</span>
           </li>
         ))}
