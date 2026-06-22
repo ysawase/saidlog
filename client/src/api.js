@@ -1,4 +1,5 @@
 import { supabase } from './lib/supabase.js';
+import { getOrCreateGuestId } from './lib/guestId.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
@@ -32,10 +33,11 @@ export async function requestTranscription(filePath, durationSeconds = 0) {
   if (session?.access_token) {
     headers['Authorization'] = `Bearer ${session.access_token}`;
   }
+  const guestId = session ? null : getOrCreateGuestId();
   const res = await fetch(`${API_BASE}/api/transcribe`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ filePath, durationSeconds }),
+    body: JSON.stringify({ filePath, durationSeconds, guestId }),
   });
 
   if (!res.ok) {
