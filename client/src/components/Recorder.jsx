@@ -221,7 +221,7 @@ export default function Recorder({ onTranscribe }) {
       {phase === 'confirming' && result && (
         <div className="notice">
           <p>
-            {formatDuration(result.durationMs)}　{(result.blob.size / 1024 / 1024).toFixed(1)} MB
+            録音時間 {formatDuration(result.durationMs)}　{(result.blob.size / 1024 / 1024).toFixed(1)} MB
           </p>
           {oversize && (
             <p className="warning">{t('recorder.warning.overSize')}</p>
