@@ -67,9 +67,32 @@ router.post('/webhook', async (req, res) => {
 
     console.log('[billing/webhook] received:', JSON.stringify(notification));
 
-    // TODO: subscriptionNotification.notificationTypeに応じた処理
-    // 1=RECOVERED, 2=RENEWED, 3=CANCELED, 4=PURCHASED, 12=EXPIRED
-    // 現時点はログのみ・200を返してGoogle側にエラーを出さない
+    const sub = notification.subscriptionNotification;
+    if (sub?.purchaseToken) {
+      const { notificationType, purchaseToken } = sub;
+      const statusMap = {
+        1: 'active',
+        2: 'active',
+        3: 'canceled',
+        4: 'active',
+        12: 'expired',
+      };
+      const newStatus = statusMap[notificationType];
+      if (newStatus) {
+        const { error: updateError } = await supabase
+          .from('user_entitlements')
+          .update({
+            status: newStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('purchase_token', purchaseToken);
+        if (updateError) {
+          console.error('[billing/webhook] update error:', updateError);
+        } else {
+          console.log(`[billing/webhook] status updated to ${newStatus} for token: ${purchaseToken}`);
+        }
+      }
+    }
 
     return res.status(200).json({ ok: true });
   } catch (err) {

@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
+import { initBilling } from './lib/billing';
 
 function AppInner() {
   const { t } = useTranslation();
@@ -25,6 +26,8 @@ function AppInner() {
   const [summaryTrialPending, setSummaryTrialPending] = useState(false);
   const [userChoseFullTrial, setUserChoseFullTrial] = useState(null);
   const processingTimerRef = useRef(null);
+
+  useEffect(() => { initBilling(); }, []);
 
   useEffect(() => {
     if (!user) {

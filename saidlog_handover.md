@@ -76,7 +76,7 @@
 - privacy.htmlにGroq利用を明記（日英両方）
 - 竹プラン表示文言を680円・月10時間に更新
 - capacitor-plugin-cdv-purchase（v13.17.2）導入済み（Google Play Billing用）
-- Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhookエンドポイント）
+- Google Play Billing基盤実装（capacitor-plugin-cdv-purchase v13.17.2・billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook notificationType別処理実装済み）
 - user_entitlementsにpurchase_tokenカラム追加（マイグレーション済み）
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
