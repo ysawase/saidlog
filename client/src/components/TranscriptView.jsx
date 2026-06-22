@@ -96,7 +96,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
 
   const exportRaw = async () => {
     if (!canExport) {
-      setExportError('エクスポートは竹プランで利用できます');
+      setShowCopyModal(true);
       return;
     }
     setExportError('');
@@ -216,13 +216,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         <button
           className="btn secondary"
           onClick={exportRaw}
-          disabled={exporting !== null || !canExport}
-          title={!canExport ? '竹プランで利用できます' : undefined}
+          disabled={exporting !== null}
         >
           {exporting === 'raw' ? t('transcript.saving') : t('transcript.saveRaw')}
         </button>
-        {!canExport && <span style={{ color: '#6b7280', fontSize: '0.8rem', marginLeft: '0.5rem' }}>エクスポートは竹プランで利用できます</span>}
-        {canExport && exportError && <span style={{ color: '#dc2626', fontSize: '0.8rem', marginLeft: '0.5rem' }}>{exportError}</span>}
+        {exportError && <span style={{ color: '#dc2626', fontSize: '0.8rem', marginLeft: '0.5rem' }}>{exportError}</span>}
       </div>
 
       <div className="summary-section">
