@@ -28,7 +28,9 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
     }
     // プロバイダーに対応するAPIキーを起動前に検証する（不正リクエストでSTT処理に入る前に弾く）
     const provider = process.env.STT_PROVIDER || 'assemblyai';
-    const requiredKey = provider === 'amivoice' ? 'AMIVOICE_APPKEY' : 'ASSEMBLYAI_API_KEY';
+    const requiredKey = provider === 'amivoice' ? 'AMIVOICE_APPKEY'
+      : provider === 'groq' ? 'GROQ_API_KEY'
+      : 'ASSEMBLYAI_API_KEY';
     if (!process.env[requiredKey]) {
       return res.status(500).json({ error: `サーバーに ${requiredKey} が設定されていません` });
     }

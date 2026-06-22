@@ -1,5 +1,6 @@
 import { transcribe as assemblyai } from './providers/assemblyai.js';
 import { transcribe as amivoice } from './providers/amivoice.js';
+import { transcribe as groq } from './providers/groq.js';
 import { removeFillers } from '../utils/removeFillers.js';
 
 // STTプロバイダーの抽象化レイヤー。
@@ -10,6 +11,7 @@ import { removeFillers } from '../utils/removeFillers.js';
 const providers = {
   assemblyai,
   amivoice,
+  groq,
 };
 
 /**
