@@ -234,6 +234,9 @@ function AppInner() {
               canExport={accountStatus?.canExport ?? true}
               summaryTrialPending={summaryTrialPending}
               onSummaryStarted={() => setSummaryTrialPending(false)}
+              onPurchaseComplete={() => {
+                getAccountStatus().then(setAccountStatus).catch(() => {});
+              }}
             />
           </>
         )}

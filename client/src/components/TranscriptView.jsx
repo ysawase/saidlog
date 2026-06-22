@@ -24,7 +24,7 @@ function formatTime(ms) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted }) {
+export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, onPurchaseComplete }) {
   const { t } = useTranslation();
   const speakers = useMemo(
     () => [...new Set(result.utterances.map((u) => u.speaker))],
@@ -178,7 +178,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
           <p style={{ fontSize: '0.9rem', color: '#4b5563', marginBottom: '1.25rem' }}>
             文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。
           </p>
-          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }} onClick={purchaseTake}>
+          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }} onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>
             竹プランを見る
           </button>
           <br />
@@ -269,7 +269,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
               <div className="summary-blur-overlay">
                 <div className="summary-upgrade-card">
                   {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-                  <button className="btn summary-upgrade-btn" onClick={purchaseTake}>竹プランを見る</button>
+                  <button className="btn summary-upgrade-btn" onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>竹プランを見る</button>
                 </div>
               </div>
             </div>
