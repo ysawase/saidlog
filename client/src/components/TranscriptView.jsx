@@ -43,6 +43,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [exportError, setExportError] = useState('');
   const [upgradeMessage, setUpgradeMessage] = useState('');
   const [unavailableMessage, setUnavailableMessage] = useState('');
+  const [showCopyModal, setShowCopyModal] = useState(false);
 
   const longEnough = (result.audioDurationSec ?? 0) >= 300;
 
@@ -129,6 +130,10 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   };
 
   const copyTranscript = async () => {
+    if (!canExport) {
+      setShowCopyModal(true);
+      return;
+    }
     const text = result.utterances
       .map((u) => `${names[u.speaker]}：${u.text}`)
       .join('\n');
@@ -152,6 +157,40 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   };
 
   return (
+    <>
+    {showCopyModal && (
+      <div
+        style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
+        }}
+        onClick={() => setShowCopyModal(false)}
+      >
+        <div
+          style={{
+            background: '#fff', borderRadius: '12px', padding: '1.5rem',
+            maxWidth: '320px', width: '90%', textAlign: 'center',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>竹プランで利用できます</p>
+          <p style={{ fontSize: '0.9rem', color: '#4b5563', marginBottom: '1.25rem' }}>
+            文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。
+          </p>
+          <button className="btn summary-upgrade-btn" style={{ marginBottom: '0.75rem' }}>
+            竹プランを見る
+          </button>
+          <br />
+          <button
+            className="btn secondary"
+            style={{ fontSize: '0.85rem' }}
+            onClick={() => setShowCopyModal(false)}
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
+    )}
     <div className="transcript">
       <div className="transcript-toolbar">
         {speakers.length > 1 && (
@@ -304,5 +343,6 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
         ))}
       </ul>
     </div>
+    </>
   );
 }
