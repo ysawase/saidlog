@@ -69,6 +69,12 @@
 - POST /summarize/full エンドポイント追加（竹加入後オンデマンド全文要約生成）
 - 竹プランマスクUI完成（白カード＋青ボタン・blur4px・overlay10%・スマホ対応・青線統一・ダミーテキスト長文化で途中切れ演出）
 - ノイズ除去（未使用CSS: .account-status/.done-elapsed/.dp-heading/.dp-line、未使用state: lockedSections）
+- Groq Whisper v3 Turbo STT組み込み（server/stt/providers/groq.js・STT抽象化層経由）
+- transcriptsテーブルにstt_model・stt_cost_estimateカラム追加（stt_provider・audio_duration_secondsは既存）
+- 話者1人の場合は話者ラベルを非表示、複数の場合はA/B/C形式で表示
+- 梅プランのコピー・エクスポート制限をモーダルCTAに統一（竹プラン680円/月への誘導）
+- privacy.htmlにGroq利用を明記（日英両方）
+- 竹プラン表示文言を680円・月10時間に更新
 
 ## 思想・方向性（重要・毎回引き継ぐこと）
 
@@ -232,8 +238,8 @@
 - ✅ Capacitor導入・Androidプロジェクト生成
 - ✅ Capacitorネイティブ録音プラグイン対応
 - ✅ STT品質テスト完了（Groq採用方針に変更・実音声4本で仮説検証済み）
-- 🔲 Groq STT組み込み実装（STT抽象化層経由）
-- 🔲 プライバシーポリシーへのGroq利用明記
+- ✅ Groq STT組み込み実装（STT抽象化層経由）
+- ✅ プライバシーポリシーへのGroq利用明記
 - 🔲 訴求文言・プラン設計・UIの見直し（話者分離なし前提）
 - ✅ プラン制御実装（梅・竹）→ 梅プランUI完了
 - ✅ 竹プランマスクUI（白カード＋青ボタン・blur・スマホ対応完了）
@@ -267,17 +273,10 @@
   - Capacitor環境でのDeep Link設定が別途必要
 
 ## 次にやること
-1. saidlog_handover.md 更新（本作業）
-2. Groq STT組み込み（server/services/stt.js または相当ファイル・STT抽象化層経由）
-3. transcriptsテーブルに以下4カラムを追加（Supabase migration）
-   - stt_provider TEXT
-   - stt_model TEXT
-   - audio_length_sec INTEGER
-   - stt_cost_estimate NUMERIC
-4. 梅プランのコピー制限CTA実装（コピーボタン押下時にモーダル表示）
-5. 梅プランのエクスポート制限CTA実装（エクスポートボタン押下時にモーダル表示）
-6. privacy.html にGroq利用を明記
-7. 竹680円・月10時間を前提に課金導線の表示文言を仮実装
+1. usage_periodsの月間上限を竹10時間・梅60分に合わせて確認・修正
+2. Vercel本番環境のSTT_PROVIDER環境変数をgroqに変更
+3. ソフトローンチ準備（Google Play申請素材・説明文・スクショ）
+4. Google Play Billing実装
 
 ## 残バグ・未実装
 - 点滅アニメーションが逆（経過時間が点滅・処理中…が点滅しない）→未修正
