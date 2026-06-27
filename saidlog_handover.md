@@ -4,6 +4,7 @@
 - 名称：SaidLog（旧Meetlog）
 - リアル会議向け・話者識別付き音声文字起こしWebアプリ
 - URL：https://saidlog.vercel.app/
+- 屋号：Solidaily（ソリデイリー）
 - GitHub：https://github.com/ysawase/saidlog
 - プロジェクトフォルダ：C:\Users\ysawa\repos\saidlog（自宅）/ C:\Users\sawase\saidlog（職場A・通常）/ C:\Users\sawase\repos\saidlog（職場B・会社中央）
 
@@ -57,7 +58,7 @@
 - profiles.full_summary_used によるフラグ管理（upsert対応済み）
 - 5分未満の音源に対する機能解放メッセージUI（竹プラン誘導含む）
 - AI要約のMarkdownレンダリング（react-markdown・見出し・行間調整済み）
-- 文字起こし処理中の点滅アニメーション（※現在逆になっているバグあり→未修正）
+- 文字起こし処理中のスピナー・点滅アニメーション追加（バグなし・動作確認済み）
 - 「原文を保存」ボタンのグレーアウト・ツールチップ（梅プラン時・竹プランで利用できます）
 - 自動プレビュー走らないバグ修正（userChoseFullTrial=nullに変更）
 - 履歴モーダル外クリックで閉じる
@@ -272,7 +273,7 @@
 - 🔲 訴求文言・プラン設計・UIの見直し（話者分離なし前提）
 - ✅ プラン制御実装（梅・竹）→ 梅プランUI完了
 - ✅ 竹プランマスクUI（白カード＋青ボタン・blur・スマホ対応完了）
-- 🔲 Google Play Billing実装（capacitor-plugin-cdv-purchase導入済み・フロント・サーバー未実装）
+- ✅ Google Play Billing実装（billing.js・TranscriptView接続・server/routes/billing.js・RTDN Webhook・grace_period対応・購入復元ボタン）
 - ✅ 録音中の音声レベルメーター（Web Audio API）
 - ✅ 文字起こし処理中のスピナー・点滅アニメーション追加
 - ✅ 録音時間表示の（）修正
@@ -302,10 +303,9 @@
   - Capacitor環境でのDeep Link設定が別途必要
 
 ## 次にやること
-1. usage_periodsの月間上限を竹10時間・梅60分に合わせて確認・修正
-2. Vercel本番環境のSTT_PROVIDER環境変数をgroqに変更
+1. Google Play Console登録完了
+2. Google Play Developer APIによるレシート検証実装（billing.jsのverifyエンドポイントTODO部分）
 3. ソフトローンチ準備（Google Play申請素材・説明文・スクショ）
-4. Google Play Billing実装
 
 ## 残バグ・未実装
 - AmiVoice 404エラー原因未調査
@@ -424,11 +424,12 @@
 
 ユーザーが求めているのはAIではない。会話後の頭の中が片づき、次にやることが見える状態である。その状態を、個人や小規模な現場でも使える価格と軽さで提供する。
 
-## Google Play Billing 実装状況（2026-06-22時点）
+## Google Play Billing 実装状況（2026-06-27確認済み）
 - ✅ capacitor-plugin-cdv-purchase（v13.17.2）導入・cap sync済み
-- 🔲 client/src/lib/billing.js 作成
-- 🔲 TranscriptView.jsx「竹プランを見る」ボタン×2にonClick接続
-- 🔲 server/routes/billing.js（レシート検証・user_entitlements更新）
-- 🔲 Google Play Webhook（RTDN）受信エンドポイント
-- 商品ID予定：take_monthly_680
+- ✅ client/src/lib/billing.js 作成
+- ✅ TranscriptView.jsx「竹プランを見る」ボタン×2にonClick接続
+- ✅ server/routes/billing.js（レシート検証・user_entitlements更新）
+- ✅ Google Play Webhook（RTDN）受信エンドポイント・notificationType別処理・grace_period対応
+- 🔲 Google Play Developer APIによるレシート検証（verifyエンドポイントのTODO部分）
+- 商品ID：take_monthly_680
 - Billingライブラリ：capacitor-plugin-cdv-purchase（MIT・無料・週8,276DL・Capacitor8対応）
