@@ -3,10 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 
 const router = express.Router();
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getSupabase() {
+  return createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 /**
  * POST /api/billing/verify
@@ -28,7 +30,7 @@ router.post('/verify', async (req, res) => {
     const periodEnd = new Date(now);
     periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('user_entitlements')
       .upsert({
         user_id,
@@ -79,7 +81,7 @@ router.post('/webhook', async (req, res) => {
       };
       const newStatus = statusMap[notificationType];
       if (newStatus) {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await getSupabase()
           .from('user_entitlements')
           .update({
             status: newStatus,
