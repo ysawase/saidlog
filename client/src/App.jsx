@@ -220,8 +220,8 @@ function AppInner() {
               <p>{t('app.processing')}<br />{t('app.processingNote')}</p>
             </div>
             <div className="processing-right">
-              <span className="blink">{t('app.processingLabel')}</span>
-              <span>{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</span>
+              <span>{t('app.processingLabel')}</span>
+              <span className="blink">{t('app.processingTimer', { elapsed: formatElapsed(processingElapsed) })}</span>
             </div>
           </div>
         )}
