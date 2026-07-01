@@ -1,4 +1,4 @@
-# SaidLog 作業引き継ぎ（2026-06-22更新）
+# SaidLog 作業引き継ぎ（2026-07-01更新）
 
 ## アプリ概要
 - 名称：SaidLog（旧Meetlog）
@@ -303,10 +303,11 @@
   - Capacitor環境でのDeep Link設定が別途必要
 
 ## 次にやること
-1. Google Play Console登録完了
-2. Google Play Developer APIによるレシート検証実装（billing.jsのverifyエンドポイントTODO部分）
-3. ソフトローンチ準備（Google Play申請素材・説明文・スクショ）
-4. Phase2a実装（イベントログ10件・Weekly Decision Report・Resendメール設定）
+1. 銀行口座届き次第・支払いプロファイル完成
+2. Google Play Developer APIによるレシート検証実装（server/routes/billing.jsのverifyエンドポイントTODO部分・GOOGLE_SERVICE_ACCOUNT_JSONを使用）
+3. デザイン修正（スクショ撮影前に実施）
+4. ソフトローンチ準備（Google Play申請素材・説明文・スクショ）
+5. Phase2a実装（イベントログ10件・Weekly Decision Report・Resendメール設定）
 
 ## 残バグ・未実装
 - AmiVoice 404エラー原因未調査
@@ -433,6 +434,16 @@
 - ✅ Google Play Webhook（RTDN）受信エンドポイント・notificationType別処理・grace_period対応
 - 🔲 Google Play Developer APIによるレシート検証（verifyエンドポイントのTODO部分）
 - 商品ID：take_monthly_680
+
+## Google Play Console / Cloud 設定状況（2026-07-01完了）
+- ✅ Play Consoleアプリ枠作成（パッケージ名：com.saidlog.app）
+- ✅ Google Cloudプロジェクト作成（プロジェクトID：saidlog）
+- ✅ Google Play Android Developer API有効化
+- ✅ サービスアカウント作成（saidlog-play-billing@saidlog.iam.gserviceaccount.com）
+- ✅ JSONキー発行・保管（C:\Users\ysawa\googledrive\work\credentials\saidlog-2fa4f22bd9e9.json）
+- ✅ Play ConsoleへサービスアカウントをAPIアクセス権付きで招待（売上データ閲覧・注文管理）
+- ✅ Vercel環境変数にGOOGLE_SERVICE_ACCOUNT_JSON追加済み
+- 🔲 支払いプロファイル（銀行口座開設待ち）
 - Billingライブラリ：capacitor-plugin-cdv-purchase（MIT・無料・週8,276DL・Capacitor8対応）
 
 ## Google Playストア掲載情報（2026-06-29確定）
