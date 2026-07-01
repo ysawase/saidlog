@@ -46,7 +46,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [unavailableMessage, setUnavailableMessage] = useState('');
   const [showCopyModal, setShowCopyModal] = useState(false);
 
-  const longEnough = (result.audioDurationSec ?? 0) >= 300;
+  const longEnough = (result.audioDurationSec ?? 0) >= 180;
 
   const colorOf = (speaker) =>
     SPEAKER_COLORS[speakers.indexOf(speaker) % SPEAKER_COLORS.length];
@@ -227,7 +227,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
       <div className="summary-section">
         {!longEnough ? (
           <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', lineHeight: '1.8' }}>
-            <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>音声が短いです。5分以上の音声であれば、『AI議事録ツール』機能が解放されます。</p>
+            <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>音声が短いです。3分以上の音声であれば、『AI議事録ツール』機能が解放されます。</p>
             <p style={{ margin: '0 0 1.25rem', fontSize: '0.9rem', color: '#4b5563' }}>決定事項・次にやることをAIが自動で整理します。</p>
             <hr style={{ margin: '0 0 1.25rem', border: 'none', borderTop: '1px solid #d1d5db' }} />
             <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>さらに竹プランにアップグレードすると、『詳細議事録・エクスポート』機能が解放されます。</p>

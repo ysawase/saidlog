@@ -118,7 +118,7 @@ function AppInner() {
           const eligible = (
             s?.planId === 'ume' &&
             s?.fullSummaryUsed === false &&
-            (data.audioDurationSec ?? 0) >= 300
+            (data.audioDurationSec ?? 0) >= 180
           );
           setSummaryTrialPending(eligible);
           if (!eligible) setUserChoseFullTrial(null);
