@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MAX_SIZE_MB } from '../constants/limits.js';
 
 const ACCEPT = '.mp3,.mp4,.wav,.m4a,.webm';
-const MAX_SIZE_MB = 50;
 
 export default function UploadForm({ onSubmit, processing }) {
   const { t } = useTranslation();

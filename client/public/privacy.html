@@ -42,7 +42,6 @@
 <h2>2. 外部サービスへの送信</h2>
 <ul>
   <li><strong>音声データ：</strong>Groq, Inc. に送信し、音声認識処理（Whisper v3 Turbo）を行います。データは米国の Google Cloud Platform 上で処理され、推論データはデフォルトで保持されません。</li>
-  <li><strong>音声データ（高品質モード）：</strong>AmiVoice（株式会社アドバンスト・メディア）に送信し、音声認識処理を行います。ログは保存されません。（高品質モード使用時のみ）</li>
   <li><strong>文字起こしテキスト：</strong>Anthropic 社の Claude API に送信し、AI による要約処理を行います（要約機能使用時のみ）。</li>
 </ul>
 
@@ -88,7 +87,6 @@
 <h2>2. Data Sent to Third-Party Services</h2>
 <ul>
   <li><strong>Audio data:</strong> Sent to Groq, Inc. for speech recognition (Whisper v3 Turbo). Data is processed on Google Cloud Platform in the United States and is not retained by default.</li>
-  <li><strong>Audio data (high-quality mode):</strong> Sent to AmiVoice (Advanced Media, Inc.) for speech recognition. No logs are retained by the provider. (Only when high-quality mode is used.)</li>
   <li><strong>Transcription text:</strong> Sent to Anthropic's Claude API for AI-generated summarization (only when the summary feature is used).</li>
 </ul>
 

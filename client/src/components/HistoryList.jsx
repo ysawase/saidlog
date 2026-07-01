@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchTranscripts, deleteTranscript } from '../lib/history.js'
 
-export function HistoryList({ onSelect, planId }) {
+export function HistoryList({ onSelect, planId, historyLimit }) {
   const { t } = useTranslation()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -36,9 +36,9 @@ export function HistoryList({ onSelect, planId }) {
           </li>
         ))}
       </ul>
-      {planId === 'ume' && (
+      {planId === 'ume' && historyLimit != null && (
         <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.75rem' }}>
-          無料プランでは直近3件まで表示されます
+          無料プランでは直近{historyLimit}件まで表示されます
         </p>
       )}
     </>

@@ -3,11 +3,11 @@
 // 逐次保存する（ブラウザクラッシュ時は IndexedDB 側から復元）。
 // 録音中は Wake Lock で画面消灯を防ぐ（非対応ブラウザでは黙ってスキップ）。
 import { saveChunk } from './recordingDb.js';
+import { SIZE_WARNING_BYTES } from '../constants/limits.js';
 
 const MIME_CANDIDATES = ['audio/webm', 'audio/mp4'];
 const TIMESLICE_MS = 5000;
 const AUDIO_BITS_PER_SECOND = 64000; // 音声向け低ビットレート（50MB上限内で約100分）
-const SIZE_WARNING_BYTES = 45 * 1024 * 1024; // 50MB制限への事前警告ライン
 
 /** 対応MIMEタイプを audio/webm → audio/mp4 の優先順で返す。非対応なら null */
 export function pickMimeType() {

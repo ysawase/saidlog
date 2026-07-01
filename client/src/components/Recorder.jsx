@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { createRecordingAdapter } from '../lib/adapters/index.js';
 import { recordingFileName, downloadBlob } from '../lib/recorder.js';
 import { listSessions, getSessionBlob, clearSession, cleanupStale } from '../lib/recordingDb.js';
-
-const MAX_SIZE_BYTES = 50 * 1024 * 1024;
+import { MAX_SIZE_BYTES } from '../constants/limits.js';
 const LONG_RECORDING_MS = 90 * 60 * 1000;
 const CHUNK_SEC = 5;
 

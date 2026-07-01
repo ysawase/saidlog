@@ -190,6 +190,7 @@ function AppInner() {
             <HistoryList
               onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }}
               planId={accountStatus?.planId}
+              historyLimit={accountStatus?.historyLimit}
             />
           </div>
         </div>
@@ -276,9 +277,6 @@ function AppInner() {
       <section className="usage-notes">
         <p>{t('app.usageNotes.title')}</p>
         <ul>
-          <li>{t('app.usageNotes.speakers')}</li>
-          <li>{t('app.usageNotes.quiet')}</li>
-          <li>{t('app.usageNotes.editName')}</li>
           <li>{t('app.usageNotes.apiCost')}</li>
           <li>{t('app.usageNotes.sizeLimit')}</li>
           <li>{t('app.usageNotes.keepScreen')}</li>

@@ -22,15 +22,12 @@ const resources = {
         transcribeError: '文字起こしエラー: {{message}}',
         usageNotes: {
           title: 'ご利用にあたって',
-          speakers: '各話者が15秒以上発話すると識別精度が上がります',
-          quiet: '発声量が少ない話者は識別されにくい場合があります',
-          editName: '話者名は右のペンアイコンから編集できます',
           apiCost: '本サービスはAI処理に複数のAPIを使用しています。各処理に費用が発生します。長時間の録音は分割してご利用ください。',
           sizeLimit: 'アップロードできるファイルは50MBまでです。超える場合は分割してください',
           keepScreen: '録音中は画面を開いたままにしてください（他のアプリへの切り替えや画面を閉じると録音が停止する場合があります）',
           noServer: '録音データの保存は端末の範囲で行えます。サーバーには保存されません',
         },
-        footer: 'SaidLog MVP — AI文字起こし・話者識別',
+        footer: 'SaidLog — AI会議メモ',
       },
       auth: {
         login: 'ログイン',
@@ -130,15 +127,12 @@ const resources = {
         transcribeError: 'Transcription error: {{message}}',
         usageNotes: {
           title: 'Usage notes',
-          speakers: 'Accuracy improves when each speaker talks for at least 15 seconds',
-          quiet: 'Speakers with low volume may not be identified',
-          editName: 'Speaker names can be edited via the pen icon on the right',
           apiCost: 'This service uses multiple APIs for AI processing. Each request incurs a cost. Please split long recordings.',
           sizeLimit: 'Files up to 50MB can be uploaded. Split larger files before uploading.',
           keepScreen: 'Keep the screen open while recording (switching apps or closing the screen may stop the recording)',
           noServer: 'Recording data is stored on your device only. Nothing is saved to the server.',
         },
-        footer: 'SaidLog MVP — AI Transcription & Speaker Identification',
+        footer: 'SaidLog — AI Meeting Notes',
       },
       auth: {
         login: 'Log in',

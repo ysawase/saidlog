@@ -11,7 +11,7 @@ export default defineConfig({
       manifest: {
         name: 'SaidLog',
         short_name: 'SaidLog',
-        description: '会議の音声を文字起こし・話者識別するアプリ',
+        description: '会議の音声を録音・要約するアプリ',
         theme_color: '#4F46E5',
         background_color: '#F7F8FC',
         display: 'standalone',
