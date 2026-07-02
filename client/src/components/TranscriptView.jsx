@@ -205,7 +205,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <>
               <p style={{ fontWeight: 'bold', margin: '0 0 8px' }}>コピー・エクスポートはSaidLog Plusで使えます</p>
               <p style={{ fontSize: '0.875rem', color: '#4b5563', margin: '0 0 16px' }}>月680円で月10時間まで。会議メモのコピー・エクスポートに対応します。</p>
-              {upgradeMode === 'web' ? (
+              {upgradeMode === 'plus_active' ? (
+                <p style={{ margin: '0 0 8px', fontSize: '0.875rem', color: '#4b5563' }}>
+                  SaidLog Plus利用中です
+                </p>
+              ) : upgradeMode === 'web' ? (
                 <p style={{ margin: '0 0 8px', fontSize: '0.875rem', color: '#4b5563' }}>
                   SaidLog PlusはAndroidアプリ版でご利用いただけます。
                   {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
