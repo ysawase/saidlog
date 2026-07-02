@@ -88,8 +88,8 @@ export function HistoryList({ onSelect, planId }) {
       {planId === 'ume' && (
         <div style={{ marginTop: '1rem', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '0.8rem' }}>
           <p style={{ margin: '0 0 4px', color: '#374151' }}>無料プランでは直近3件まで表示されます</p>
-          <p style={{ margin: '0 0 10px', color: '#6b7280' }}>竹プランなら直近30件まで・月680円</p>
-          <button className="btn primary" onClick={purchaseTake} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>竹プランに進む</button>
+          <p style={{ margin: '0 0 10px', color: '#6b7280' }}>SaidLog Plusなら直近30件まで・月680円</p>
+          <button className="btn primary" onClick={purchaseTake} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>SaidLog Plusに進む</button>
         </div>
       )}
     </>
