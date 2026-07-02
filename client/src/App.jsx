@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import UploadForm from './components/UploadForm.jsx';
 import Recorder from './components/Recorder.jsx';
 import TranscriptView from './components/TranscriptView.jsx';
 import { uploadAudio, requestTranscription, getAudioDuration, getAccountStatus } from './api.js';
@@ -11,6 +10,7 @@ import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
 import { initBilling, restorePurchases } from './lib/billing';
 import { getOrCreateGuestId } from './lib/guestId';
+import { MAX_SIZE_MB } from './constants/limits.js';
 
 function AppInner() {
   const { t } = useTranslation();
@@ -27,7 +27,10 @@ function AppInner() {
   const [accountStatus, setAccountStatus] = useState(null);
   const [summaryTrialPending, setSummaryTrialPending] = useState(false);
   const [userChoseFullTrial, setUserChoseFullTrial] = useState(null);
+  const [s01File, setS01File] = useState(null);
+  const [s01Warning, setS01Warning] = useState('');
   const processingTimerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => { initBilling(); }, []);
 
@@ -157,6 +160,25 @@ function AppInner() {
     setRecordedFile(null);
     setSummaryTrialPending(false);
     setUserChoseFullTrial(null);
+    setS01File(null);
+    setS01Warning('');
+  };
+
+  const handleS01FileSelect = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
+    if (!['.mp3', '.mp4', '.wav', '.m4a', '.webm'].includes(ext)) {
+      setS01Warning(t('upload.errorFormat'));
+      return;
+    }
+    if (f.size > MAX_SIZE_MB * 1024 * 1024) {
+      setS01Warning(t('upload.errorSize', { max: MAX_SIZE_MB }));
+      return;
+    }
+    setS01Warning('');
+    setS01File(f);
+    e.target.value = '';
   };
 
   const busy = status === 'uploading' || status === 'processing';
@@ -164,7 +186,7 @@ function AppInner() {
   return (
     <div className="app">
       <header className="header">
-        <h1>SaidLog</h1>
+        <h1 style={{ fontSize: '1rem', fontWeight: '600', letterSpacing: '0.05em' }}>SaidLog</h1>
         <div className="header-auth">
           {user ? (
             <>
@@ -181,10 +203,10 @@ function AppInner() {
       </header>
 
       {showHistory && user && (
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:900,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:'80px'}} onClick={() => setShowHistory(false)}>
-          <div style={{background:'#fff',borderRadius:'8px',padding:'1.5rem',width:'90%',maxWidth:'480px',maxHeight:'70vh',overflowY:'auto'}} onClick={(e) => e.stopPropagation()}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1rem'}}>
-              <h2 style={{margin:0}}>{t('history.title')}</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(31,41,55,0.64)', zIndex: 900, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '80px' }} onClick={() => setShowHistory(false)}>
+          <div style={{ background: '#fff', borderRadius: '12px', padding: '1.5rem', width: '90%', maxWidth: '480px', maxHeight: '70vh', overflowY: 'auto', boxShadow: '0 12px 32px rgba(0,0,0,0.18)', border: '1px solid #e5e7eb' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ margin: 0 }}>{t('history.title')}</h2>
               <button onClick={() => setShowHistory(false)}>{t('history.close')}</button>
             </div>
             <HistoryList
@@ -195,6 +217,7 @@ function AppInner() {
           </div>
         </div>
       )}
+
       <main>
         {user && accountStatus && (
           <p className="account-status">
@@ -203,9 +226,76 @@ function AppInner() {
           </p>
         )}
 
-        {status !== 'done' && <UploadForm onSubmit={handleTranscribe} processing={busy} />}
+        {/* S01: idle 時のヒーローレイアウト */}
+        {status === 'idle' && (
+          <div style={{ textAlign: 'center', padding: '8px 0 24px' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', margin: '0 0 8px', lineHeight: '1.4' }}>
+              {t('app.s01.heading')}
+            </h2>
+            <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '0.95rem' }}>
+              {t('app.s01.sub')}
+            </p>
 
-        {status !== 'done' && !busy && <Recorder onTranscribe={handleRecordedTranscribe} />}
+            <Recorder onTranscribe={handleRecordedTranscribe} />
+
+            <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: '20px 0 8px' }}>
+              {t('app.s01.uploadHint')}
+            </p>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              accept=".mp3,.mp4,.wav,.m4a,.webm"
+              onChange={handleS01FileSelect}
+            />
+
+            {s01File ? (
+              <div style={{ marginBottom: '8px' }}>
+                <p style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '8px' }}>{s01File.name}</p>
+                <button
+                  className="btn primary"
+                  onClick={() => { handleTranscribe(s01File); setS01File(null); }}
+                >
+                  {t('app.s01.startTranscribe')}
+                </button>
+                {' '}
+                <button
+                  className="btn secondary"
+                  style={{ marginBottom: 0 }}
+                  onClick={() => { setS01File(null); setS01Warning(''); }}
+                >
+                  {t('app.s01.changeFile')}
+                </button>
+              </div>
+            ) : (
+              <button
+                className="btn secondary"
+                style={{ marginBottom: 0 }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {t('app.s01.uploadCTA')}
+              </button>
+            )}
+
+            {s01Warning && <p className="warning" style={{ marginTop: '8px' }}>{s01Warning}</p>}
+
+            <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '16px 0' }}>
+              {t('app.s01.trust')}
+            </p>
+
+            <details style={{ textAlign: 'left', fontSize: '0.8rem', color: '#6b7280', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+              <summary style={{ cursor: 'pointer', color: '#374151', fontWeight: '500' }}>
+                {t('app.s01.detailsSummary')}
+              </summary>
+              <ul style={{ marginTop: '8px', paddingLeft: '1.4em', lineHeight: '2' }}>
+                <li>{t('app.s01.detailsFormat')}</li>
+                <li>{t('app.s01.detailsSize')}</li>
+                <li>{t('app.s01.detailsTrial')}</li>
+              </ul>
+            </details>
+          </div>
+        )}
 
         {status === 'uploading' && (
           <div className="notice processing">
@@ -227,7 +317,12 @@ function AppInner() {
           </div>
         )}
 
-        {status === 'error' && <div className="notice error">{error}</div>}
+        {status === 'error' && (
+          <>
+            <div className="notice error">{error}</div>
+            <button className="btn secondary" style={{ marginTop: '12px', marginBottom: 0 }} onClick={handleReset}>← やり直す</button>
+          </>
+        )}
 
         {status === 'done' && result && (
           <>
@@ -273,16 +368,6 @@ function AppInner() {
         )}
         {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} user={user} initialMode={authModalInitialMode} />}
       </main>
-
-      <section className="usage-notes">
-        <p>{t('app.usageNotes.title')}</p>
-        <ul>
-          <li>{t('app.usageNotes.apiCost')}</li>
-          <li>{t('app.usageNotes.sizeLimit')}</li>
-          <li>{t('app.usageNotes.keepScreen')}</li>
-          <li>{t('app.usageNotes.noServer')}</li>
-        </ul>
-      </section>
 
       <footer className="footer">{t('app.footer')}</footer>
     </div>
