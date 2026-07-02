@@ -143,6 +143,26 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const parseBulletCards = (markdown) => {
+    const lines = markdown.split('\n');
+    let section = null;
+    const decisions = [];
+    const actions = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^##\s*決定事項/.test(trimmed)) { section = 'decisions'; continue; }
+      if (/^##\s*(アクションアイテム|次のアクション)/.test(trimmed)) { section = 'actions'; continue; }
+      if (trimmed.startsWith('#')) { section = null; continue; }
+      if (section === 'decisions' && trimmed) decisions.push(line);
+      if (section === 'actions' && trimmed) actions.push(line);
+    }
+    return { decisions, actions };
+  };
+
+  const bulletCards = summaryStatus === 'done' && summaryType === 'full' && summaryTemplate === 'bullets'
+    ? parseBulletCards(summary)
+    : null;
+
   if (result.utterances.length === 0) {
     return <div className="notice">{t('transcript.noResult')}</div>;
   }
@@ -184,7 +204,8 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             </>
           ) : (
             <>
-              <p>文字起こしのコピー・エクスポートは竹プラン（680円/月）でご利用いただけます。</p>
+              <p style={{ fontWeight: 'bold', margin: '0 0 8px' }}>コピー・エクスポートは竹プランで使えます</p>
+              <p style={{ fontSize: '0.875rem', color: '#4b5563', margin: '0 0 16px' }}>月680円で月10時間まで。会議メモのコピー・エクスポートに対応します。</p>
               <button className="btn primary" onClick={purchaseTake}>竹プランを見る</button>
               <button className="btn secondary" onClick={() => setShowCopyModal(false)}>閉じる</button>
             </>
@@ -321,7 +342,27 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
                 </div>
               )}
             </div>
-            <div className="summary-result"><ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown></div>
+            {bulletCards ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                {[
+                  { heading: '決定したこと', lines: bulletCards.decisions },
+                  { heading: '次にやること', lines: bulletCards.actions },
+                ].map(({ heading, lines }) => (
+                  <div key={heading} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
+                    <p style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px' }}>{heading}</p>
+                    {lines.length > 0 ? (
+                      <div style={{ fontSize: '14px', lineHeight: '1.7' }}>
+                        <ReactMarkdown components={markdownComponents}>{lines.join('\n')}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0 }}>今回は該当なし</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="summary-result"><ReactMarkdown components={markdownComponents}>{summary}</ReactMarkdown></div>
+            )}
           </>
         )}
         </>
