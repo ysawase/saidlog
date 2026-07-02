@@ -36,7 +36,7 @@ export async function initBilling() {
 }
 
 /**
- * 竹プランの購入開始
+ * SaidLog Plus（旧称：竹プラン）の購入開始
  */
 export async function purchaseTake() {
   if (!isNative()) {
