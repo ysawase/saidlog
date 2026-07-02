@@ -386,16 +386,49 @@ accountStatus取得失敗時の復帰導線追加 実装完了レポート
 ■ 28. commit hash と message
 ================================================================
 
-  （コミット後に記載）
+  hash:    fbce42d
+  message: fix: add retry path for account status errors
+  変更: App.jsx, upgradeGuard.js, HistoryList.jsx, TranscriptView.jsx,
+        docs/account_status_retry_impl_report.txt
 
 ■ 29. push していないこと
 ================================================================
 
   push: 未実施 ✅
+  origin/main との差: 1コミット先行（fbce42d のみ）
 
 ■ 30. git status 最終結果
 ================================================================
 
-  （コミット後に記載）
+  On branch main
+  Your branch is ahead of 'origin/main' by 1 commit.
+  ワーキングツリー: クリーン（未コミット変更なし）
+  未追跡ファイル: docs/ 以下の作業ファイル（コミット対象外）
+
+■ 31. 【追加確認】初回失敗ケース（accountStatus未取得のままerror）
+================================================================
+
+  状態: user存在、accountStatus=null、accountStatusLoadState='error'
+
+  upgradeGuard.js 評価順:
+    ① accountStatusLoadState === 'success' → false（'error' ≠ 'success'）
+    ② !isNativePlatform()                  → false（Native 想定）
+    ③ !user                                → false（user あり）
+    ④ accountStatusLoadState === 'error'   → true → 'account_error' 確定 ✅
+
+  account_error 判定は accountStatus の値を一切参照せず、
+  accountStatusLoadState のみで確定するため、初回失敗ケースでも
+  問題なく機能する。
+
+  UI 側確認:
+    S04 / S08-P / S08-E:
+      account_error 分岐は accountStatus を参照せず
+      「プラン情報を確認できませんでした」＋再試行ボタンを表示 ✅
+    アカウントステータス行（user && accountStatus &&）:
+      accountStatus=null → 行自体が非表示（正常） ✅
+    canExport（accountStatus?.canExport ?? false）:
+      null?.canExport → false にフォールバック（正常） ✅
+
+  初回失敗ケースで表示が破綻する箇所はなし。確認完了。
 
 ================================================================
