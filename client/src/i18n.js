@@ -7,6 +7,17 @@ const resources = {
     translation: {
       app: {
         tagline: '録音するだけで、会議メモができる。文字起こしとAI要約を自動で整理。',
+        s01: {
+          heading: '録音するだけで、会議メモができる',
+          sub: '文字起こしとAI要約を自動で整理。あとですぐ見返せます。',
+          uploadHint: '録音済みの音声はこちら',
+          uploadCTA: '音声ファイルを選ぶ',
+          trust: '録音データは会議メモ作成のために処理されます。',
+          detailsSummary: '録音・アップロード前の確認',
+          detailsFormat: '対応フォーマット：mp3 / mp4 / wav / m4a / webm',
+          detailsSize: 'ファイルサイズ上限：50MB（超える場合は分割してください）',
+          detailsTrial: '3分以上の音声でAI要約を試せます（無料）',
+        },
         history: '履歴',
         logout: 'ログアウト',
         login: 'ログイン / 登録',
@@ -112,6 +123,17 @@ const resources = {
     translation: {
       app: {
         tagline: 'Record your meeting and get an organized meeting memo, with automatic transcription and AI summary.',
+        s01: {
+          heading: 'Record and get an instant meeting memo',
+          sub: 'Transcription and AI summary, organized automatically. Easy to review later.',
+          uploadHint: 'Have an audio file instead?',
+          uploadCTA: 'Choose an audio file',
+          trust: 'Your recording is processed to create your meeting memo.',
+          detailsSummary: 'Before you record or upload',
+          detailsFormat: 'Supported formats: mp3 / mp4 / wav / m4a / webm',
+          detailsSize: 'File size limit: 50MB (split larger files)',
+          detailsTrial: 'Audio 3+ minutes unlocks free AI summary',
+        },
         history: 'History',
         logout: 'Log out',
         login: 'Log in / Sign up',
