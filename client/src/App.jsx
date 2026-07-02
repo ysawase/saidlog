@@ -221,7 +221,7 @@ function AppInner() {
       <main>
         {user && accountStatus && (
           <p className="account-status">
-            {accountStatus.planName}プラン | 今月の利用: {formatDuration(accountStatus.usedSeconds)} / {formatDuration(accountStatus.limitSeconds)}
+            {accountStatus.planId === 'ume' ? '無料プラン' : accountStatus.planName} | 今月の利用: {formatDuration(accountStatus.usedSeconds)} / {formatDuration(accountStatus.limitSeconds)}
             {accountStatus.remainingSeconds <= 0 && ' | 今月の上限に達しています'}
           </p>
         )}
