@@ -1,0 +1,116 @@
+================================================================
+upgradeGuard.js レビューレポート
+2026-07-02
+================================================================
+
+■ ファイルパス
+================================================================
+
+  client/src/lib/upgradeGuard.js
+
+================================================================
+■ 実装全文
+================================================================
+
+  import { Capacitor } from '@capacitor/core';
+
+  /**
+   * Plus アップグレードの状態を5段階で判定する（優先順位厳守）。
+   *
+   * 1. plus_active   – Plus 利用中（最優先。環境・ログイン問わず購入CTA非表示）
+   * 2. web           – Web 環境（isNative() = false）
+   * 3. not_logged_in – Native かつ未ログイン → AuthModal を開く
+   * 4. loading       – Native かつログイン済み、accountStatus 未取得 / 取得エラー
+   * 5. purchase      – Native + ログイン済み + 無料プラン + accountStatus 取得済み
+   */
+  export function getUpgradeMode({ user, accountStatus }) {
+    if (accountStatus?.planId === 'take') return 'plus_active';
+    if (!Capacitor.isNativePlatform()) return 'web';
+    if (!user) return 'not_logged_in';
+    if (accountStatus === null) return 'loading';
+    return 'purchase';
+  }
+
+================================================================
+■ 確認項目 1: 引数の受け取り方
+================================================================
+
+  getUpgradeMode は { user, accountStatus } のオブジェクトをデストラクチャリングで受け取る。
+
+  ・user        : Supabase の認証ユーザーオブジェクト（null = 未ログイン）
+  ・accountStatus : サーバーから取得したアカウント状態（null = 取得中/エラー）
+
+  isNative() 判定は引数として受け取らず、関数内部で
+  Capacitor.isNativePlatform() を直接呼んでいる。
+  これにより呼び出し側での isNative() の渡し忘れを防いでいる。
+
+  → OK。isNative() を引数化するより安全なアプローチ。
+
+================================================================
+■ 確認項目 2: 5段階の判定順序
+================================================================
+
+  コードの評価順序（上から優先）:
+
+  ① if (accountStatus?.planId === 'take') return 'plus_active';
+     → Plus 利用中。最優先。環境・ログイン状態を問わず CTA を非表示にすべき状態。
+     → 指定の優先順位①と一致。✅
+
+  ② if (!Capacitor.isNativePlatform()) return 'web';
+     → Web 環境。①をパスした（Plus でない）場合にのみ評価。
+     → 指定の優先順位②と一致。✅
+
+  ③ if (!user) return 'not_logged_in';
+     → Native かつ未ログイン。②をパスした（Native）場合にのみ評価。
+     → 指定の優先順位③と一致。✅
+
+  ④ if (accountStatus === null) return 'loading';
+     → Native + ログイン済み、accountStatus 未取得。
+       ③をパスした（user がいる）場合にのみ評価。
+     → 指定の優先順位④と一致。✅
+
+  ⑤ return 'purchase';
+     → Native + ログイン済み + accountStatus 取得済み（無料プラン）。
+     → 指定の優先順位⑤と一致。✅
+
+  全5段階の優先順位が正しく実装されている。
+
+================================================================
+■ 確認項目 3: 「未ログイン」と「ロード中」の区別
+================================================================
+
+  問題の焦点:
+    どちらも accountStatus が null になりうるが、
+    「未ログインユーザーのロード中 → not_logged_in」か
+    「ログイン済みのロード中 → loading」かを正しく区別できているか。
+
+  実装の動作:
+    ③ !user チェックが ④ accountStatus === null チェックより先に評価される。
+
+    ケース別:
+      ・未ログイン + accountStatus = null:
+        → ③ !user = true で 'not_logged_in' を返す（④には到達しない） ✅
+
+      ・ログイン済み + accountStatus = null（取得中）:
+        → ③ !user = false でパス → ④ accountStatus === null で 'loading' を返す ✅
+
+      ・ログイン済み + accountStatus 取得済み（'ume'）:
+        → ③ ④ ともパス → ⑤ 'purchase' を返す ✅
+
+  結論:
+    user の有無を先に確認することで、両者を正しく区別できている。
+    実装は問題なし。✅
+
+================================================================
+■ 総合判定
+================================================================
+
+  全確認項目クリア。upgradeGuard.js の実装は設計仕様に完全に準拠している。
+
+  ・引数の受け取り: ✅（user, accountStatus のみ。isNative は内部呼び出し）
+  ・判定順序:       ✅（5段階すべて仕様通り）
+  ・未ログイン/ロード中の区別: ✅（user チェック先行で正しく分岐）
+
+  App.jsx / HistoryList.jsx / TranscriptView.jsx への適用を進めてよい。
+
+================================================================

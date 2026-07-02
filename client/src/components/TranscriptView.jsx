@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { requestSummary } from '../api.js';
 import { exportTxt, exportDocx, exportPdf } from '../utils/export.js';
-import { purchaseTake } from '../lib/billing';
 
 const SPEAKER_COLORS = ['#2563eb', '#dc2626', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 const SPEAKER_LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -24,7 +23,7 @@ function formatTime(ms) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, onPurchaseComplete, isLoggedIn, onOpenAuthModal }) {
+export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, upgradeMode, onUpgrade, isLoggedIn, onOpenAuthModal }) {
   const { t } = useTranslation();
   const speakers = useMemo(
     () => [...new Set(result.utterances.map((u) => u.speaker))],
@@ -206,7 +205,16 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <>
               <p style={{ fontWeight: 'bold', margin: '0 0 8px' }}>コピー・エクスポートはSaidLog Plusで使えます</p>
               <p style={{ fontSize: '0.875rem', color: '#4b5563', margin: '0 0 16px' }}>月680円で月10時間まで。会議メモのコピー・エクスポートに対応します。</p>
-              <button className="btn primary" onClick={purchaseTake}>SaidLog Plusに進む</button>
+              {upgradeMode === 'web' ? (
+                <p style={{ margin: '0 0 8px', fontSize: '0.875rem', color: '#4b5563' }}>
+                  SaidLog PlusはAndroidアプリ版でご利用いただけます。
+                  {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+                </p>
+              ) : upgradeMode === 'loading' ? (
+                <button className="btn primary" disabled>確認中...</button>
+              ) : (
+                <button className="btn primary" onClick={() => { setShowCopyModal(false); onUpgrade(); }}>SaidLog Plusに進む</button>
+              )}
               <button className="btn secondary" onClick={() => setShowCopyModal(false)}>閉じる</button>
             </>
           )}
@@ -290,7 +298,19 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
               <div className="summary-blur-overlay">
                 <div className="summary-upgrade-card">
                   {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-                  <button className="btn summary-upgrade-btn" onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>SaidLog Plusに進む</button>
+                  {upgradeMode === 'plus_active' ? null
+                   : upgradeMode === 'web' ? (
+                    <p style={{ fontSize: '0.9rem', color: '#4b5563', margin: 0 }}>
+                      SaidLog PlusはAndroidアプリ版でご利用いただけます。
+                      {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+                    </p>
+                   ) : upgradeMode === 'loading' ? (
+                    <button className="btn summary-upgrade-btn" disabled>確認中...</button>
+                   ) : upgradeMode === 'not_logged_in' ? (
+                    <button className="btn summary-upgrade-btn" onClick={onUpgrade}>無料登録 / ログイン</button>
+                   ) : (
+                    <button className="btn summary-upgrade-btn" onClick={onUpgrade}>SaidLog Plusに進む</button>
+                   )}
                 </div>
               </div>
             </div>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { fetchTranscripts, deleteTranscript } from '../lib/history.js'
-import { purchaseTake } from '../lib/billing'
 
 function formatDate(isoString) {
   const d = new Date(isoString)
@@ -28,7 +27,7 @@ function getChipStyle(summaryType) {
   return { background: '#f3f4f6', color: '#4b5563', border: '1px solid #e5e7eb' }
 }
 
-export function HistoryList({ onSelect, planId }) {
+export function HistoryList({ onSelect, upgradeMode, onUpgrade }) {
   const { t } = useTranslation()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -92,11 +91,20 @@ export function HistoryList({ onSelect, planId }) {
         })}
       </ul>
 
-      {planId === 'ume' && (
+      {(upgradeMode === 'web' || upgradeMode === 'purchase' || upgradeMode === 'loading') && (
         <div style={{ marginTop: '1rem', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '0.8rem' }}>
           <p style={{ margin: '0 0 4px', color: '#374151' }}>無料プランでは直近3件まで表示されます</p>
           <p style={{ margin: '0 0 10px', color: '#6b7280' }}>SaidLog Plusなら直近30件まで・月680円</p>
-          <button className="btn primary" onClick={purchaseTake} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>SaidLog Plusに進む</button>
+          {upgradeMode === 'web' ? (
+            <p style={{ margin: 0, color: '#4b5563', fontSize: '0.8rem' }}>
+              SaidLog PlusはAndroidアプリ版でご利用いただけます。
+              {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+            </p>
+          ) : upgradeMode === 'loading' ? (
+            <button className="btn primary" disabled style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>確認中...</button>
+          ) : (
+            <button className="btn primary" onClick={onUpgrade} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>SaidLog Plusに進む</button>
+          )}
         </div>
       )}
     </>

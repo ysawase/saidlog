@@ -1,0 +1,181 @@
+================================================================
+Plus CTA 安全化 実装完了レポート
+2026-07-02
+================================================================
+
+■ 変更ファイル一覧
+================================================================
+
+  1. client/src/lib/upgradeGuard.js   （新規作成）
+  2. client/src/App.jsx               （変更）
+  3. client/src/components/HistoryList.jsx   （変更）
+  4. client/src/components/TranscriptView.jsx（変更）
+
+================================================================
+■ 各ファイルの変更内容
+================================================================
+
+【1】upgradeGuard.js（新規作成）
+  getUpgradeMode({ user, accountStatus }) を export。
+  5段階の優先判定を実装:
+    ① plus_active  : accountStatus?.planId === 'take'（最優先）
+    ② web          : !Capacitor.isNativePlatform()
+    ③ not_logged_in: !user（Native かつ未ログイン）
+    ④ loading      : accountStatus === null（Native + ログイン済み + 未取得）
+    ⑤ purchase     : それ以外（購入可能）
+
+【2】App.jsx（4箇所変更）
+  変更A: import
+    - 変更前: import { initBilling, restorePurchases } from './lib/billing';
+    - 変更後: import { initBilling, purchaseTake, restorePurchases } from './lib/billing';
+              import { getUpgradeMode } from './lib/upgradeGuard'; を追加
+
+  変更B: const busy の直後に追加
+    const upgradeMode = getUpgradeMode({ user, accountStatus });
+    const handleUpgrade = async () => {
+      if (upgradeMode === 'purchase') {
+        try {
+          await purchaseTake();
+          getAccountStatus().then(setAccountStatus).catch(() => {});
+        } catch (err) {
+          console.error('[upgrade] purchaseTake failed:', err);
+          alert('購入処理に失敗しました。時間をおいて再度お試しください。');
+        }
+      } else if (upgradeMode === 'not_logged_in') {
+        setAuthModalInitialMode('signup');
+        setShowAuthModal(true);
+      }
+    };
+
+  変更C: HistoryList JSX
+    - 変更前: planId={accountStatus?.planId} / historyLimit={accountStatus?.historyLimit}
+    - 変更後: upgradeMode={upgradeMode} / onUpgrade={handleUpgrade}
+
+  変更D: TranscriptView JSX
+    - 変更前: onPurchaseComplete={() => { getAccountStatus().then(setAccountStatus).catch(() => {}); }}
+    - 変更後: upgradeMode={upgradeMode} / onUpgrade={handleUpgrade}
+    （onPurchaseComplete の役割は handleUpgrade 内の購入成功後処理に統合）
+
+【3】HistoryList.jsx（3箇所変更）
+  変更A: import { purchaseTake } from '../lib/billing' を削除
+
+  変更B: props
+    - 変更前: { onSelect, planId }
+    - 変更後: { onSelect, upgradeMode, onUpgrade }
+
+  変更C: CTA セクション
+    - 変更前: planId === 'ume' の場合のみバナー表示、purchaseTake 直接呼び出し
+    - 変更後: upgradeMode に応じた3分岐
+        web     → 静的テキスト「SaidLog PlusはAndroidアプリ版でご利用いただけます」
+                  ※ TODO: Google Play 申請完了後ストアリンクに差し替え
+        loading → disabled ボタン「確認中...」
+        purchase→ onUpgrade を呼ぶボタン「SaidLog Plusに進む」
+
+【4】TranscriptView.jsx（4箇所変更）
+  変更A: import { purchaseTake } from '../lib/billing'; を削除
+
+  変更B: props
+    - 変更前: ..., onPurchaseComplete, isLoggedIn, onOpenAuthModal
+    - 変更後: ..., upgradeMode, onUpgrade, isLoggedIn, onOpenAuthModal
+
+  変更C: S08-E（showCopyModal ログイン済み分岐内のボタン）
+    - 変更前: <button onClick={purchaseTake}>SaidLog Plusに進む</button>
+    - 変更後: upgradeMode に応じた3分岐
+        web     → 静的テキスト
+                  ※ TODO: Google Play 申請完了後ストアリンクに差し替え
+        loading → disabled ボタン「確認中...」
+        purchase→ setShowCopyModal(false) + onUpgrade()
+
+  変更D: S08-P（summary-blur-wrapper 内 CTA、最高リスク箇所）
+    - 変更前: onClick で purchaseTake を直接呼び出し（未ログイン catch なし）
+    - 変更後: upgradeMode に応じた5分岐
+        plus_active → null（表示なし）
+        web         → 静的テキスト
+                      ※ TODO: Google Play 申請完了後ストアリンクに差し替え
+        loading     → disabled ボタン「確認中...」
+        not_logged_in → onUpgrade()（→ AuthModal を開く）「無料登録 / ログイン」
+        purchase    → onUpgrade()（→ purchaseTake）「SaidLog Plusに進む」
+
+================================================================
+■ purchaseTake 直接呼び出し箇所の検索結果
+================================================================
+
+  検索: grep purchaseTake client/src/**/*.{js,jsx}
+
+  結果:
+    client/src/App.jsx:11         import { initBilling, purchaseTake, restorePurchases } ...
+    client/src/App.jsx:192        await purchaseTake();              ← handleUpgrade 内（正規）
+    client/src/App.jsx:195        console.error('[upgrade] purchaseTake failed:', err);
+    client/src/lib/billing.js:41  export async function purchaseTake() {  ← 定義
+    client/src/lib/billing.js:43  console.warn('[billing] purchaseTake: not native');
+
+  HistoryList.jsx・TranscriptView.jsx からの直接参照: なし ✅
+
+================================================================
+■ 5段階状態判定の実装確認
+================================================================
+
+  判定ロジック（getUpgradeMode、upgradeGuard.js）:
+    ① accountStatus?.planId === 'take' → plus_active  ✅ 最優先
+    ② !Capacitor.isNativePlatform()    → web          ✅
+    ③ !user                            → not_logged_in ✅（Native かつ未ログイン）
+    ④ accountStatus === null           → loading      ✅（user あり + 未取得）
+    ⑤ return 'purchase'               → purchase     ✅
+
+  呼び出し元（App.jsx、const busy の直後）:
+    const upgradeMode = getUpgradeMode({ user, accountStatus });
+    → user, accountStatus は App.jsx の useState から取得（常に最新値）
+
+================================================================
+■ Web 環境での表示文言
+================================================================
+
+  3箇所すべて統一:
+    「SaidLog PlusはAndroidアプリ版でご利用いただけます。」
+    （静的テキスト、ボタンなし）
+
+  TODO コメントを各箇所に挿入済み:
+    /* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */
+
+================================================================
+■ エラーハンドリング
+================================================================
+
+  handleUpgrade（App.jsx）:
+    - purchaseTake() の throw を try/catch で捕捉
+    - catch 時: console.error + alert（ユーザー向けメッセージ）
+    - 購入成功時: getAccountStatus() で accountStatus を更新
+
+  not_logged_in 時:
+    - purchaseTake を呼ばず AuthModal（'signup' モード）を開く
+
+  loading 時:
+    - disabled ボタン表示のみ（handleUpgrade 呼び出しなし）
+
+  web 時:
+    - 静的テキスト表示のみ（handleUpgrade 呼び出しなし）
+
+================================================================
+■ billing.js の変更有無
+================================================================
+
+  billing.js は一切変更していない。
+  purchaseTake 本体（41〜58行）はそのまま。
+
+================================================================
+■ S08-P（summary-blur-wrapper）の構造変更有無
+================================================================
+
+  summary-blur-wrapper / summary-blur-overlay の DOM 構造は変更なし。
+  内部の <button> 要素を upgradeMode 分岐に差し替えたのみ。
+
+================================================================
+■ コミット・push 状況
+================================================================
+
+  ファイル変更: 完了
+  npm run build: 下記参照
+  git commit: 下記参照
+  git push: 未実施（指示通り）
+
+================================================================

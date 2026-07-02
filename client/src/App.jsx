@@ -8,7 +8,8 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AuthModal } from './components/AuthModal.jsx';
 import { saveTranscript } from './lib/history.js';
 import { HistoryList } from './components/HistoryList.jsx';
-import { initBilling, restorePurchases } from './lib/billing';
+import { initBilling, purchaseTake, restorePurchases } from './lib/billing';
+import { getUpgradeMode } from './lib/upgradeGuard';
 import { getOrCreateGuestId } from './lib/guestId';
 import { MAX_SIZE_MB } from './constants/limits.js';
 
@@ -183,6 +184,23 @@ function AppInner() {
 
   const busy = status === 'uploading' || status === 'processing';
 
+  const upgradeMode = getUpgradeMode({ user, accountStatus });
+
+  const handleUpgrade = async () => {
+    if (upgradeMode === 'purchase') {
+      try {
+        await purchaseTake();
+        getAccountStatus().then(setAccountStatus).catch(() => {});
+      } catch (err) {
+        console.error('[upgrade] purchaseTake failed:', err);
+        alert('購入処理に失敗しました。時間をおいて再度お試しください。');
+      }
+    } else if (upgradeMode === 'not_logged_in') {
+      setAuthModalInitialMode('signup');
+      setShowAuthModal(true);
+    }
+  };
+
   return (
     <div className="app">
       <header className="header">
@@ -211,8 +229,8 @@ function AppInner() {
             </div>
             <HistoryList
               onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }}
-              planId={accountStatus?.planId}
-              historyLimit={accountStatus?.historyLimit}
+              upgradeMode={upgradeMode}
+              onUpgrade={handleUpgrade}
             />
           </div>
         </div>
@@ -358,9 +376,8 @@ function AppInner() {
               canExport={accountStatus?.canExport ?? false}
               summaryTrialPending={summaryTrialPending}
               onSummaryStarted={() => setSummaryTrialPending(false)}
-              onPurchaseComplete={() => {
-                getAccountStatus().then(setAccountStatus).catch(() => {});
-              }}
+              upgradeMode={upgradeMode}
+              onUpgrade={handleUpgrade}
               isLoggedIn={!!user}
               onOpenAuthModal={() => { setAuthModalInitialMode('signup'); setShowAuthModal(true); }}
             />
