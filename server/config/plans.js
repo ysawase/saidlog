@@ -9,7 +9,7 @@ export const PLANS = {
   },
   take: {
     id: 'take',
-    name: '竹',
+    name: 'SaidLog Plus',
     monthlySeconds: 10 * 60 * 60,
     historyLimit: 30,
     canExport: true,
