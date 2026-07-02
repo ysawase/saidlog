@@ -3,7 +3,7 @@ import { PLANS } from '../config/plans.js';
 
 /**
  * ユーザーの現在プランを返す。
- * status="active" かつ current_period_end が未来の take レコードがあれば竹、それ以外は梅。
+ * status="active" かつ current_period_end が未来の take レコードがあればSaidLog Plus（旧称：竹）、それ以外は無料プラン（旧称：梅）。
  */
 export async function getEntitlement(userId) {
   const { data } = await getSupabase()
@@ -121,7 +121,7 @@ export async function recordTranscriptionFailure(meetingId, errorCode) {
 }
 
 /**
- * エクスポート可否チェック。竹のみ許可。
+ * エクスポート可否チェック。SaidLog Plus（旧称：竹）のみ許可。
  */
 export async function canExport(userId) {
   const { planId } = await getEntitlement(userId);
