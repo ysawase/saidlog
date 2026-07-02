@@ -22,6 +22,12 @@ function getChipLabel(summaryType) {
   return '文字起こし済み'
 }
 
+function getChipStyle(summaryType) {
+  if (summaryType === 'full')    return { background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }
+  if (summaryType === 'preview') return { background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }
+  return { background: '#f3f4f6', color: '#4b5563', border: '1px solid #e5e7eb' }
+}
+
 export function HistoryList({ onSelect, planId }) {
   const { t } = useTranslation()
   const [list, setList] = useState([])
@@ -49,6 +55,7 @@ export function HistoryList({ onSelect, planId }) {
         {list.map(item => {
           const duration = formatDuration(item.result?.audioDurationSec)
           const chip = getChipLabel(item.summary_type)
+          const chipStyle = getChipStyle(item.summary_type)
           return (
             <li key={item.id} style={{ display: 'flex', alignItems: 'stretch', borderBottom: '1px solid #eee' }}>
               <button
@@ -69,7 +76,7 @@ export function HistoryList({ onSelect, planId }) {
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', marginTop: '4px', fontSize: '0.75rem', color: '#6b7280' }}>
                   <span>{formatDate(item.created_at)}</span>
                   {duration && <span>· {duration}</span>}
-                  <span style={{ background: '#f3f4f6', color: '#374151', borderRadius: '4px', padding: '1px 6px' }}>
+                  <span style={{ ...chipStyle, borderRadius: '4px', padding: '1px 6px' }}>
                     {chip}
                   </span>
                 </div>
