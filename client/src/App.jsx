@@ -235,20 +235,25 @@ function AppInner() {
   return (
     <div className="app">
       <header className="header">
-        <h1 style={{ fontSize: '1rem', fontWeight: '600', letterSpacing: '0.05em' }}>SaidLog</h1>
-        <div className="header-auth">
-          {user ? (
-            <>
-              <button onClick={() => setShowHistory(!showHistory)}>{t('app.history')}</button>
-              <button onClick={restorePurchases}>購入を復元</button>
-              <button onClick={() => setShowAuthModal(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit' }}>{user.email}</button>
-              <button onClick={signOut}>{t('app.logout')}</button>
-            </>
-          ) : (
-            <button onClick={() => setShowAuthModal(true)}>{t('app.login')}</button>
-          )}
+        <div className="header-brand">
+          <h1>SaidLog<span className="header-brand-sub">AI会議メモ</span></h1>
+          <div className="header-auth">
+            {user ? (
+              <>
+                <button className="history-pill-btn" onClick={() => setShowHistory(!showHistory)}>{t('app.history')}</button>
+                <details className="header-account-details">
+                  <summary className="header-account-summary">{user.email}</summary>
+                  <div className="header-account-menu">
+                    <button onClick={restorePurchases}>購入を復元</button>
+                    <button onClick={signOut}>{t('app.logout')}</button>
+                  </div>
+                </details>
+              </>
+            ) : (
+              <button onClick={() => setShowAuthModal(true)}>{t('app.login')}</button>
+            )}
+          </div>
         </div>
-        <p className="tagline">{t('app.tagline')}</p>
       </header>
 
       {showHistory && user && (
@@ -278,72 +283,207 @@ function AppInner() {
 
         {/* S01: idle 時のヒーローレイアウト */}
         {status === 'idle' && (
-          <div style={{ textAlign: 'center', padding: '8px 0 24px' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827', margin: '0 0 8px', lineHeight: '1.4' }}>
-              {t('app.s01.heading')}
-            </h2>
-            <p style={{ color: '#4b5563', marginBottom: '24px', fontSize: '0.95rem' }}>
-              {t('app.s01.sub')}
-            </p>
+          <div className="s01">
+            {/* ヒーロー */}
+            <div className="s01-hero">
+              <h2 className="s01-heading">{t('app.s01.heading')}</h2>
+              <p className="s01-sub">{t('app.s01.sub')}</p>
 
-            <Recorder onTranscribe={handleRecordedTranscribe} />
-
-            <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: '20px 0 8px' }}>
-              {t('app.s01.uploadHint')}
-            </p>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              hidden
-              accept=".mp3,.mp4,.wav,.m4a,.webm"
-              onChange={handleS01FileSelect}
-            />
-
-            {s01File ? (
-              <div style={{ marginBottom: '8px' }}>
-                <p style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '8px' }}>{s01File.name}</p>
-                <button
-                  className="btn primary"
-                  onClick={() => { handleTranscribe(s01File); setS01File(null); }}
-                >
-                  {t('app.s01.startTranscribe')}
-                </button>
-                {' '}
-                <button
-                  className="btn secondary"
-                  style={{ marginBottom: 0 }}
-                  onClick={() => { setS01File(null); setS01Warning(''); }}
-                >
-                  {t('app.s01.changeFile')}
-                </button>
+              {/* 3ステップ */}
+              <div className="s01-steps">
+                <div className="s01-step">
+                  <div className="s01-step-miniature">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', flexShrink: 0 }} />
+                      {[5, 9, 13, 8, 11, 7, 10].map((h, i) => (
+                        <div key={i} style={{ width: '3px', height: `${h}px`, background: '#3b82f6', borderRadius: '2px' }} />
+                      ))}
+                    </div>
+                    <div style={{ width: '32px', height: '18px', borderRadius: '4px', background: '#fee2e2', border: '1px solid #fca5a5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '7px', height: '7px', background: '#ef4444', borderRadius: '2px' }} />
+                    </div>
+                  </div>
+                  <span className="s01-step-label">{t('app.s01.step1')}</span>
+                </div>
+                <span className="s01-step-arrow">→</span>
+                <div className="s01-step">
+                  <div className="s01-step-miniature" style={{ alignItems: 'flex-start', padding: '8px 10px' }}>
+                    <div style={{ height: '5px', background: '#2563eb', borderRadius: '3px', width: '55%', marginBottom: '4px' }} />
+                    {[null, null, null].map((_, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%', marginBottom: '2px' }}>
+                        <div style={{ height: '4px', background: '#bfdbfe', borderRadius: '2px', flex: 1 }} />
+                        {i === 0 && (
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5l2.5 2.5L8 3" stroke="#047857" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <span className="s01-step-label">{t('app.s01.step2')}</span>
+                </div>
+                <span className="s01-step-arrow">→</span>
+                <div className="s01-step">
+                  <div className="s01-step-miniature" style={{ alignItems: 'flex-start', padding: '6px 8px' }}>
+                    <div style={{ fontSize: '0.6rem', fontWeight: '600', color: '#111827', marginBottom: '4px' }}>履歴</div>
+                    {[
+                      { name: '週次MTG', bg: '#ecfdf5', color: '#047857', chip: '要約済み' },
+                      { name: '営業会議', bg: '#eff6ff', color: '#1d4ed8', chip: 'プレビュー' },
+                      { name: '1on1', bg: '#f3f4f6', color: '#4b5563', chip: '文字起こし' },
+                    ].map((item, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '3px', width: '100%', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '0.6rem', color: '#111827', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
+                        <span style={{ fontSize: '0.5rem', background: item.bg, color: item.color, borderRadius: '3px', padding: '1px 3px', whiteSpace: 'nowrap', flexShrink: 0 }}>{item.chip}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <span className="s01-step-label">{t('app.s01.step3')}</span>
+                </div>
               </div>
-            ) : (
-              <button
-                className="btn secondary"
-                style={{ marginBottom: 0 }}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {t('app.s01.uploadCTA')}
-              </button>
-            )}
 
-            {s01Warning && <p className="warning" style={{ marginTop: '8px' }}>{s01Warning}</p>}
+              {/* 主CTA（Recorder のスタートボタンを .s01-recorder-wrap CSS でスタイル上書き） */}
+              <div className="s01-recorder-wrap">
+                <Recorder onTranscribe={handleRecordedTranscribe} />
+              </div>
 
-            <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: '16px 0' }}>
-              {t('app.s01.trust')}
-            </p>
+              {/* 補助CTA */}
+              <p className="s01-upload-hint">{t('app.s01.uploadHint')}</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                hidden
+                accept=".mp3,.mp4,.wav,.m4a,.webm"
+                onChange={handleS01FileSelect}
+              />
+              {s01File ? (
+                <div style={{ marginBottom: '8px' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '8px' }}>{s01File.name}</p>
+                  <button
+                    className="btn primary"
+                    onClick={() => { handleTranscribe(s01File); setS01File(null); }}
+                  >
+                    {t('app.s01.startTranscribe')}
+                  </button>
+                  {' '}
+                  <button
+                    className="btn secondary"
+                    style={{ marginBottom: 0 }}
+                    onClick={() => { setS01File(null); setS01Warning(''); }}
+                  >
+                    {t('app.s01.changeFile')}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="s01-file-btn"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  {t('app.s01.uploadCTA')}
+                </button>
+              )}
+              {s01Warning && <p className="warning" style={{ marginTop: '8px' }}>{s01Warning}</p>}
 
-            <details style={{ textAlign: 'left', fontSize: '0.8rem', color: '#6b7280', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
-              <summary style={{ cursor: 'pointer', color: '#374151', fontWeight: '500' }}>
-                {t('app.s01.detailsSummary')}
-              </summary>
-              <ul style={{ marginTop: '8px', paddingLeft: '1.4em', lineHeight: '2' }}>
-                <li>{t('app.s01.detailsFormat')}</li>
-                <li>{t('app.s01.detailsSize')}</li>
-                <li>{t('app.s01.detailsTrial')}</li>
-              </ul>
-            </details>
+              {/* 安心文 */}
+              <p className="s01-trust">{t('app.s01.trust')}</p>
+
+              {/* 無料枠ミニ説明 */}
+              <div className="s01-free-mini">
+                <p>{t('app.s01.freeTrialBanner')}</p>
+                <a href="#s01-pricing">{t('app.s01.freeTrialLink')}</a>
+              </div>
+
+              {/* 詳細折りたたみ */}
+              <details style={{ textAlign: 'left', fontSize: '0.8rem', color: '#6b7280', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+                <summary style={{ cursor: 'pointer', color: '#374151', fontWeight: '500' }}>
+                  {t('app.s01.detailsSummary')}
+                </summary>
+                <ul style={{ marginTop: '8px', paddingLeft: '1.4em', lineHeight: '2' }}>
+                  <li>{t('app.s01.detailsFormat')}</li>
+                  <li>{t('app.s01.detailsSize')}</li>
+                  <li>{t('app.s01.detailsTrial')}</li>
+                </ul>
+              </details>
+            </div>
+
+            {/* 価格・無料枠説明エリア */}
+            <section id="s01-pricing" className="s01-pricing">
+              <h3>無料で試せる範囲と料金</h3>
+              <div className="s01-plan-grid">
+                <div className="s01-plan">
+                  <div className="s01-plan-name">無料プラン</div>
+                  {[
+                    { text: '0円', yes: true },
+                    { text: '月60分まで', yes: true },
+                    { text: '履歴は直近3件まで表示', yes: true },
+                    { text: '要約プレビュー（3行、閲覧のみ）', yes: true },
+                    { text: '詳細要約（フル）', yes: false },
+                    { text: 'コピー・エクスポート', yes: false },
+                  ].map((f, i) => (
+                    <div key={i} className={`s01-plan-feature${f.yes ? '' : ' s01-plan-feature-no'}`}>
+                      <span>{f.yes ? '✓' : '✗'}</span>
+                      <span>{f.text}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="s01-plan s01-plan-plus">
+                  <div className="s01-plan-name">SaidLog Plus</div>
+                  {[
+                    { text: '月680円', yes: true },
+                    { text: '月10時間', yes: true },
+                    { text: '履歴は直近30件まで表示', yes: true },
+                    { text: '詳細要約', yes: true },
+                    { text: 'コピー・エクスポート', yes: true },
+                  ].map((f, i) => (
+                    <div key={i} className="s01-plan-feature">
+                      <span>✓</span>
+                      <span>{f.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                {upgradeMode === 'plus_active' ? (
+                  <p style={{ fontSize: '0.875rem', color: '#047857' }}>SaidLog Plus利用中です</p>
+                ) : upgradeMode === 'web' ? (
+                  <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>SaidLog PlusはAndroidアプリ版でご利用いただけます。</p>
+                ) : upgradeMode === 'account_error' ? (
+                  <>
+                    <p style={{ fontSize: '0.875rem', color: '#b91c1c', marginBottom: '6px' }}>プラン情報を確認できませんでした</p>
+                    <button className="btn secondary" onClick={retryAccountStatus} style={{ marginBottom: 0 }}>再試行</button>
+                  </>
+                ) : upgradeMode === 'loading' ? (
+                  <button className="btn primary" disabled style={{ marginBottom: 0 }}>確認中...</button>
+                ) : upgradeMode === 'not_logged_in' ? (
+                  <button className="btn primary" onClick={handleUpgrade} style={{ marginBottom: 0 }}>無料登録 / ログイン</button>
+                ) : (
+                  <button className="btn primary" onClick={handleUpgrade} style={{ marginBottom: 0 }}>SaidLog Plusに進む</button>
+                )}
+              </div>
+            </section>
+
+            {/* 無料枠とSaidLog Plusについて */}
+            <section className="s01-explanation">
+              <h3>無料枠とSaidLog Plusについて</h3>
+              <p>音声の文字起こしやAI要約は、録音時間が長いほど処理量が増えます。議事録・文字起こし・AI処理サービスでは一般的にコストがかかる部分ですが、SaidLogでは無料で試せる範囲を用意し、継続して使いやすいように月680円・10時間のPlusプランにしています。</p>
+            </section>
+
+            {/* 処理フロー */}
+            <section className="s01-flow">
+              <h3>録音から会議メモができるまで</h3>
+              <div className="s01-flow-steps">
+                <div className="s01-flow-step">録音データ</div>
+                <span className="s01-flow-arrow">→</span>
+                <div className="s01-flow-step">文字起こし</div>
+                <span className="s01-flow-arrow">→</span>
+                <div className="s01-flow-step">AI要約</div>
+                <span className="s01-flow-arrow">→</span>
+                <div className="s01-flow-step">会議メモ</div>
+              </div>
+            </section>
           </div>
         )}
 
