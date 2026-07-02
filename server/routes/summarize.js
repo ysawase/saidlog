@@ -62,11 +62,11 @@ const PROMPTS = {
 const LOCKED_SECTIONS = {
   bullets: {
     sections: ['全文のAI要約', '決定事項の詳細', 'アクションアイテム', 'エクスポート'],
-    upgradeMessage: '全文のAI要約・TODO整理は竹プランで利用できます',
+    upgradeMessage: '全文のAI要約・TODO整理はSaidLog Plusで利用できます',
   },
   minutes: {
     sections: ['詳しい議事録', '主な議題と議論', '決定事項', '次のアクション', 'エクスポート'],
-    upgradeMessage: '詳しい議事録・エクスポートは竹プランで利用できます',
+    upgradeMessage: '詳しい議事録・エクスポートはSaidLog Plusで利用できます',
   },
 };
 
@@ -196,10 +196,10 @@ router.post('/summarize/full', optionalAuth, async (req, res, next) => {
 
     const supabase = getSupabase();
 
-    // 竹プランか確認
+    // SaidLog Plusか確認
     const summaryMode = await getSummaryMode(userId, null, 99999, false);
     if (summaryMode !== 'full') {
-      return res.status(403).json({ error: '竹プランが必要です' });
+      return res.status(403).json({ error: 'SaidLog Plusが必要です' });
     }
 
     // 本人のtranscriptか確認・utterances取得
