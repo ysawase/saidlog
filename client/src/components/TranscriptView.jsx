@@ -23,7 +23,7 @@ function formatTime(ms) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, upgradeMode, onUpgrade, isLoggedIn, onOpenAuthModal }) {
+export default function TranscriptView({ result, userChoseFullTrial = null, canExport = true, summaryTrialPending = false, onSummaryStarted, upgradeMode, onUpgrade, onRetry, isLoggedIn, onOpenAuthModal }) {
   const { t } = useTranslation();
   const speakers = useMemo(
     () => [...new Set(result.utterances.map((u) => u.speaker))],
@@ -214,6 +214,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
                   SaidLog PlusはAndroidアプリ版でご利用いただけます。
                   {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
                 </p>
+              ) : upgradeMode === 'account_error' ? (
+                <>
+                  <p style={{ margin: '0 0 8px', fontSize: '0.875rem', color: '#b91c1c' }}>プラン情報を確認できませんでした</p>
+                  <button className="btn secondary" onClick={() => { setShowCopyModal(false); onRetry(); }}>再試行</button>
+                </>
               ) : upgradeMode === 'loading' ? (
                 <button className="btn primary" disabled>確認中...</button>
               ) : (
@@ -308,6 +313,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
                       SaidLog PlusはAndroidアプリ版でご利用いただけます。
                       {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
                     </p>
+                   ) : upgradeMode === 'account_error' ? (
+                    <>
+                      <p style={{ fontSize: '0.9rem', color: '#b91c1c', margin: '0 0 8px' }}>プラン情報を確認できませんでした</p>
+                      <button className="btn summary-upgrade-btn" onClick={onRetry}>再試行</button>
+                    </>
                    ) : upgradeMode === 'loading' ? (
                     <button className="btn summary-upgrade-btn" disabled>確認中...</button>
                    ) : upgradeMode === 'not_logged_in' ? (

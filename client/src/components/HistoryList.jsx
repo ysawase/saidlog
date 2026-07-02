@@ -27,7 +27,7 @@ function getChipStyle(summaryType) {
   return { background: '#f3f4f6', color: '#4b5563', border: '1px solid #e5e7eb' }
 }
 
-export function HistoryList({ onSelect, upgradeMode, onUpgrade }) {
+export function HistoryList({ onSelect, upgradeMode, onUpgrade, onRetry }) {
   const { t } = useTranslation()
   const [list, setList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -91,7 +91,7 @@ export function HistoryList({ onSelect, upgradeMode, onUpgrade }) {
         })}
       </ul>
 
-      {(upgradeMode === 'web' || upgradeMode === 'purchase' || upgradeMode === 'loading') && (
+      {(upgradeMode === 'web' || upgradeMode === 'purchase' || upgradeMode === 'loading' || upgradeMode === 'account_error') && (
         <div style={{ marginTop: '1rem', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '0.8rem' }}>
           <p style={{ margin: '0 0 4px', color: '#374151' }}>無料プランでは直近3件まで表示されます</p>
           <p style={{ margin: '0 0 10px', color: '#6b7280' }}>SaidLog Plusなら直近30件まで・月680円</p>
@@ -100,6 +100,11 @@ export function HistoryList({ onSelect, upgradeMode, onUpgrade }) {
               SaidLog PlusはAndroidアプリ版でご利用いただけます。
               {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
             </p>
+          ) : upgradeMode === 'account_error' ? (
+            <>
+              <p style={{ margin: '0 0 6px', color: '#b91c1c', fontSize: '0.8rem' }}>プラン情報を確認できませんでした</p>
+              <button className="btn secondary" onClick={onRetry} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>再試行</button>
+            </>
           ) : upgradeMode === 'loading' ? (
             <button className="btn primary" disabled style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>確認中...</button>
           ) : (

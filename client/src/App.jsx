@@ -26,6 +26,8 @@ function AppInner() {
   const [recordedFile, setRecordedFile] = useState(null);
   const [processingElapsed, setProcessingElapsed] = useState(0);
   const [accountStatus, setAccountStatus] = useState(null);
+  const [accountStatusLoadState, setAccountStatusLoadState] = useState('not_applicable');
+  const [accountStatusRetryCount, setAccountStatusRetryCount] = useState(0);
   const [summaryTrialPending, setSummaryTrialPending] = useState(false);
   const [userChoseFullTrial, setUserChoseFullTrial] = useState(null);
   const [s01File, setS01File] = useState(null);
@@ -38,10 +40,25 @@ function AppInner() {
   useEffect(() => {
     if (!user) {
       setAccountStatus(null);
+      setAccountStatusLoadState('not_applicable');
       return;
     }
-    getAccountStatus().then(setAccountStatus).catch(() => setAccountStatus(null));
-  }, [user]);
+    let cancelled = false;
+    setAccountStatusLoadState('loading');
+    getAccountStatus()
+      .then((s) => {
+        if (cancelled) return;
+        if (!s) { setAccountStatusLoadState('error'); return; }
+        setAccountStatus(s);
+        setAccountStatusLoadState('success');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error('[account] getAccountStatus failed:', err);
+        setAccountStatusLoadState('error');
+      });
+    return () => { cancelled = true; };
+  }, [user, accountStatusRetryCount]);
 
   useEffect(() => {
     if (status === 'processing') {
@@ -118,7 +135,9 @@ function AppInner() {
       }
       if (user) {
         getAccountStatus().then((s) => {
+          if (!s) { setAccountStatusLoadState('error'); return; }
           setAccountStatus(s);
+          setAccountStatusLoadState('success');
           const eligible = (
             s?.planId === 'ume' &&
             s?.fullSummaryUsed === false &&
@@ -126,7 +145,10 @@ function AppInner() {
           );
           setSummaryTrialPending(eligible);
           if (!eligible) setUserChoseFullTrial(null);
-        }).catch(() => {});
+        }).catch((err) => {
+          console.error('[account] post-transcription refresh failed:', err);
+          setAccountStatusLoadState('error');
+        });
       } else {
         setUserChoseFullTrial(false);
       }
@@ -184,13 +206,22 @@ function AppInner() {
 
   const busy = status === 'uploading' || status === 'processing';
 
-  const upgradeMode = getUpgradeMode({ user, accountStatus });
+  const retryAccountStatus = () => setAccountStatusRetryCount((c) => c + 1);
+
+  const upgradeMode = getUpgradeMode({ user, accountStatus, accountStatusLoadState });
 
   const handleUpgrade = async () => {
     if (upgradeMode === 'purchase') {
       try {
         await purchaseTake();
-        getAccountStatus().then(setAccountStatus).catch(() => {});
+        getAccountStatus().then((s) => {
+          if (!s) { setAccountStatusLoadState('error'); return; }
+          setAccountStatus(s);
+          setAccountStatusLoadState('success');
+        }).catch((err) => {
+          console.error('[account] post-purchase refresh failed:', err);
+          setAccountStatusLoadState('error');
+        });
       } catch (err) {
         console.error('[upgrade] purchaseTake failed:', err);
         alert('購入処理に失敗しました。時間をおいて再度お試しください。');
@@ -231,6 +262,7 @@ function AppInner() {
               onSelect={(result) => { setResult(result); setStatus('done'); setShowHistory(false); }}
               upgradeMode={upgradeMode}
               onUpgrade={handleUpgrade}
+              onRetry={retryAccountStatus}
             />
           </div>
         </div>
@@ -378,6 +410,7 @@ function AppInner() {
               onSummaryStarted={() => setSummaryTrialPending(false)}
               upgradeMode={upgradeMode}
               onUpgrade={handleUpgrade}
+              onRetry={retryAccountStatus}
               isLoggedIn={!!user}
               onOpenAuthModal={() => { setAuthModalInitialMode('signup'); setShowAuthModal(true); }}
             />

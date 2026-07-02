@@ -1,0 +1,401 @@
+================================================================
+accountStatus取得失敗時の復帰導線追加 実装完了レポート
+2026-07-03
+================================================================
+
+■ 1. 変更したファイル一覧
+================================================================
+
+  1. client/src/App.jsx               （変更）
+  2. client/src/lib/upgradeGuard.js   （変更）
+  3. client/src/components/HistoryList.jsx   （変更）
+  4. client/src/components/TranscriptView.jsx（変更）
+
+■ 2. 変更していない重要ファイル
+================================================================
+
+  client/src/api.js                   変更なし（getAccountStatus 仕様は呼び出し側で対処）
+  client/src/lib/billing.js           変更なし
+  server/routes/account.js           変更なし
+  client/src/i18n.js                  変更なし
+  client/src/App.css                  変更なし
+  S01 v2.1 UI 関連一切               変更なし
+
+■ 3. getAccountStatus の正常レスポンス仕様確認結果
+================================================================
+
+  定義ファイル: client/src/api.js (line 66)
+
+  実装:
+    const res = await fetch(`${API_BASE}/api/account/status`, { headers });
+    if (!res.ok) return null;   ← HTTP エラー時は null を return（throw しない）
+    return res.json();
+
+  サーバー側 (server/routes/account.js):
+    - 未認証（userId なし）: 401 JSON → クライアントで null return
+    - 成功: 200 + オブジェクト
+
+  重要な発見:
+    HTTP エラー時は .then() 経由で null が返るため、.catch() では検知不可。
+    → 呼び出し側で `if (!s)` チェックを追加して対処（api.js 変更なし）。
+
+■ 4. 無料ユーザーの正常レスポンス
+================================================================
+
+  { planId: 'ume', planName: '梅', usedSeconds, limitSeconds,
+    remainingSeconds, fullSummaryUsed, historyLimit: 3, canExport: false }
+
+  ← 非 null オブジェクト。null が正常レスポンスになるケースは存在しない。
+
+■ 5. Plus ユーザーの正常レスポンス
+================================================================
+
+  { planId: 'take', planName: 'SaidLog Plus', usedSeconds, limitSeconds,
+    remainingSeconds, fullSummaryUsed, historyLimit: 30, canExport: true }
+
+  ← 非 null オブジェクト。planId 判定は 'take' で正しい。
+     planName は表示用のみ、ロジック判定に使用していない。
+
+■ 6. accountStatus 状態管理の変更内容
+================================================================
+
+  追加した state（App.jsx）:
+
+    const [accountStatusLoadState, setAccountStatusLoadState]
+      = useState('not_applicable');
+    // 'not_applicable' | 'loading' | 'success' | 'error'
+
+    const [accountStatusRetryCount, setAccountStatusRetryCount]
+      = useState(0);
+    // インクリメントで useEffect の再実行をトリガー
+
+  accountStatus と accountStatusLoadState の関係:
+    - accountStatus: 最後に成功した取得値を保持（エラー時もクリアしない）
+    - accountStatusLoadState: 現在の取得状態を管理
+    - plus_active 判定は「loadState === success」の場合のみ有効
+
+■ 7. getAccountStatus 失敗時の扱い
+================================================================
+
+  取得失敗の2経路:
+    A. HTTP エラー（401, 500 等）: null が .then() で来る
+       → `if (!s) { setAccountStatusLoadState('error'); return; }`
+
+    B. ネットワークエラー（fetch 失敗）: .catch() で来る
+       → `console.error(...); setAccountStatusLoadState('error');`
+
+  失敗時の accountStatus: 変更しない（前回成功値を保持）
+  理由: loadState === 'error' なら upgradeGuard で account_error が確定し、
+        購入には進めない。古い値を残すことで画面のちらつきを防止。
+
+■ 8. stale response 対策
+================================================================
+
+  useEffect 内で cancelled フラグを使用:
+
+    let cancelled = false;
+    getAccountStatus()
+      .then((s) => {
+        if (cancelled) return;  ← ログアウト・再ログイン・再試行で無効化
+        ...
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        ...
+      });
+    return () => { cancelled = true; };
+
+  再試行（accountStatusRetryCount インクリメント）時:
+    → 前回の useEffect のクリーンアップが cancelled = true にする
+    → 新しい useEffect が新しい cancelled = false で起動
+    → 古いレスポンスが新しい状態を上書きしない ✅
+
+■ 9. retry 関数の実装内容
+================================================================
+
+  App.jsx:
+    const retryAccountStatus = () => setAccountStatusRetryCount((c) => c + 1);
+
+  子コンポーネントへの渡し方:
+    HistoryList:    onRetry={retryAccountStatus}
+    TranscriptView: onRetry={retryAccountStatus}
+
+  retry が呼ばれると:
+    1. accountStatusRetryCount がインクリメント
+    2. useEffect の dependency [user, accountStatusRetryCount] が変化
+    3. useEffect が再実行: setAccountStatusLoadState('loading') → 取得開始
+    4. 取得成功 → 'success' に遷移、upgradeMode が再計算
+    5. 取得失敗 → 'error' に戻る
+
+■ 10. retry 中の表示・連打防止
+================================================================
+
+  retry が呼ばれた直後:
+    → accountStatusLoadState = 'loading'
+    → upgradeMode = 'loading'
+    → 各 CTA が disabled「確認中...」に切り替わる
+
+  連打防止:
+    loading 中は upgradeMode = 'loading' → 再試行ボタン自体が非表示になる
+    （account_error の場合のみ再試行ボタンが出るため）✅
+
+  retry 成功後: 'success' → upgradeMode が plus_active/purchase/web に遷移
+  retry 失敗後: 'error' → account_error に戻り、再試行ボタン再表示
+
+■ 11. upgradeGuard.js の変更内容
+================================================================
+
+  変更前（5段階）:
+    ① accountStatus?.planId === 'take' → 'plus_active'
+    ② !isNative() → 'web'
+    ③ !user → 'not_logged_in'
+    ④ accountStatus === null → 'loading'
+    ⑤ return 'purchase'
+
+  変更後（6段階）:
+    ① accountStatusLoadState === 'success' && planId === 'take' → 'plus_active'
+    ② !isNative() → 'web'
+    ③ !user → 'not_logged_in'
+    ④ accountStatusLoadState === 'error' → 'account_error'
+    ⑤ accountStatusLoadState !== 'success' → 'loading'（loading/not_applicable 等）
+    ⑥ return 'purchase'
+
+■ 12. 新しい upgradeMode 名
+================================================================
+
+  追加: 'account_error'
+  意味: Native + ログイン済み + accountStatus 取得失敗
+
+■ 13. plus_active が success/ready 時のみ成立すること
+================================================================
+
+  upgradeGuard.js:
+    if (accountStatusLoadState === 'success' && accountStatus?.planId === 'take')
+      return 'plus_active';
+
+  loadState が 'error' の場合:
+    → ① の条件を満たさない（'success' でないため）
+    → ④ で 'account_error' に確定
+    → 古い accountStatus.planId === 'take' が残っていても plus_active にならない ✅
+
+■ 14. S04（HistoryList）の account_error 表示
+================================================================
+
+  外側条件（表示有無）:
+    upgradeMode === 'web' || 'purchase' || 'loading' || 'account_error'
+
+  account_error 分岐（HistoryList.jsx:103-107）:
+    <p style={{ color: '#b91c1c' }}>プラン情報を確認できませんでした</p>
+    <button className="btn secondary" onClick={onRetry}>再試行</button>
+
+  onRetry: purchaseTake を呼ばない（retryAccountStatus → accountStatus 再取得）✅
+
+■ 15. S08-P（summary-blur-wrapper）の account_error 表示
+================================================================
+
+  account_error 分岐（TranscriptView.jsx:316-320）:
+    <p style={{ color: '#b91c1c' }}>プラン情報を確認できませんでした</p>
+    <button className="btn summary-upgrade-btn" onClick={onRetry}>再試行</button>
+
+  onRetry: retryAccountStatus（purchaseTake ではない）✅
+
+■ 16. S08-E（showCopyModal）の account_error 表示
+================================================================
+
+  account_error 分岐（TranscriptView.jsx:217-221）:
+    <p style={{ color: '#b91c1c' }}>プラン情報を確認できませんでした</p>
+    <button className="btn secondary"
+      onClick={() => { setShowCopyModal(false); onRetry(); }}>再試行</button>
+
+  モーダルを閉じてから retry を実行（onUpgrade と同じパターン）✅
+
+■ 17. handleUpgrade が account_error/loading/plus_active/web で
+       purchaseTake を呼ばないこと
+================================================================
+
+  handleUpgrade（App.jsx）:
+    if (upgradeMode === 'purchase') {
+      await purchaseTake();
+    } else if (upgradeMode === 'not_logged_in') {
+      setShowAuthModal(true);
+    }
+    // 他のモードは何もしない
+
+  account_error / loading / plus_active / web:
+    → 'purchase' でも 'not_logged_in' でもないため purchaseTake は呼ばれない ✅
+
+  UI 側でも account_error のとき購入ボタンは表示されない（二重ガード）✅
+
+■ 18. 再試行ボタンが purchaseTake ではなく accountStatus 再取得を呼ぶこと
+================================================================
+
+  全3箇所の再試行ボタンの onClick:
+    S04: onClick={onRetry}
+    S08-P: onClick={onRetry}
+    S08-E: onClick={() => { setShowCopyModal(false); onRetry(); }}
+
+  onRetry の定義（App.jsx）:
+    const retryAccountStatus = () => setAccountStatusRetryCount((c) => c + 1);
+    → accountStatus 再取得 useEffect をトリガー
+    → purchaseTake を呼ばない ✅
+
+■ 19. accountStatus 利用箇所の全検索結果
+================================================================
+
+  App.jsx での利用:
+    :28   useState(null)                              ← 初期値
+    :29   accountStatusLoadState useState             ← 新規
+    :30   accountStatusRetryCount useState            ← 新規
+    :40   setAccountStatus(null)                      ← !user 時のクリア（正規）
+    :43   setAccountStatusLoadState('not_applicable') ← !user 時
+    :48   getAccountStatus() 呼び出し
+    :211  getUpgradeMode({ ..., accountStatusLoadState })
+    :240  user && accountStatus && (                  ← 表示行（loadState とは独立）
+    :242  accountStatus.planId === 'ume' ? '無料プラン' : accountStatus.planName
+    :376  canExport={accountStatus?.canExport ?? false}
+
+  upgradeGuard.js での利用:
+    :14   accountStatusLoadState === 'success' && accountStatus?.planId === 'take'
+
+  planId 判定: App.jsx の表示行（:242）と upgradeGuard.js のみ。分散なし ✅
+  planName: 表示用のみ（:242）。ロジック判定に使用なし ✅
+
+■ 20. accountStatus === null 検索結果
+================================================================
+
+  client/src 全体: 0件 ✅
+
+  旧 upgradeGuard.js にあった `accountStatus === null` は削除済み。
+  App.jsx の !user 分岐は `setAccountStatus(null)` のみ
+  （null チェックとして使用していない）。
+
+■ 21. setAccountStatus(null) 検索結果
+================================================================
+
+  App.jsx:42: 1件のみ
+    → !user の場合のクリア処理（正規）
+    → accountStatusLoadState('not_applicable') と同時に実行
+    → upgradeGuard では !user → not_logged_in に確定するため問題なし ✅
+
+  旧コードにあった `.catch(() => setAccountStatus(null))` は削除済み ✅
+
+■ 22. purchaseTake 検索結果
+================================================================
+
+  client/src/lib/billing.js:41   定義
+  client/src/lib/billing.js:43   console.warn 内
+  client/src/App.jsx:11          import
+  client/src/App.jsx:216         handleUpgrade 内（upgradeMode === 'purchase' のみ）
+  client/src/App.jsx:226         console.error 内
+
+  HistoryList / TranscriptView での直接参照: 0件 ✅
+
+■ 23. 状態別確認表
+================================================================
+
+  【S04 HistoryList】
+
+  upgradeMode      | 表示内容                       | ボタン | onClick
+  plus_active      | バナー非表示                   | -      | -
+  web              | p: Androidアプリ版...           | なし   | -
+  not_logged_in    | バナー非表示（S04は user必須）  | -      | -
+  account_error    | p: プラン情報を確認できません   | 再試行 | onRetry
+  loading          | button: 確認中...（disabled）   | あり   | なし
+  purchase         | button: SaidLog Plusに進む      | あり   | onUpgrade
+
+  【S08-P TranscriptView summary-blur-wrapper】
+
+  upgradeMode      | 表示内容                       | ボタン | onClick
+  plus_active      | null（非表示）                 | -      | -
+  web              | p: Androidアプリ版...           | なし   | -
+  not_logged_in    | button: 無料登録/ログイン       | あり   | onUpgrade
+  account_error    | p: プラン情報を確認できません   | 再試行 | onRetry
+  loading          | button: 確認中...（disabled）   | あり   | なし
+  purchase         | button: SaidLog Plusに進む      | あり   | onUpgrade
+
+  【S08-E TranscriptView showCopyModal ログイン済み分岐】
+
+  upgradeMode      | 表示内容                       | ボタン | onClick
+  plus_active      | p: SaidLog Plus利用中です       | なし   | -
+  web              | p: Androidアプリ版...           | なし   | -
+  not_logged_in    | [到達不可: isLoggedIn=true]     | -      | -
+  account_error    | p: プラン情報を確認できません   | 再試行 | setShowCopyModal(false)+onRetry
+  loading          | button: 確認中...（disabled）   | あり   | なし
+  purchase         | button: SaidLog Plusに進む      | あり   | setShowCopyModal(false)+onUpgrade
+
+  全セル確認:
+  ・account_error で purchaseTake に進まない ✅
+  ・account_error で再試行導線がある ✅
+  ・loading で再試行ではなく確認中になる ✅
+  ・purchase だけが購入 CTA になる ✅
+  ・plus_active で再購入 CTA が出ない ✅
+  ・web で押せる購入 CTA が出ない ✅
+
+■ 24. upgradeGuard 12ケース確認表
+================================================================
+
+  No.  条件                                        結果           備考
+  1.   Web + 未ログイン                            web            ② が先に確定
+  2.   Web + ログイン済み無料                      web            ② が先に確定
+  3.   Web + Plus利用中                            plus_active    ① loadState=success+take
+  4.   Web + loadState=loading                     web            ② が先。意図通り
+  5.   Web + loadState=error                       web            ② が先。購入導線なし
+  6.   Native + 未ログイン                         not_logged_in  ③
+  7.   Native + loadState=loading                  loading        ⑤ (not success)
+  8.   Native + loadState=error                    account_error  ④
+  9.   Native + ログイン済み無料（success）         purchase       ⑥
+  10.  Native + Plus利用中（success）              plus_active    ①
+  11.  Native + success だが accountStatus=null    purchase       ① は null?.planId=undefined≠take
+                                                                  成功時は非null仕様なので発生しない
+  12.  Native + error だが旧 plus accountStatus残  account_error  ① は success 必須なので回避 ✅
+
+  ケース4・5（Web + loading/error）:
+    購入フロー自体が存在しない Web 環境なので、
+    accountStatus の取得状況にかかわらず 'web' を返す設計は意図通り ✅
+
+  ケース11（success だが null）:
+    api.js の `if (!res.ok) return null` + 呼び出し側の `if (!s) → error`
+    により、success 時に null を setAccountStatus することはない。
+    仮にあっても purchase に落ちるだけで購入操作は可能なため問題小。
+
+  ケース12（error だが旧 Plus 値残存）:
+    ① の `accountStatusLoadState === 'success'` 条件で弾かれ account_error 確定 ✅
+
+■ 25. S01 v2.1 UI を実装していないこと
+================================================================
+
+  S01 idle ブロック: 変更なし ✅
+
+■ 26. 変更していない重要ファイル確認
+================================================================
+
+  billing.js / 課金ロジック: 変更なし ✅
+  認証ロジック（AuthContext等）: 変更なし ✅
+  DB関連: 変更なし ✅
+  plans.js / plan 仕様: 変更なし ✅
+  STT処理: 変更なし ✅
+  api.js: 変更なし ✅
+
+■ 27. build 結果
+================================================================
+
+  npm --prefix client run build: ✓ built in 5.49s ✅
+  新規エラー: なし
+  新規警告: なし（チャンクサイズ警告は pdfmake 由来の既存）
+
+■ 28. commit hash と message
+================================================================
+
+  （コミット後に記載）
+
+■ 29. push していないこと
+================================================================
+
+  push: 未実施 ✅
+
+■ 30. git status 最終結果
+================================================================
+
+  （コミット後に記載）
+
+================================================================
