@@ -1,0 +1,145 @@
+================================================================
+SaidLog 公開前バグ監査パケット（Claude Code Fable向け）
+作成日: 2026-07-03
+================================================================
+
+■ 監査の目的と制約
+- 本パケットは公開前バグ監査の前提整理です。
+- 監査の結果として問題を発見した場合は「報告のみ」とし、
+  ユーザーの明示的な承認なしに修正・削除・リファクタを行わないこと。
+- 禁止領域（無断変更禁止）：billing・auth・STT・env vars・DBロジック
+- 1タスク1ファイル・1コミットの原則は監査後の修正フェーズにも適用される。
+- 監査範囲：push済みコミット（最新: 7801c55）までを対象とする。
+  ローカルにのみ存在するS01 v2.1関連の3コミット
+  （e7a385d, 2778895, 15c4df1）は、GPT承認待ちの未確定UI実装のため
+  今回の監査スコープ外とする。
+  → 監査時、これら3コミットの変更内容（App.jsx等）が
+    ワーキングツリーに存在していても、コミット済みのpush範囲
+    （7801c55時点）とは別扱いであることを認識した上で監査すること。
+
+================================================================
+■ 最新のSaidLog状態
+================================================================
+repo名: https://github.com/ysawase/saidlog.git
+branch: main
+最新commit hash（ワーキングツリー）: e7a385df79d9b4b38385df66798b92ee619a82a1
+  （※監査対象外。監査対象の最新commitは 7801c55）
+push済みか: 未push（ローカルに3コミット先行、いずれも監査対象外。
+            監査対象範囲はpush済みの7801c55まで）
+  e7a385d feat: implement S01 v2.1 hero, pricing, explanation, flow sections
+  2778895 feat: add S01 v2.1 CSS (header redesign, steps, pricing, flow sections)
+  15c4df1 feat: add S01 v2.1 i18n keys (step labels, free trial banner)
+deploy済みか: 済み（最新push分 7801c55 まで本番反映確認済み。
+              未pushのS01 v2.1コミットは当然未反映）
+本番確認: 未（本番URLでのpush済み部分の実機動作確認は次工程）
+
+================================================================
+■ 直近で直したバグ一覧
+================================================================
+1. STT_PROVIDER未設定によるGroq→AssemblyAIフォールバック問題
+   → Vercelに STT_PROVIDER=groq を設定して解消済み
+2. 話者識別テキスト残留の削除
+3. 梅プラン（無料プラン）useTimeが正しく制限されない問題
+4. i18n.js taglineバグ修正（commit 93dd13d）
+5. Plus CTA安全化（upgradeGuard.js新規作成、6段階judgment実装）
+   commit: b175537, 81d5b57
+   → Web無反応・未ログイン課金・Plus利用中再購入・accountStatus取得失敗
+     の4種の安全性バグを根絶する対応
+6. accountStatus取得失敗時の復帰導線（accountStatusLoadState新設、
+   stale response対策、retryAccountStatus）
+   commit: fbce42d, 7801c55（push済み）
+
+================================================================
+■ 未解決・保留・要確認のもの
+================================================================
+1. S01 v2.1 UI本実装がローカルのみ（未push）
+   commit: e7a385d, 2778895, 15c4df1
+   → 実機スクショ確認・GPT承認待ちのため意図的に未push。
+     監査時点でこの3コミットが含まれているかは上記「push済みか」欄で確認。
+2. server/index.js:7 のキーチェックが実態と不一致の疑いあり
+   const requiredKey = provider === 'amivoice' ? 'AMIVOICE_APPKEY' : 'ASSEMBLYAI_API_KEY';
+   → STT_PROVIDER=groq運用時もASSEMBLYAI_API_KEYチェックになっており、
+     Groq実行にこのキーは不要。実害があるか要確認。
+3. server/routes/billing.js:26 のTODO未実装
+   // TODO: Google Play Developer API でトークン検証（実装は後続タスク）
+   → 現在はトークン受け取りのみで検証スキップ。公開前に要実装判断。
+4. Google Play Console サブスク表示名の「SaidLog Plus」への変更（手動、未実施）
+5. 銀行口座・支払いプロファイル未完了（Google Play公開のブロッカー）
+
+================================================================
+■ ノイズ一覧（2026-07-03棚卸し結果より）
+================================================================
+※ 詳細は docs/codebase_inventory_2026_07_03.txt を参照。
+※ 監査対象からの除外ではなく「旧仕様/未使用/将来機能と把握した上で
+   誤検出しないための前提情報」として提示する。
+
+【現行で使っている（誤検知に注意）】
+- 話者識別UI（TranscriptView.jsx）：Groqはspeaker0固定のため実質単一話者だが、
+  UI自体は複数話者前提の実装が現役で残る。バグではなく仕様上の非対称。
+- DUMMY_PREVIEW_HTML：Plus未加入者への要約プレビューblur演出として現役使用。
+- AmiVoice実装（server/stt/providers/amivoice.js）：STT抽象化層に登録済みで
+  切り替え可能状態だが、現在未使用（Groqが運用値）。
+- purchaseTakeの呼び出しはApp.jsx:216の1箇所のみ（handleUpgrade内）。
+
+【旧仕様だがコード/文言が残っている】
+- CLAUDE.md / README.md：「話者識別付き」「AssemblyAI」等、現行仕様と
+  乖離した説明が複数箇所に残存。
+- i18n.js の tagline / usageNotes キー：JSX側で参照されておらず孤立。
+- App.css の .tagline / .usage-notes：対応するJSXがなく未使用。
+- handover.md内の「月3回」表記：現行の時間制プランと不一致（旧文書内のみ）。
+
+【未使用候補】
+- App.jsx:207 の const busy：定義のみでJSX内での参照なし。
+- 上記i18n/CSSの孤立キーと重複。
+
+【ダミー/テスト/preview用途】
+- DUMMY_PREVIEW_HTML（現役使用、上記参照）
+- test-assemblyai.mjs / test-groq.mjs / test-summarize.mjs
+  （ルート直下、untracked、本体未組み込みの検証用スクリプト）
+
+【将来機能候補】
+- AmiVoice実装一式：松プラン候補として温存（話者識別あり、¥2,980/月想定）
+- AssemblyAI実装一式：話者分離の安価な代替候補として保留（品質検証未完）
+- Google Playストアリンクへの差し替えTODO×3箇所
+  （HistoryList.jsx:101、TranscriptView.jsx:215,314）
+- billing.js:26のトークン検証TODO（上記「未解決」にも重複記載、要実装）
+
+【判断不能】
+- summarize.js:236 の話者プレフィックス整形（speaker0固定下での意図確認要）
+- TranscriptView.jsx内の「詳細な議事録の生成」文言（S01価格表との表現差）
+- 「旧称：竹プラン」というコードコメントの残置意図
+
+================================================================
+■ 現行仕様として正しいもの（誤って「バグ」判定しないための正解セット）
+================================================================
+- プラン：無料プラン（月60分・履歴3件・要約プレビュー3行閲覧のみ、
+  コピー不可）／ SaidLog Plus（¥680/月・月10時間・詳細要約・
+  エクスポート可・履歴30件）
+- STT：Groq（Whisper v3 Turbo）が唯一の運用プロバイダ。
+  AmiVoice/AssemblyAIはコード上存在するが未使用（将来候補、[5-1][5-2]参照）
+- upgradeGuard.jsの優先順位は固定：
+  plus_active → web → not_logged_in → account_error → loading → purchase
+  plus_activeはaccountStatusLoadState==='success'が必須条件
+- Web環境ではPlus購入ボタンを一切表示しない
+  （Androidアプリ版案内の静的テキストに差し替え済み、3箇所にTODO設置）
+- accountStatusは「値」と「取得状態（accountStatusLoadState）」を
+  必ず分離して扱う設計
+
+================================================================
+■ Fableに重点的に見てほしい観点
+================================================================
+1. 【最重要】billing.js:26のトークン検証未実装が実際にどこまで
+   悪用可能な穴になっているか（不正なトークンでのPlus昇格の可否）
+2. upgradeGuard.jsの6段階判定に、過去バグ再発の余地がないか
+   （Web無反応・未ログイン課金・Plus利用中再購入・accountStatus取得失敗
+   の4種は根絶済みとされているが、新規コードパスでの再現がないか）
+3. server/index.js:7のキーチェックがGroq運用時に実害を及ぼしていないか
+   （起動時エラー・誤ったバリデーションの有無）
+4. speaker0固定とTranscriptViewの複数話者UIの不整合が、
+   将来的なクラッシュ・表示崩れの原因にならないか
+5. Google Play Billing（capacitor-plugin-cdv-purchase）周りで、
+   Web版とAndroid版の分岐漏れがないか（web分岐が実際に全経路で
+   有効になっているか）
+6. 本パケットのノイズ一覧に載っていない、新規発見のバグ・矛盾点
+
+================================================================
