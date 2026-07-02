@@ -6,7 +6,7 @@ const resources = {
   ja: {
     translation: {
       app: {
-        tagline: '会議録音をアップロードするだけで、話者ごとの議事録に',
+        tagline: '録音するだけで、会議メモができる。文字起こしとAI要約を自動で整理。',
         history: '履歴',
         logout: 'ログアウト',
         login: 'ログイン / 登録',
@@ -111,7 +111,7 @@ const resources = {
   en: {
     translation: {
       app: {
-        tagline: 'Upload your meeting recording and get a speaker-labeled transcript',
+        tagline: 'Record your meeting and get an organized meeting memo, with automatic transcription and AI summary.',
         history: 'History',
         logout: 'Log out',
         login: 'Log in / Sign up',
