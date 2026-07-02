@@ -206,7 +206,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <>
               <p style={{ fontWeight: 'bold', margin: '0 0 8px' }}>コピー・エクスポートは竹プランで使えます</p>
               <p style={{ fontSize: '0.875rem', color: '#4b5563', margin: '0 0 16px' }}>月680円で月10時間まで。会議メモのコピー・エクスポートに対応します。</p>
-              <button className="btn primary" onClick={purchaseTake}>竹プランを見る</button>
+              <button className="btn primary" onClick={purchaseTake}>竹プランに進む</button>
               <button className="btn secondary" onClick={() => setShowCopyModal(false)}>閉じる</button>
             </>
           )}
@@ -290,7 +290,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
               <div className="summary-blur-overlay">
                 <div className="summary-upgrade-card">
                   {upgradeMessage && <p className="summary-upgrade-message">{upgradeMessage}</p>}
-                  <button className="btn summary-upgrade-btn" onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>竹プランを見る</button>
+                  <button className="btn summary-upgrade-btn" onClick={async () => { await purchaseTake(); if (onPurchaseComplete) onPurchaseComplete(); }}>竹プランに進む</button>
                 </div>
               </div>
             </div>
