@@ -1,5 +1,8 @@
 import express from 'express';
+import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
+import { optionalAuth } from '../middleware/auth.js';
+import { verifyGooglePlaySubscription } from '../services/googlePlay.js';
 
 const router = express.Router();
 
@@ -10,25 +13,108 @@ function getSupabase() {
   );
 }
 
+function isProduction() {
+  return process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
+}
+
+let cachedOAuth2Client = null;
+
+function getOAuth2Client() {
+  if (!cachedOAuth2Client) cachedOAuth2Client = new google.auth.OAuth2();
+  return cachedOAuth2Client;
+}
+
+/**
+ * Pub/Sub push subscription のOIDCトークンを検証する。
+ * verifyIdToken が署名・iss・exp・aud を検証するため、
+ * ここでは email / email_verified の照合のみ追加で行う。
+ *
+ * @returns {Promise<{ok: true} | {ok: false, status: number, error: string}>}
+ */
+async function verifyPubSubPushToken(req) {
+  const audience = process.env.PUBSUB_PUSH_AUDIENCE;
+  const serviceAccount = process.env.PUBSUB_PUSH_SERVICE_ACCOUNT;
+
+  if (!audience || !serviceAccount) {
+    // 本番では検証をスキップせずエラーにする（fail-close）
+    if (isProduction()) {
+      console.error('[billing/webhook] PUBSUB_PUSH_AUDIENCE / PUBSUB_PUSH_SERVICE_ACCOUNT が未設定のため検証できません');
+      return { ok: false, status: 500, error: 'webhook not configured' };
+    }
+    console.warn('[billing/webhook] PUBSUB_PUSH_* 未設定（開発環境）。OIDC検証をスキップします');
+    return { ok: true };
+  }
+
+  const [scheme, token] = (req.headers.authorization ?? '').split(' ');
+  if (scheme !== 'Bearer' || !token) {
+    return { ok: false, status: 401, error: 'unauthorized' };
+  }
+
+  let payload;
+  try {
+    const ticket = await getOAuth2Client().verifyIdToken({
+      idToken: token,
+      audience,
+    });
+    payload = ticket.getPayload();
+  } catch (err) {
+    console.warn('[billing/webhook] OIDCトークン検証失敗:', err?.message);
+    return { ok: false, status: 401, error: 'unauthorized' };
+  }
+
+  if (payload?.email !== serviceAccount || payload?.email_verified !== true) {
+    console.warn('[billing/webhook] サービスアカウント照合失敗:', payload?.email);
+    return { ok: false, status: 403, error: 'forbidden' };
+  }
+
+  return { ok: true };
+}
+
 /**
  * POST /api/billing/verify
  * Google Playレシート検証・エンタイトルメント更新
- * body: { purchase_token: string, user_id: string }
+ * body: { purchase_token: string }
  */
-router.post('/verify', async (req, res) => {
-  const { purchase_token, user_id } = req.body;
+router.post('/verify', optionalAuth, async (req, res) => {
+  const user_id = req.userId;
+  if (!user_id) return res.status(401).json({ error: 'ログインが必要です' });
 
-  if (!purchase_token || !user_id) {
-    return res.status(400).json({ error: 'purchase_token and user_id are required' });
+  const { purchase_token } = req.body;
+
+  if (!purchase_token) {
+    return res.status(400).json({ error: 'purchase_token is required' });
   }
 
   try {
-    // TODO: Google Play Developer API でトークン検証（実装は後続タスク）
-    // 現時点ではトークンをDBに保存してstatusをactiveにする仮実装
+    const verification = await verifyGooglePlaySubscription(purchase_token);
+
+    if (!verification.valid) {
+      if (verification.reason === 'NOT_CONFIGURED') {
+        // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
+        return res.status(500).json({ error: 'billing not configured' });
+      }
+      console.warn('[billing/verify] 検証失敗:', verification.reason, verification.subscriptionState);
+      return res.status(403).json({ error: '購入トークンの検証に失敗しました', reason: verification.reason });
+    }
+
+    const { data: existing, error: lookupError } = await getSupabase()
+      .from('user_entitlements')
+      .select('user_id')
+      .eq('purchase_token', purchase_token)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (existing && existing.user_id !== user_id) {
+      return res.status(403).json({ error: 'このトークンは既に別のアカウントで使用されています' });
+    }
 
     const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setMonth(periodEnd.getMonth() + 1);
+    // 検証で得た実際の有効期限を使う（開発環境の検証スキップ時のみ従来どおり+1ヶ月）
+    const periodEnd = verification.expiryTime
+      ? new Date(verification.expiryTime)
+      : new Date(now);
+    if (!verification.expiryTime) periodEnd.setMonth(periodEnd.getMonth() + 1);
 
     const { error } = await getSupabase()
       .from('user_entitlements')
@@ -58,6 +144,11 @@ router.post('/verify', async (req, res) => {
  * body: Pub/Subメッセージ形式
  */
 router.post('/webhook', async (req, res) => {
+  const auth = await verifyPubSubPushToken(req);
+  if (!auth.ok) {
+    return res.status(auth.status).json({ error: auth.error });
+  }
+
   try {
     const message = req.body?.message;
     if (!message?.data) {

@@ -1,0 +1,236 @@
+================================================================
+コードベース棚卸し報告（Fable監査前ノイズ整理）
+2026-07-03
+================================================================
+調査範囲: client/src/ + server/ + ルート *.md
+調査方法: grep / Read による確認。ファイル変更なし。
+================================================================
+
+■ 1. 現行で使っている
+================================================================
+
+[1-1] 話者識別（speaker）関連 — TranscriptView に現役実装あり
+  client/src/components/TranscriptView.jsx:7-8
+    const SPEAKER_COLORS = [...]; const SPEAKER_LABELS = ['A','B','C','D','E','F'];
+  client/src/components/TranscriptView.jsx:28-51
+    speakers = useMemo(...u.speaker...) / colorOf(speaker) — 話者色付け
+  client/src/components/TranscriptView.jsx:235-243
+    <div className="speaker-legend"> — 複数話者時のラベル凡例 UI
+  client/src/components/TranscriptView.jsx:410-412
+    <span className="speaker-name"> — 発言一覧の話者名表示
+  client/src/i18n.js:104 / :227
+    speakerLabel: '話者{{s}}の名前' — 話者名編集用ラベル
+  client/src/utils/export.js:17 / :97
+    names[u.speaker] — エクスポート時の話者名埋め込み
+  server/routes/summarize.js:97
+    `話者${u.speaker}：${u.text}` — AI要約プロンプト用の話者フォーマット
+  server/stt/providers/groq.js:10,57,60
+    speaker: 'speaker0' 固定（話者分離なし、speaker0として全発話を返す）
+  → 補足: Groq は speaker0 固定だが、TranscriptView は複数話者前提のUIも備える。
+    現在の録音では speaker0 のみ → speakers.length === 1 → 凡例は非表示。
+
+[1-2] DUMMY_PREVIEW_HTML — 要約プレビューのblur演出に実使用
+  client/src/components/TranscriptView.jsx:10-17  定義
+  client/src/components/TranscriptView.jsx:306
+    dangerouslySetInnerHTML={{ __html: DUMMY_PREVIEW_HTML }}
+  → Plus未加入ユーザーへのプレビューぼかし表示に使用中。
+
+[1-3] AmiVoice実装コード — STT抽象化層に登録済み・切り替え可能状態
+  server/stt/providers/amivoice.js（全体）
+  server/stt/index.js:2,13
+    import / providers.amivoice として登録
+  → STT_PROVIDER=amivoice に変更すれば即有効化できる実装済みコード。
+
+[1-4] purchaseTake — App.jsx handleUpgrade 内の唯一の呼び出し元
+  client/src/App.jsx:11   import
+  client/src/App.jsx:216  await purchaseTake()  ← upgradeMode==='purchase'時のみ
+  client/src/lib/billing.js:41-43  定義（非Native時は console.warn のみ）
+
+[1-5] 制限値 — server/config/plans.js が正式な単一ソース
+  server/config/plans.js:5   monthlySeconds: 3600  （梅 60分）
+  server/config/plans.js:6   historyLimit: 3
+  server/config/plans.js:13  monthlySeconds: 10*60*60  （竹 10時間）
+  server/config/plans.js:14  historyLimit: 30
+  → account.js / services/plan.js がここを参照してAPIレスポンスに含める。
+
+[1-6] server/routes/transcribe.js:31-124 — provider分岐（groq/amivoice/assemblyai）
+  現在 STT_PROVIDER=groq が運用値（handover.md確認）。
+  amivoice / assemblyai 分岐コードも同ファイル内に残存（後述 [5-x] と重複判定）。
+
+================================================================
+■ 2. 旧仕様だがまだコード/文言が残っている
+================================================================
+
+[2-1] CLAUDE.md:3 — アプリ説明文に旧キャッチコピー残存
+  「リアル会議をする社会人向けの、話者識別付き音声文字起こしWebアプリ。」
+  → 現行は話者識別なし（Groq=speaker0固定）。製品説明が実態と乖離。
+
+[2-2] README.md:3,5,13,29,78 — 旧構成の説明が多数残存
+  :3   「話者識別付き音声文字起こしWebアプリ」
+  :5   「AssemblyAI で文字起こし＋話者識別」（現在はGroq）
+  :13  「文字起こし・話者識別 | AssemblyAI API」
+  :29  「TranscriptView.jsx # 結果表示（話者名は編集可能）」
+  :78  utterancesのJSONサンプル（speaker: "A"）
+  → STT=Groq、話者分離なし、SaidLog Plusへの製品転換が反映されていない。
+
+[2-3] i18n.js — taglineキーはJSX削除済みで孤立
+  client/src/i18n.js:9
+    tagline: '録音するだけで、会議メモができる。文字起こしとAI要約を自動で整理。'
+  client/src/i18n.js:132
+    tagline: 'Record your meeting...'
+  → App.jsx の <p className="tagline"> は S01 v2.1 で削除済み。キーが残存。
+
+[2-4] App.css — .tagline CSSルールがJSX削除後も残存
+  client/src/App.css:118-120
+    .tagline { color: #6b7280; margin-top: 6px; }
+  → レンダリング対象なし。
+
+[2-5] i18n.js — usageNotes キー群がJSXで未参照
+  client/src/i18n.js:41-48（ja）/ :164-171（en）
+    usageNotes: { title, apiCost, sizeLimit, keepScreen, noServer }
+  → App.jsx / 各コンポーネントに {t('app.usageNotes.*')} の呼び出しなし。
+    「本サービスはAI処理に複数のAPIを使用しています」等の旧注意書き文言。
+
+[2-6] App.css — .usage-notes CSSルール群がJSX削除後も残存
+  client/src/App.css:409-424
+    .usage-notes { ... }  .usage-notes p  .usage-notes ul
+  → 使用箇所なし。
+
+[2-7] saidlog_handover.md:22 / server/# Saidlog作業引き継ぎ（2026-06-12）.md:21
+  「AmiVoice話者識別付き文字起こし（STT抽象化層経由）」を現行STTとして記載
+  → 現在はGroqに切り替え済み。旧引き継ぎ文書の記述。
+
+[2-8] saidlog_handover.md:110 / server/# Saidlog作業引き継ぎ（2026-06-12）.md:56
+  「| 話者識別文字起こし | 月3回 | 無制限 | 無制限 |」
+  → 旧プラン表（月3回という旧制限）。現行のプラン体系（時間制）と不一致。
+
+[2-9] server/index.js:7 — amivoice/assemblyai のみを想定したキーチェック
+  const requiredKey = provider === 'amivoice' ? 'AMIVOICE_APPKEY' : 'ASSEMBLYAI_API_KEY';
+  → STT_PROVIDER=groq 時は ASSEMBLYAI_API_KEY チェックになるが、
+    Groqの実行にそのキーは不要。キーチェック自体が無意味な状態。
+
+================================================================
+■ 3. 未使用候補（importされていない・呼び出し元がない）
+================================================================
+
+[3-1] const busy — App.jsx 定義済みだが参照なし
+  client/src/App.jsx:207
+    const busy = status === 'uploading' || status === 'processing';
+  → JSX内でbusy変数を使っている箇所なし（全文確認済み）。
+
+[3-2] usageNotes i18n キー — [2-5]と重複、未参照
+  （[2-5]参照）
+
+[3-3] .tagline / .usage-notes CSS — [2-4][2-6]と重複、未参照
+  （[2-4][2-6]参照）
+
+================================================================
+■ 4. ダミー/テスト/preview用途
+================================================================
+
+[4-1] DUMMY_PREVIEW_HTML — 要約プレビューのダミー本文
+  client/src/components/TranscriptView.jsx:10-17
+  → 「利用者さんとの関わり方…」「担当者会議…」という架空会議の要約文。
+    blur演出のためのダミーコンテンツ。現役使用中（[1-2]参照）。
+    モデルケースとして福祉施設の打ち合わせを想定した内容。
+
+[4-2] テストスクリプト（untracked）
+  test-assemblyai.mjs  （プロジェクトルート）
+  test-groq.mjs        （プロジェクトルート）
+  test-summarize.mjs   （プロジェクトルート）
+  → gitignore対象外・未コミット。本体には組み込まれていない検証用スクリプト。
+
+================================================================
+■ 5. 将来機能候補（コメントアウト・TODO・未接続の分岐等）
+================================================================
+
+[5-1] AmiVoice実装 — 松プラン候補として温存
+  server/stt/providers/amivoice.js（全体・124行）
+  → handover.md:541「将来：松プラン候補（2,980円/月・5時間・AmiVoice・話者識別あり）」
+    STT_PROVIDER=amivoice で即有効化可能な完成コード。
+
+[5-2] AssemblyAI実装 — 話者分離候補として保留
+  server/stt/providers/assemblyai.js（全体）
+  server/stt/providers/assemblyai.js:21  speaker_labels: true
+  → handover.md:212「AssemblyAIは安価な話者分離候補として保留（品質検証未完）」
+
+[5-3] TODO: Google Play ストアリンク × 3箇所
+  client/src/components/HistoryList.jsx:101
+    {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+  client/src/components/TranscriptView.jsx:215
+    {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+  client/src/components/TranscriptView.jsx:314
+    {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+  → web分岐（upgradeMode==='web'）で表示されるp要素に付いたTODO。
+    Google Play審査完了後にストアURLへ差し替える予定箇所。
+
+[5-4] TODO: Google Play トークン検証
+  server/routes/billing.js:26
+    // TODO: Google Play Developer API でトークン検証（実装は後続タスク）
+  → 現在はトークン受け取りのみで検証スキップ。本番前に実装が必要。
+
+[5-5] meetlog-phase2-design.md — AmiVoice/Deepgram/Soniox比較実験計画
+  meetlog-phase2-design.md:184-188
+  → ベンダー比較スクリプトの計画文書。現時点で未着手。
+
+================================================================
+■ 6. 判断不能
+================================================================
+
+[6-1] server/routes/summarize.js:236
+    .map((u) => `話者${u.speaker}：${u.text}`)
+  → ファイルプレビュー要約（summary_type='preview'）用のプロンプト整形。
+    Groq利用時は全話者がspeaker0なので「話者speaker0：」と並ぶが機能上は問題なし。
+    意図的かどうか（将来の多話者対応を見越した設計か、speaker0で十分なはずが残存か）
+    は文脈から判断が割れる。
+
+[6-2] client/src/components/TranscriptView.jsx:272
+    「月額680円で、詳細な議事録の生成・テキストエクスポート・履歴30件保存が使えます。月10時間まで利用可能。」
+  および :207
+    「月680円で月10時間まで。会議メモのコピー・エクスポートに対応します。」
+  → S01価格表（App.jsx:420-440）との文言は揃っているが、
+    TranscriptViewのこれらの文言はS08-Pのblurカード内とS08-Eのモーダル内。
+    「詳細な議事録の生成」という表現は現行UI（会議メモ）と微妙にずれる可能性あり。
+    現行仕様内と見るか旧文言残存と見るか判断が割れる。
+
+[6-3] client/src/App.css:433 / client/src/lib/billing.js:39
+    「旧称：竹プラン」というコメント
+  → 名称変更の経緯メモ。削除しても機能上は無問題だが、
+    履歴・引き継ぎ情報として意図的に残している可能性もある。
+
+================================================================
+■ 個別観点 — 「該当なし」だったもの
+================================================================
+
+【旧メールアドレス saidlogapp@gmail.com のソースコード残存】
+  → client/src / server/ 内には存在しない。
+    saidlog_handover.md:50 のdocs参照のみ（privacy.html の問い合わせ先記載）。
+    ソースコード・JSX・サーバーコードへの残存：なし ✅
+
+【Web環境での purchaseTake 直接呼び出しの残骸】
+  → HistoryList.jsx / TranscriptView.jsx からの直接呼び出し：なし ✅
+    唯一の呼び出しは App.jsx:216（handleUpgrade内、purchase モード限定）
+
+【client側とserver側で同じ制限値が変数として重複定義されている箇所】
+  → 変数・定数の重複定義はなし。
+    server/config/plans.js が唯一の正式定義。
+    client側は i18n.js / App.jsx / HistoryList.jsx / TranscriptView.jsx で
+    ハードコードされた表示文字列として存在するが、これはUI文言であり
+    プログラム的な重複定義ではない。
+    ただし計画値が変わった場合にclient側文字列を手動で更新する必要がある点は
+    棚卸し結果として記録。
+
+【README内の旧スクショパス・Obsidian参照】
+  → スクショパスや画像参照：README.mdに画像リンクなし
+  → Obsidian参照：saidlog_handover.md:589 にのみ「Decision LogはObsidianにもコピー」
+    という運用メモがある（ソースコードではなく文書）。
+
+================================================================
+■ git status 最終確認
+================================================================
+
+  ソースコード（client/ server/）への変更：なし
+  ステータス: nothing added to commit but untracked files present
+  → 今回の調査で変更したファイルなし ✅
+
+================================================================
