@@ -1,9 +1,45 @@
 import { Capacitor } from '@capacitor/core';
+import { supabase } from './supabase';
+
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
 // cdv-purchaseプラグインはCapacitorネイティブ環境のみ有効
 const isNative = () => Capacitor.isNativePlatform();
 
 let storeInitialized = false;
+
+/**
+ * サーバーの /api/billing/verify を呼び、購入トークンを検証・保存する。
+ * 成功時のみ true を返す。
+ */
+async function verifyPurchaseOnServer(receipt) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) {
+    console.error('[billing] verifyPurchaseOnServer: no access_token, skipping finish()');
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/billing/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ purchase_token: receipt.purchaseToken }),
+    });
+
+    if (!res.ok) {
+      console.error('[billing] /api/billing/verify failed:', res.status);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[billing] /api/billing/verify request error:', err);
+    return false;
+  }
+}
 
 /**
  * Google Play Billingの初期化
@@ -29,7 +65,10 @@ export async function initBilling() {
 
   store.when()
     .approved(transaction => transaction.verify())
-    .verified(receipt => receipt.finish());
+    .verified(async receipt => {
+      const ok = await verifyPurchaseOnServer(receipt);
+      if (ok) await receipt.finish();
+    });
 
   await store.initialize([Platform.GOOGLE_PLAY]);
   storeInitialized = true;
