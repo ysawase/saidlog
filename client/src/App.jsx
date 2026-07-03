@@ -327,13 +327,13 @@ function AppInner() {
                   <div className="s01-step-miniature" style={{ alignItems: 'flex-start', padding: '6px 8px' }}>
                     <div style={{ fontSize: '0.6rem', fontWeight: '600', color: '#111827', marginBottom: '4px' }}>履歴</div>
                     {[
-                      { name: '週次MTG', bg: '#ecfdf5', color: '#047857', chip: '要約済み' },
-                      { name: '営業会議', bg: '#eff6ff', color: '#1d4ed8', chip: 'プレビュー' },
-                      { name: '1on1', bg: '#f3f4f6', color: '#4b5563', chip: '文字起こし' },
+                      { name: '週次MTG', dot: '#047857' },
+                      { name: '営業会議', dot: '#1d4ed8' },
+                      { name: '1on1', dot: '#9ca3af' },
                     ].map((item, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '3px', width: '100%', marginBottom: '2px' }}>
-                        <span style={{ fontSize: '0.6rem', color: '#111827', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
-                        <span style={{ fontSize: '0.5rem', background: item.bg, color: item.color, borderRadius: '3px', padding: '1px 3px', whiteSpace: 'nowrap', flexShrink: 0 }}>{item.chip}</span>
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%', marginBottom: '3px' }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: item.dot, flexShrink: 0 }} />
+                        <span style={{ fontSize: '0.7rem', color: '#111827', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</span>
                       </div>
                     ))}
                   </div>
