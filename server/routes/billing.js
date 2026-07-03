@@ -1,6 +1,7 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
+import { verifyGooglePlaySubscription } from '../services/googlePlay.js';
 
 const router = express.Router();
 
@@ -27,12 +28,23 @@ router.post('/verify', optionalAuth, async (req, res) => {
   }
 
   try {
-    // TODO: Google Play Developer API でトークン検証（実装は後続タスク）
-    // 現時点ではトークンをDBに保存してstatusをactiveにする仮実装
+    const verification = await verifyGooglePlaySubscription(purchase_token);
+
+    if (!verification.valid) {
+      if (verification.reason === 'NOT_CONFIGURED') {
+        // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
+        return res.status(500).json({ error: 'billing not configured' });
+      }
+      console.warn('[billing/verify] 検証失敗:', verification.reason, verification.subscriptionState);
+      return res.status(403).json({ error: '購入トークンの検証に失敗しました', reason: verification.reason });
+    }
 
     const now = new Date();
-    const periodEnd = new Date(now);
-    periodEnd.setMonth(periodEnd.getMonth() + 1);
+    // 検証で得た実際の有効期限を使う（開発環境の検証スキップ時のみ従来どおり+1ヶ月）
+    const periodEnd = verification.expiryTime
+      ? new Date(verification.expiryTime)
+      : new Date(now);
+    if (!verification.expiryTime) periodEnd.setMonth(periodEnd.getMonth() + 1);
 
     const { error } = await getSupabase()
       .from('user_entitlements')
