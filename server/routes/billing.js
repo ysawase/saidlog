@@ -1,5 +1,6 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -13,13 +14,16 @@ function getSupabase() {
 /**
  * POST /api/billing/verify
  * Google Playレシート検証・エンタイトルメント更新
- * body: { purchase_token: string, user_id: string }
+ * body: { purchase_token: string }
  */
-router.post('/verify', async (req, res) => {
-  const { purchase_token, user_id } = req.body;
+router.post('/verify', optionalAuth, async (req, res) => {
+  const user_id = req.userId;
+  if (!user_id) return res.status(401).json({ error: 'ログインが必要です' });
 
-  if (!purchase_token || !user_id) {
-    return res.status(400).json({ error: 'purchase_token and user_id are required' });
+  const { purchase_token } = req.body;
+
+  if (!purchase_token) {
+    return res.status(400).json({ error: 'purchase_token is required' });
   }
 
   try {
