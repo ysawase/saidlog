@@ -13,6 +13,11 @@ let storeInitialized = false;
  * 成功時のみ true を返す。
  */
 async function verifyPurchaseOnServer(receipt) {
+  if (!receipt.purchaseToken) {
+    console.error('[billing] receipt.purchaseToken is missing, skipping verification');
+    return false;
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
   const accessToken = session?.access_token;
   if (!accessToken) {
