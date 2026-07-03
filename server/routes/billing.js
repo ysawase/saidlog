@@ -97,6 +97,18 @@ router.post('/verify', optionalAuth, async (req, res) => {
       return res.status(403).json({ error: '購入トークンの検証に失敗しました', reason: verification.reason });
     }
 
+    const { data: existing, error: lookupError } = await getSupabase()
+      .from('user_entitlements')
+      .select('user_id')
+      .eq('purchase_token', purchase_token)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (existing && existing.user_id !== user_id) {
+      return res.status(403).json({ error: 'このトークンは既に別のアカウントで使用されています' });
+    }
+
     const now = new Date();
     // 検証で得た実際の有効期限を使う（開発環境の検証スキップ時のみ従来どおり+1ヶ月）
     const periodEnd = verification.expiryTime
