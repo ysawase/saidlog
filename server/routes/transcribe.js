@@ -6,10 +6,13 @@ import {
 } from '../services/storage.js';
 import { cleanupOldFiles } from '../services/cleanup.js';
 import {
-  canStartTranscription, recordTranscriptionSuccess, recordTranscriptionFailure,
+  canStartTranscription, recordTranscriptionSuccess, recordTranscriptionFailure, getEntitlement,
 } from '../services/plan.js';
 import { optionalAuth } from '../middleware/auth.js';
-import { buildTranscriptionErrorCode } from '../utils/classifyTranscriptionError.js';
+import { buildTranscriptionErrorCode, classifyTranscriptionError } from '../utils/classifyTranscriptionError.js';
+import {
+  insertEvent, sanitizeSessionId, bucketAudioDuration, mapErrorCategory,
+} from '../services/events.js';
 
 const router = Router();
 
@@ -36,6 +39,34 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
     if (!process.env[requiredKey]) {
       return res.status(500).json({ error: `サーバーに ${requiredKey} が設定されていません` });
     }
+
+    // ---- analytics（S01効果検証）----
+    // sessionIdは任意・analytics専用。不正値はここでnullに落とし、本体処理には一切使わない。
+    // insertEventは例外を投げないため、以降のイベント記録が本体を失敗させることはない。
+    const anonymousSessionId = sanitizeSessionId(req.body.sessionId);
+    const deviceCategory = /mobile|android|iphone|ipad/i.test(req.headers['user-agent'] ?? '')
+      ? 'mobile' : 'desktop';
+    let planState = 'unknown';
+    if (userId) {
+      try {
+        const { planId } = await getEntitlement(userId);
+        planState = planId === 'take' ? 'plus' : 'free';
+      } catch { /* unknownのまま */ }
+    }
+    const baseEvent = {
+      anonymous_session_id: anonymousSessionId,
+      actor_type: userId ? 'user' : 'guest',
+      auth_state: userId ? 'logged_in' : 'guest',
+      plan_state: planState,
+      source: 's01',
+      device_category: deviceCategory,
+      stt_provider: provider,
+    };
+    await insertEvent({
+      ...baseEvent,
+      event_name: 'transcription_request',
+      audio_duration_bucket: bucketAudioDuration(durationSeconds ?? 0),
+    });
 
     const GUEST_TRIAL_MAX_MINUTES = parseInt(process.env.GUEST_TRIAL_MAX_MINUTES ?? '15', 10);
     const GUEST_TRIAL_MAX_SECONDS = GUEST_TRIAL_MAX_MINUTES * 60;
@@ -128,10 +159,25 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
       if (userId) {
         await recordTranscriptionFailure(transcriptId, buildTranscriptionErrorCode(sttError)).catch(console.error);
       }
+      // eventsにはrawメッセージを渡さず、分類コードのみをマッピングして記録する
+      await insertEvent({
+        ...baseEvent,
+        event_name: 'transcription_error',
+        result: 'error',
+        error_category: mapErrorCategory(classifyTranscriptionError(sttError)),
+        audio_duration_bucket: bucketAudioDuration(durationSeconds ?? 0),
+      });
       throw sttError;
     }
 
     console.log(`文字起こし完了: ${filePath} (発言数: ${result.utterances.length}, 音声長: ${result.audioDurationSec}s)`);
+
+    await insertEvent({
+      ...baseEvent,
+      event_name: 'transcription_success',
+      result: 'success',
+      audio_duration_bucket: bucketAudioDuration(result.audioDurationSec ?? durationSeconds ?? 0),
+    });
 
     let insertedId = transcriptId;
     if (hasPlanContext) {
