@@ -91,7 +91,7 @@ export async function transcribe({ audio, filename }) {
     const result = await pollRes.json();
 
     if (result.status === 'error') {
-      throw new Error(`AmiVoice 認識エラー: ${result.message ?? JSON.stringify(result)}`);
+      throw new Error(`AmiVoice 認識エラー: ${amivoiceErrorMessage(result)}`);
     }
 
     if (result.status !== 'completed') continue;
@@ -126,4 +126,19 @@ export async function transcribe({ audio, filename }) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * AmiVoiceのエラー応答からエラーメッセージ文字列のみを安全に取り出す。
+ * result.message以外（segments/results/tokens等、認識済みテキストを
+ * 含みうるフィールド）は一切参照しない。result.messageが無い・
+ * 文字列でない場合は固定の安全な文言にフォールバックする
+ * （認識結果本文をログ/DBへ流出させないため、JSON.stringify(result)は行わない）。
+ * @param {object} result AmiVoiceポーリングAPIのレスポンス
+ * @returns {string}
+ */
+export function amivoiceErrorMessage(result) {
+  return typeof result?.message === 'string' && result.message.length > 0
+    ? result.message
+    : 'AMIVOICE_RESPONSE_ERROR';
 }
