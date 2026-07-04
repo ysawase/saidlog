@@ -16,6 +16,9 @@ router.get('/transcripts', optionalAuth, async (req, res, next) => {
       .from('transcripts')
       .select('id, filename, created_at, result, summary_preview, summary_type')
       .eq('user_id', userId)
+      // STT前にtranscribing状態で行を作成する方式のため、処理中・失敗行を除外する。
+      // 旧データ（transcription_status未設定）はnullとして許可する。
+      .or('transcription_status.eq.completed,transcription_status.is.null')
       .order('created_at', { ascending: false })
       .limit(limit);
 

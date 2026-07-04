@@ -9,6 +9,7 @@ import {
   canStartTranscription, recordTranscriptionSuccess, recordTranscriptionFailure,
 } from '../services/plan.js';
 import { optionalAuth } from '../middleware/auth.js';
+import { buildTranscriptionErrorCode } from '../utils/classifyTranscriptionError.js';
 
 const router = Router();
 
@@ -74,13 +75,42 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
     }
 
     const audioUrl = await createSignedAudioUrl(filePath);
+    const filename = filePath.split('/').pop();
+    const sttModel = provider === 'groq' ? 'whisper-large-v3-turbo'
+      : provider === 'amivoice' ? 'a-general'
+      : 'universal-3-pro';
+
+    // STT開始前にtranscripts行を先に作っておく（transcribing）。
+    // 失敗時もこのIDでrecordTranscriptionFailureが更新できるようにするため。
+    // 事前insertに失敗しても文字起こし自体は継続する（ベストエフォート、フォールバックは成功時に行う）。
+    let transcriptId = null;
+    if (hasPlanContext) {
+      const { data: preInserted, error: preInsertError } = await getSupabase()
+        .from('transcripts')
+        .insert({
+          user_id: userId,
+          filename,
+          result: { utterances: [] },
+          transcription_status: 'transcribing',
+          stt_provider: provider,
+          stt_model: sttModel,
+          audio_duration_seconds: durationSeconds ?? 0,
+        })
+        .select('id')
+        .single();
+      if (preInsertError) {
+        console.error('[transcribe] 事前insert失敗:', preInsertError.message);
+      } else {
+        transcriptId = preInserted?.id ?? null;
+      }
+    }
 
     console.log(`文字起こし開始: ${filePath}`);
     let result;
     let sttError = null;
     try {
       // filePath は {uuid}/{ファイル名} 形式。拡張子による変換判定用にファイル名部分を渡す
-      result = await transcribe({ audio: audioUrl, language: 'ja', filename: filePath.split('/').pop() });
+      result = await transcribe({ audio: audioUrl, language: 'ja', filename });
     } catch (err) {
       sttError = err;
     } finally {
@@ -96,38 +126,51 @@ router.post('/transcribe', optionalAuth, async (req, res, next) => {
 
     if (sttError) {
       if (userId) {
-        await recordTranscriptionFailure(null, sttError.code || 'UNKNOWN').catch(console.error);
+        await recordTranscriptionFailure(transcriptId, buildTranscriptionErrorCode(sttError)).catch(console.error);
       }
       throw sttError;
     }
 
     console.log(`文字起こし完了: ${filePath} (発言数: ${result.utterances.length}, 音声長: ${result.audioDurationSec}s)`);
 
-    let insertedId = null;
+    let insertedId = transcriptId;
     if (hasPlanContext) {
       const actualSeconds = Math.ceil(result.audioDurationSec);
-      const filename = filePath.split('/').pop();
+      const costEstimate = provider === 'groq' ? Math.round(actualSeconds / 60 * 0.004 * 150) / 100
+        : provider === 'amivoice' ? Math.round(actualSeconds / 60 * 0.044 * 100) / 100
+        : Math.round(actualSeconds / 60 * 0.007 * 100) / 100;
 
-      const { data: inserted } = await getSupabase()
-        .from('transcripts')
-        .insert({
-          user_id: userId,
-          filename,
-          result,
-          transcription_status: 'transcribing',
-          stt_provider: provider,
-          stt_model: provider === 'groq' ? 'whisper-large-v3-turbo'
-            : provider === 'amivoice' ? 'a-general'
-            : 'universal-3-pro',
-          audio_duration_seconds: actualSeconds,
-          stt_cost_estimate: provider === 'groq' ? Math.round(actualSeconds / 60 * 0.004 * 150) / 100
-            : provider === 'amivoice' ? Math.round(actualSeconds / 60 * 0.044 * 100) / 100
-            : Math.round(actualSeconds / 60 * 0.007 * 100) / 100,
-        })
-        .select('id')
-        .single();
+      if (insertedId) {
+        const { error: updateError } = await getSupabase()
+          .from('transcripts')
+          .update({
+            result,
+            audio_duration_seconds: actualSeconds,
+            stt_cost_estimate: costEstimate,
+          })
+          .eq('id', insertedId);
+        if (updateError) {
+          console.error('[transcribe] 結果update失敗:', updateError.message);
+        }
+      } else {
+        // 事前insertが失敗していた場合のフォールバック（従来どおりinsert）
+        const { data: inserted } = await getSupabase()
+          .from('transcripts')
+          .insert({
+            user_id: userId,
+            filename,
+            result,
+            transcription_status: 'transcribing',
+            stt_provider: provider,
+            stt_model: sttModel,
+            audio_duration_seconds: actualSeconds,
+            stt_cost_estimate: costEstimate,
+          })
+          .select('id')
+          .single();
+        insertedId = inserted?.id ?? null;
+      }
 
-      insertedId = inserted?.id ?? null;
       await recordTranscriptionSuccess(userId, insertedId, actualSeconds).catch(console.error);
     }
 

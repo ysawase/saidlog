@@ -114,10 +114,13 @@ export async function recordTranscriptionSuccess(userId, meetingId, durationSeco
  */
 export async function recordTranscriptionFailure(meetingId, errorCode) {
   if (!meetingId) return;
-  await getSupabase()
+  const { error } = await getSupabase()
     .from('transcripts')
     .update({ transcription_status: 'failed', error_code: errorCode })
     .eq('id', meetingId);
+  if (error) {
+    console.error('[plan] recordTranscriptionFailure update error:', error.message);
+  }
 }
 
 /**
