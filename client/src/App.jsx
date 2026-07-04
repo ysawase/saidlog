@@ -11,6 +11,7 @@ import { HistoryList } from './components/HistoryList.jsx';
 import { initBilling, purchaseTake, restorePurchases } from './lib/billing';
 import { getUpgradeMode } from './lib/upgradeGuard';
 import { getOrCreateGuestId } from './lib/guestId';
+import { trackEvent, planStateFromPlanId } from './lib/analytics.js';
 import { MAX_SIZE_MB } from './constants/limits.js';
 
 function AppInner() {
@@ -18,6 +19,7 @@ function AppInner() {
   const { user, signOut } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalInitialMode, setAuthModalInitialMode] = useState('login');
+  const [authModalSource, setAuthModalSource] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | uploading | processing | done | error
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -34,8 +36,31 @@ function AppInner() {
   const [s01Warning, setS01Warning] = useState('');
   const processingTimerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const s01ViewTrackedRef = useRef(false);
 
   useEffect(() => { initBilling(); }, []);
+
+  const planState = planStateFromPlanId(accountStatus?.planId);
+
+  // 認証モーダルを開く。開いた契機はauth_modal_openイベントのsourceとして記録する
+  const openAuthModal = (source, mode = null) => {
+    if (mode) setAuthModalInitialMode(mode);
+    setAuthModalSource(source);
+    setShowAuthModal(true);
+  };
+
+  // s01_view: S01はidle時の初期画面のため、ページロードごとに1回だけ記録する
+  useEffect(() => {
+    if (s01ViewTrackedRef.current) return;
+    s01ViewTrackedRef.current = true;
+    trackEvent('s01_view', { source: 's01' });
+  }, []);
+
+  useEffect(() => {
+    if (showAuthModal) {
+      trackEvent('auth_modal_open', { source: authModalSource, planState });
+    }
+  }, [showAuthModal]);
 
   useEffect(() => {
     if (!user) {
@@ -99,8 +124,7 @@ function AppInner() {
       const usedKey = `saidlog_guest_used_${guestId}`;
       if (localStorage.getItem(usedKey)) {
         setError('ゲストの無料体験は1回までです。続けてご利用いただくには無料登録をしてください。');
-        setAuthModalInitialMode('signup');
-        setShowAuthModal(true);
+        openAuthModal('guest_gate', 'signup');
         return;
       }
     }
@@ -155,8 +179,7 @@ function AppInner() {
     } catch (err) {
       if (err.message === 'GUEST_TRIAL_USED') {
         setError('ゲストの無料体験は1回までです。続けてご利用いただくには無料登録をしてください。');
-        setAuthModalInitialMode('signup');
-        setShowAuthModal(true);
+        openAuthModal('guest_gate', 'signup');
       } else if (err.message === 'GUEST_TRIAL_TOO_LONG') {
         setError('ゲストの無料体験は15分以内の音声のみ対応しています。無料登録するとより長い音声も文字起こしできます。');
       } else {
@@ -237,8 +260,7 @@ function AppInner() {
         alert('購入処理に失敗しました。時間をおいて再度お試しください。');
       }
     } else if (upgradeMode === 'not_logged_in') {
-      setAuthModalInitialMode('signup');
-      setShowAuthModal(true);
+      openAuthModal('plus_cta', 'signup');
     }
   };
 
@@ -260,7 +282,7 @@ function AppInner() {
                 </details>
               </>
             ) : (
-              <button onClick={() => setShowAuthModal(true)}>{t('app.login')}</button>
+              <button onClick={() => openAuthModal('header')}>{t('app.login')}</button>
             )}
           </div>
         </div>
@@ -353,7 +375,10 @@ function AppInner() {
 
               {/* 主CTA（Recorder のスタートボタンを .s01-recorder-wrap CSS でスタイル上書き） */}
               <div className="s01-recorder-wrap">
-                <Recorder onTranscribe={handleRecordedTranscribe} />
+                <Recorder
+                  onTranscribe={handleRecordedTranscribe}
+                  onRecordStart={() => trackEvent('s01_record_click', { source: 's01', planState })}
+                />
               </div>
 
               {/* 補助CTA */}
@@ -386,7 +411,10 @@ function AppInner() {
               ) : (
                 <button
                   className="s01-file-btn"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    trackEvent('s01_upload_click', { source: 's01', planState });
+                    fileInputRef.current?.click();
+                  }}
                 >
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -562,7 +590,7 @@ function AppInner() {
               onUpgrade={handleUpgrade}
               onRetry={retryAccountStatus}
               isLoggedIn={!!user}
-              onOpenAuthModal={() => { setAuthModalInitialMode('signup'); setShowAuthModal(true); }}
+              onOpenAuthModal={() => openAuthModal('plus_cta', 'signup')}
             />
           </>
         )}

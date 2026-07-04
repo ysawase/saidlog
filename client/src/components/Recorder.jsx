@@ -17,7 +17,7 @@ function formatDuration(ms) {
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-export default function Recorder({ onTranscribe }) {
+export default function Recorder({ onTranscribe, onRecordStart }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState('idle'); // idle | recording | confirming
   const [restoreInfo, setRestoreInfo] = useState(null);
@@ -81,6 +81,7 @@ export default function Recorder({ onTranscribe }) {
   };
 
   const handleStart = async () => {
+    onRecordStart?.();
     setError('');
     setSizeWarning(false);
     setRecordingMs(0);

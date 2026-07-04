@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
 import { deleteAccount } from '../api.js'
+import { trackEvent } from '../lib/analytics.js'
 
 export function AuthModal({ onClose, user, initialMode }) {
   const { t } = useTranslation()
@@ -22,6 +23,8 @@ export function AuthModal({ onClose, user, initialMode }) {
       if (error) setError(error.message)
       else onClose()
     } else {
+      // 送信「試行」の計測（成否を問わず発火。email等の入力値は一切送らない）
+      trackEvent('signup_submit', { source: 'auth_modal' })
       const { error } = await supabase.auth.signUp({ email, password })
       if (error) setError(error.message)
       else setDone(true)

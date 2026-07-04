@@ -1,5 +1,6 @@
 import { supabase } from './lib/supabase.js';
 import { getOrCreateGuestId } from './lib/guestId.js';
+import { getOrCreateSessionId } from './lib/analytics.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
 
@@ -37,7 +38,8 @@ export async function requestTranscription(filePath, durationSeconds = 0) {
   const res = await fetch(`${API_BASE}/api/transcribe`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ filePath, durationSeconds, guestId }),
+    // sessionIdはanalytics専用の任意フィールド（サーバー側で検証、本体処理には不使用）
+    body: JSON.stringify({ filePath, durationSeconds, guestId, sessionId: getOrCreateSessionId() }),
   });
 
   if (!res.ok) {
