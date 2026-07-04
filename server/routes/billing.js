@@ -2,7 +2,7 @@ import express from 'express';
 import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
-import { verifyGooglePlaySubscription } from '../services/googlePlay.js';
+import { verifyGooglePlaySubscription, PACKAGE_NAME } from '../services/googlePlay.js';
 
 const router = express.Router();
 
@@ -158,30 +158,53 @@ router.post('/webhook', async (req, res) => {
     const decoded = Buffer.from(message.data, 'base64').toString('utf8');
     const notification = JSON.parse(decoded);
 
+    if (notification.packageName !== PACKAGE_NAME) {
+      console.warn('[billing/webhook] packageName不一致:', notification.packageName);
+      return res.status(200).json({ ok: true }); // 自アプリ以外の通知は無視してACK
+    }
+
     const sub = notification.subscriptionNotification;
     if (sub?.purchaseToken) {
       const { notificationType, purchaseToken } = sub;
-      const statusMap = {
-        1: 'active',
-        2: 'active',
-        3: 'canceled',
-        4: 'active',
-        5: 'grace_period',
-        6: 'grace_period',
-        12: 'expired',
-      };
-      const newStatus = statusMap[notificationType];
-      if (newStatus) {
-        const { error: updateError } = await getSupabase()
-          .from('user_entitlements')
-          .update({
-            status: newStatus,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('purchase_token', purchaseToken);
-        if (updateError) {
-          console.error('[billing/webhook] update error:', updateError);
-        }
+      // notificationType はログ用途のみ。statusはGoogle側の実状態（再取得）から決定する。
+      // Pub/Subはat-least-once・順序不保証のため、通知の値をそのまま状態遷移に使わない。
+      console.log(`[billing/webhook] notificationType=${notificationType} purchaseToken=${purchaseToken}`);
+
+      const verification = await verifyGooglePlaySubscription(purchaseToken);
+
+      let newStatus;
+      if (verification.valid) {
+        // ACTIVE / CANCELED（期限内）はどちらもアクセス継続として扱う
+        newStatus = verification.subscriptionState === 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD'
+          ? 'grace_period'
+          : 'active';
+      } else if (verification.reason === 'EXPIRED') {
+        newStatus = 'expired';
+      } else if (verification.reason === 'NOT_ACTIVE') {
+        // ON_HOLD/PAUSED/PENDING等。Plusアクセスを付与すべきでないため'expired'に寄せる。
+        // grace_periodには絶対にしない（誤ってアクセス継続を許すことになるため）。
+        newStatus = 'expired';
+      } else if (verification.reason === 'NOT_CONFIGURED') {
+        // 本番の設定不備。/verify と同じfail-close方針でPub/Subに再試行させる。
+        console.error('[billing/webhook] verifyGooglePlaySubscription: NOT_CONFIGURED');
+        return res.status(500).json({ error: 'billing not configured' });
+      } else {
+        // PRODUCT_MISMATCH / TOKEN_INVALID 等の異常系。既存entitlementは書き換えない。
+        console.warn('[billing/webhook] 検証結果により更新をスキップ:', verification.reason);
+        return res.status(200).json({ ok: true });
+      }
+
+      const update = { status: newStatus, updated_at: new Date().toISOString() };
+      if (verification.expiryTime) {
+        update.current_period_end = verification.expiryTime;
+      }
+
+      const { error: updateError } = await getSupabase()
+        .from('user_entitlements')
+        .update(update)
+        .eq('purchase_token', purchaseToken);
+      if (updateError) {
+        console.error('[billing/webhook] update error:', updateError);
       }
     }
 

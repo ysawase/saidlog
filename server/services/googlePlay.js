@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 
-const PACKAGE_NAME = 'com.saidlog.app';
+export const PACKAGE_NAME = 'com.saidlog.app';
 const SUBSCRIPTION_PRODUCT_ID = 'take_monthly_680';
 
 // 有効とみなす購読状態。
