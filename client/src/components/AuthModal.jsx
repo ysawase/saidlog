@@ -73,6 +73,9 @@ export function AuthModal({ onClose, user, initialMode }) {
         ) : (
           <>
             <h2>{mode === 'login' ? t('auth.login') : t('auth.signup')}</h2>
+            {mode === 'signup' && (
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#555' }}>{t('auth.signupNotice')}</p>
+            )}
             <input
               type="email"
               placeholder={t('auth.email')}
