@@ -1,0 +1,128 @@
+untracked docs 整理 完了報告
+日付: 2026-07-04
+コミット: 03066cd
+
+================================================================
+削除したファイル（36件）
+================================================================
+
+--- plan_rename関連 7件 ---
+docs/comment_cleanup_planrename.txt
+docs/commit_app_planrename.txt
+docs/commit_historylist_planrename.txt
+docs/commit_summarize_planrename.txt
+docs/commit_transcriptview_planrename.txt
+docs/plan_rename_final_check.txt
+docs/plan_rename_final_verification.txt
+
+--- git log / build / deploy 単発チェック出力 6件 ---
+docs/latest_commit_check.txt
+docs/latest_commits.txt
+docs/build_check.txt
+docs/vercel_deploy_check.txt
+docs/account_status_push_report.txt
+docs/i18n_diff_check.txt
+
+--- App.jsx / UIコンポーネント diff・確認 7件 ---
+docs/app_jsx_diff_report.txt
+docs/transcriptview_card_fix.txt
+docs/historylist_chip_color.txt
+docs/gpt_conditional_fix.txt
+docs/gpt_conditional_fix_diff.txt
+docs/plus_cta_final_audit.txt
+docs/plus_cta_push_and_next_task.txt
+
+--- S01デザイン検討の途中経緯 12件（v2.1で確定済み） ---
+docs/s01_mock_options.html
+docs/s01_mock_report.txt
+docs/s01_mock_v2.html
+docs/s01_mock_v2_fix_report.txt
+docs/s01_mock_v2_report.txt
+docs/s01_mock_v2_1_fix2_report.txt
+docs/s01_mock_v2_1_report.txt
+docs/s01_header_investigation.txt
+docs/s01_recorder_css_scope_check.txt
+docs/s01_v2_1_pre_impl_check.txt
+docs/pricing_table_fact_check.txt
+docs/screenshots/_take_s01_screenshots.mjs
+
+--- 分類3（重複と判断して削除） 1件 ---
+docs/s01_analytics_phase1_push_report_2026_07_04.txt
+
+--- ルート直下のテストスクリプト 3件 ---
+test-assemblyai.mjs
+test-groq.mjs
+test-summarize.mjs
+
+================================================================
+残したファイル（コミット対象、17件）
+================================================================
+
+--- S01効果検証イベント Phase 1 analytics（4件）---
+docs/s01_analytics_phase1_investigation_2026_07_04.txt
+docs/s01_analytics_phase1_implementation_2026_07_04.txt
+docs/s01_events_final_push_2026_07_04.txt
+docs/db_push_verification_2026_07_04.txt
+
+--- S01 v2.1 UI実装（3件）---
+docs/s01_mock_v2_1.html
+docs/s01_v2_1_final_check_2026_07_03.txt
+docs/s01_v2_1_impl_report.txt
+
+--- S01 スクリーンショット（8件）---
+docs/screenshots/s01_firstview_2026_07_03.png
+docs/screenshots/s01_firstview_mobile_2026_07_03.png
+docs/screenshots/s01_flow_2026_07_03.png
+docs/screenshots/s01_flow_mobile_2026_07_03.png
+docs/screenshots/s01_pricing_2026_07_03.png
+docs/screenshots/s01_pricing_mobile_2026_07_03.png
+docs/screenshots/s01_step3_fixed_desktop_2026_07_03.png
+docs/screenshots/s01_step3_fixed_mobile_2026_07_03.png
+
+--- Plus CTA 安全化（3件）---
+docs/plus_cta_safety_investigation.md
+docs/plus_cta_safety_final_summary.txt
+docs/final_code_review.txt
+
+※ docs/untracked_docs_final_triage_2026_07_04.txt（トリアージ報告書）
+   本ファイル（cleanup完了報告）もあわせてコミット対象に追加
+
+================================================================
+.gitignore への追加
+================================================================
+
+追加あり。ルート .gitignore に以下を追記：
+  supabase/.temp/
+
+さらに supabase/.temp/ 配下の追跡済み9ファイルを git rm --cached で
+インデックスから除外した（ローカルファイルは保持）：
+  supabase/.temp/cli-latest
+  supabase/.temp/gotrue-version
+  supabase/.temp/linked-project.json
+  supabase/.temp/pooler-url
+  supabase/.temp/postgres-version
+  supabase/.temp/project-ref
+  supabase/.temp/rest-version
+  supabase/.temp/storage-migration
+  supabase/.temp/storage-version
+
+================================================================
+git status 最終結果
+================================================================
+
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+（supabase/.temp/ は .gitignore により不可視）
+
+================================================================
+commit hash
+================================================================
+
+03066cd chore: docs整理・.gitignore更新・supabase/.temp追跡除外
+
+29 files changed, 2574 insertions(+), 9 deletions(-)
+
+以上。git pushの指示をお待ちします。

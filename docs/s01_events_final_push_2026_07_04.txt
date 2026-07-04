@@ -1,0 +1,93 @@
+S01効果検証イベント（Phase 1）最終push報告
+日付: 2026-07-04
+状態: git push完了。Phase 1の実装・DB適用・デプロイ投入まで全工程完了
+
+================================================================
+push結果
+================================================================
+
+git push origin main: 成功
+
+  To https://github.com/ysawase/saidlog.git
+     dc5d5a0..cf903a4  main -> main
+
+push範囲: S01イベントPhase 1の5コミットのみ（事前確認済み、混入なし）
+
+push前確認の結果:
+- git log --oneline origin/main..HEAD: 5コミットのみ ✓
+- npm test: 48件全パス ✓
+- npm --prefix client run build: 成功（built in 5.93s）✓
+- git status: ソースコードの未コミット変更なし ✓
+
+================================================================
+git log origin/main -6 --oneline
+================================================================
+
+cf903a4 feat: client発火5イベントとanalytics送信ヘルパー追加
+fea76f9 feat: transcribe.jsにtranscription系3イベント記録を追加
+88e862a feat: POST /api/events エンドポイント追加
+146fd0e feat: eventsサニタイズ・insertサービスとテスト追加
+2e8f9e9 feat: eventsテーブルのmigration追加（S01効果検証 Phase 1）
+dc5d5a0 chore: add playwright as dev dependency for screenshot verification
+
+================================================================
+git status 最終結果
+================================================================
+
+On branch main
+Your branch is up to date with 'origin/main'.
+＝ origin/main と完全同期。push漏れコミットなし。
+
+追跡ファイルの変更:
+- supabase/.temp/cli-latest のみ（supabase CLI実行で自動更新される
+  キャッシュファイル。ソースコードではなく、コミット不要）
+
+未追跡ファイル:
+- docs/ 配下の作業報告書類、docs/screenshots/、test-*.mjs
+  （従来からの未追跡ファイル＋今回の報告書。ソースコードではない）
+
+================================================================
+本日の全工程まとめ
+================================================================
+
+1. migration履歴repair: 20260623000001（guest_usage）と
+   20260703000000（stt制約）を実DB整合確認のうえapplied化
+2. db push --include-all: purchase_tokenカラム追加＋events
+   テーブル作成の2件のみ適用（成功・エラーなし）
+3. DB適用後検証: purchase_token存在／events存在／RLS有効・
+   ポリシーなし（anonの42501拒否を実測）／既存6テーブル無事／
+   billing同型クエリのカラム欠落エラー解消 … 全項目OK
+4. git push: 5コミットをorigin/mainへ（本報告）
+
+================================================================
+既知の残存事項
+================================================================
+
+1. supabase/.temp/cli-latest が作業ツリーで変更状態
+   （CLIキャッシュ。無視してよい。気になる場合は.gitignore追加を
+   別タスクで検討）
+2. POST /api/eventsのHTTP経由の統合テストは未実装
+   （保存経路は全てsanitizeEvent/insertEventを通るため単体テスト
+   でカバー。既存testsにHTTPテストの前例なし）
+3. eventsの保持期間削除バッチ（30〜90日）はPhase 1スコープ外・未実装
+   （occurred_atインデックスは作成済みで、既存の/api/cleanup Cronに
+   1クエリ追加すれば実装可能な設計）
+4. amivoiceのtranscripts行が0件のため、stt_provider制約の
+   amivoice許可は間接証明のみ（groq行の存在により新制約適用は確定）
+5. Phase 1見送りイベント（summary_preview_shown, plus_cta_view,
+   plus_cta_click, history_open, s01_pricing_link_click,
+   plus_cta_web_guidance_shown）は未実装（計画どおり）
+
+================================================================
+ユーザー側で実施いただく確認（push後）
+================================================================
+
+以下はゆう側での実施をお願いします：
+1. Vercelダッシュボードで Production デプロイが Ready になること
+2. 本番でS01を開き、S01表示・録音/アップロード・AuthModal・
+   文字起こし本体が壊れていないこと
+3. Supabaseのeventsテーブルに s01_view が記録されること
+4. events行に禁止情報（email・URL・ファイル名・本文・rawエラー・
+   UA全文・IP・raw user_id/guest_id）が含まれていないこと
+
+以上。

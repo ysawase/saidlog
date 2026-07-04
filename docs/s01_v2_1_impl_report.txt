@@ -1,0 +1,255 @@
+================================================================
+S01 v2.1 UI 実装完了報告
+2026-07-03
+================================================================
+
+■ 変更ファイル一覧
+================================================================
+
+  M  client/src/App.jsx       (213行追加 / 73行削除)
+  M  client/src/App.css       (351行追加 / 4行変更)
+  M  client/src/i18n.js       (10行追加)
+  --- 変更禁止ファイルの変更なし ---
+  api.js / billing.js / upgradeGuard.js / HistoryList.jsx /
+  TranscriptView.jsx / plans.js / package.json : 変更なし ✅
+
+■ build 結果
+================================================================
+
+  npm --prefix client run build
+  → ✓ built in 5.09s ✅
+  → エラー：なし
+  → 新規警告：なし
+  → 既存チャンクサイズ警告（pdfmake等）：今回変更と無関係
+
+■ commit hash 一覧（今回のS01 v2.1 実装分）
+================================================================
+
+  e7a385d  feat: implement S01 v2.1 hero, pricing, explanation, flow sections  [App.jsx]
+  2778895  feat: add S01 v2.1 CSS (header redesign, steps, pricing, flow sections) [App.css]
+  15c4df1  feat: add S01 v2.1 i18n keys (step labels, free trial banner) [i18n.js]
+
+■ push していないこと
+================================================================
+
+  $ git status
+  On branch main
+  Your branch is ahead of 'origin/main' by 3 commits.
+  → 上記3コミットはローカルのみ。push は未実施 ✅
+
+■ git status 最終結果
+================================================================
+
+  On branch main
+  Your branch is ahead of 'origin/main' by 3 commits.
+  nothing added to commit but untracked files present
+  （未追跡: docs/ 以下の作業ファイル。コミット対象外）
+  ソースコードへの未コミット変更：なし ✅
+
+================================================================
+■ 実装後確認事項 1〜12
+================================================================
+
+【1】ヘッダー：SaidLog ワードマーク + "AI会議メモ" サブテキスト
+----------------------------------------------------------------
+  App.jsx:239
+    <h1>SaidLog<span className="header-brand-sub">AI会議メモ</span></h1>
+
+  App.css:
+    .header-brand-sub { font-size: 0.65rem; font-weight: 400; color: #9ca3af; }
+    （≒ 10px、グレー。SaidLog より弱い表示）✅
+
+【2】ヘッダー：履歴ボタンのピルアウトライン
+----------------------------------------------------------------
+  App.jsx:243
+    <button className="history-pill-btn" onClick={...}>{t('app.history')}</button>
+
+  App.css .history-pill-btn:
+    border: 1px solid #bfdbfe
+    background: #eff6ff
+    color: #1d4ed8
+    border-radius: 999px
+    padding: 6px 14px
+    font-weight: 600 ✅
+
+【3】ヘッダー：メール・購入を復元・ログアウトを account details 内に格納
+----------------------------------------------------------------
+  App.jsx:244-250
+    <details className="header-account-details">
+      <summary className="header-account-summary">{user.email}</summary>
+      <div className="header-account-menu">
+        <button onClick={restorePurchases}>購入を復元</button>
+        <button onClick={signOut}>{t('app.logout')}</button>
+      </div>
+    </details>
+  → ドロップダウンメニュー内に格納（絶対配置、z-index:100）✅
+
+【4】ヘッダー：<p className="tagline"> の削除
+----------------------------------------------------------------
+  検索結果: App.jsx 内に tagline レンダリング箇所 なし ✅
+  （CSS ルールは残存するが、JSX から削除済み）
+
+【5】S01：3ステップミニチュア UI
+----------------------------------------------------------------
+  App.jsx:293-342
+  ・ ステップ1「録音する」（行:294-307）
+    　赤い録音点（#ef4444）+ 青い波形バー（#3b82f6）+ 淡い赤の停止ボタン
+  ・ ステップ2「会議メモに整理」（行:309-323）
+    　青い見出しバー（#2563eb）+ 淡い青カード（#bfdbfe）+ 緑のチェック（#047857）
+  ・ ステップ3「履歴で見返す」（行:326-341）
+    　「履歴」テキスト + 週次MTG/営業会議/1on1 + 状態チップ
+    　チップ色は S04 と統一:
+      要約済み:bg #ecfdf5 color #047857
+      プレビュー:bg #eff6ff color #1d4ed8
+      文字起こし:bg #f3f4f6 color #4b5563 ✅
+
+【6】S01：主CTA（マイク SVG + 「録音を開始する」）
+----------------------------------------------------------------
+  App.jsx:344-347
+    <div className="s01-recorder-wrap">
+      <Recorder onTranscribe={handleRecordedTranscribe} />
+    </div>
+
+  App.css .s01-recorder-wrap .recorder > .btn.primary:
+    height: 56px
+    width: 230px
+    font-size: 1rem
+    font-weight: 700
+    display: inline-flex; align-items: center; gap: 8px
+
+  App.css .s01-recorder-wrap .recorder > .btn.primary::before:
+    マイク SVG（data URL）width/height: 20px
+  → Recorder.jsx 未変更、CSS で idle 時の start ボタンのみ対象 ✅
+
+【7】S01：補助CTA（ファイル SVG + 「音声ファイルを選ぶ」）
+----------------------------------------------------------------
+  App.jsx:377-387（ファイル未選択時）
+    <button className="s01-file-btn" onClick={...}>
+      <svg width="15" height="15" ...>ファイルアイコン</svg>
+      {t('app.s01.uploadCTA')}
+    </button>
+
+  App.css .s01-file-btn:
+    height: 46px
+    font-size: 0.9rem
+    display: inline-flex; align-items: center; gap: 6px
+    background: #fff; border: 1px solid #d1d5db
+  → 主CTA より小さく（46px vs 56px）、幅も自然に狭い ✅
+
+【8】S01：無料枠ミニ説明 + pricing アンカーリンク
+----------------------------------------------------------------
+  App.jsx:393-397
+    <div className="s01-free-mini">
+      <p>{t('app.s01.freeTrialBanner')}</p>
+      <a href="#s01-pricing">{t('app.s01.freeTrialLink')}</a>
+    </div>
+
+  i18n.js ja:
+    freeTrialBanner: '無料プランは月60分まで試せます。月10時間まで使うならSaidLog Plus。'
+    freeTrialLink: '無料枠と料金を見る'
+
+  配置: s01-trust（安心文）の後、details（折りたたみ）の前 ✅
+
+【9】S01 価格エリア：無料プラン / SaidLog Plus 比較表（禁止文言なし）
+----------------------------------------------------------------
+  App.jsx:413-446  section id="s01-pricing"
+
+  無料プラン（行:417-430）:
+    ✓ 0円
+    ✓ 月60分まで
+    ✓ 履歴は直近3件まで表示
+    ✓ 要約プレビュー（3行、閲覧のみ）  ← コピー可の記載なし
+    ✗ 詳細要約（フル）
+    ✗ コピー・エクスポート
+
+  SaidLog Plus（行:432-445）:
+    ✓ 月680円
+    ✓ 月10時間
+    ✓ 履歴は直近30件まで表示
+    ✓ 詳細要約
+    ✓ コピー・エクスポート
+
+  禁止文言検索結果（client/src 全体）:
+    「月3回」     → 0件 ✅
+    「3行要約コピー可」→ 0件 ✅
+
+【10】S01 価格エリア：Plus CTA 6分岐（upgradeMode / purchaseTake 確認）
+----------------------------------------------------------------
+  App.jsx:448-465
+    {upgradeMode === 'plus_active' ? (
+      <p ...>SaidLog Plus利用中です</p>                       ← 行449-450
+    ) : upgradeMode === 'web' ? (
+      <p ...>SaidLog PlusはAndroidアプリ版でご利用いただけます。</p> ← 行451-452
+    ) : upgradeMode === 'account_error' ? (
+      <>
+        <p ...>プラン情報を確認できませんでした</p>               ← 行455
+        <button ... onClick={retryAccountStatus}>再試行</button>  ← 行456
+      </>                                                        ← 行453-457
+    ) : upgradeMode === 'loading' ? (
+      <button ... disabled>確認中...</button>                   ← 行458-459
+    ) : upgradeMode === 'not_logged_in' ? (
+      <button ... onClick={handleUpgrade}>無料登録 / ログイン</button> ← 行460-461
+    ) : (
+      <button ... onClick={handleUpgrade}>SaidLog Plusに進む</button>  ← 行462-463
+    )}
+
+  使用しているもの:
+    upgradeMode       … App.jsx:211 で計算済みの値をそのまま参照 ✅
+    handleUpgrade     … App.jsx:213 定義（purchaseTake は内部のみ）✅
+    retryAccountStatus… App.jsx:209 定義（accountStatusRetryCountのインクリメント）✅
+
+  purchaseTake 検索結果（client/src 全体）:
+    App.jsx:11  import { initBilling, purchaseTake, restorePurchases } from './lib/billing';
+    App.jsx:216 await purchaseTake();  ← handleUpgrade 内、upgradeMode==='purchase'時のみ
+    App.jsx:226 console.error('[upgrade] purchaseTake failed:', err);
+    billing.js:41  export async function purchaseTake() {  （定義）
+    billing.js:43  console.warn 内
+  → S01価格CTA から purchaseTake への直接呼び出し: なし ✅
+  → HistoryList / TranscriptView での参照: なし ✅
+  → 唯一の呼び出しは App.jsx:216（handleUpgrade内、purchase モード時のみ）✅
+
+【11】S01 説明エリア：「無料枠とSaidLog Plusについて」
+----------------------------------------------------------------
+  App.jsx:469-472
+    <section className="s01-explanation">
+      <h3>無料枠とSaidLog Plusについて</h3>
+      <p>音声の文字起こしやAI要約は、録音時間が長いほど処理量が増えます。
+      議事録・文字起こし・AI処理サービスでは一般的にコストがかかる部分ですが、
+      SaidLogでは無料で試せる範囲を用意し、継続して使いやすいように
+      月680円・10時間のPlusプランにしています。</p>
+    </section>
+  → 「API」「外部API」「他社名」の記載：なし ✅
+
+【12】S01 処理フロー：録音データ → 文字起こし → AI要約 → 会議メモ
+----------------------------------------------------------------
+  App.jsx:474-486
+    <section className="s01-flow">
+      <h3>録音から会議メモができるまで</h3>
+      <div className="s01-flow-steps">
+        <div class="s01-flow-step">録音データ</div>
+        <span class="s01-flow-arrow">→</span>
+        <div class="s01-flow-step">文字起こし</div>
+        <span class="s01-flow-arrow">→</span>
+        <div class="s01-flow-step">AI要約</div>
+        <span class="s01-flow-arrow">→</span>
+        <div class="s01-flow-step">会議メモ</div>
+      </div>
+    </section>
+  → 歯車・キラキラ表現なし。シンプルなカード+矢印のフロー ✅
+
+================================================================
+■ その他の変更点（仕様外確認）
+================================================================
+
+【upgradeGuard.js】変更なし ✅
+  → getUpgradeMode の優先順位・accountStatusLoadState の意味：一切変更していない
+
+【TranscriptView.jsx】変更なし ✅
+【HistoryList.jsx】変更なし ✅
+【billing.js / purchaseTake 本体】変更なし ✅
+【S08 preview blur + CTA 構造】変更なし ✅
+【S01 v2.1 での accountStatusLoadState / retryAccountStatus 使用】
+  → App.jsx の既存実装（accountStatus useEffect、retryAccountStatus）を
+     そのまま流用。新規の判定ロジックなし ✅
+
+================================================================

@@ -12,3 +12,6 @@ dist/
 scripts/last-result.json
 
 /sample/
+
+# Supabase CLI キャッシュ（実行のたびに自動更新される）
+supabase/.temp/

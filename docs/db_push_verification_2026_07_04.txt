@@ -1,0 +1,93 @@
+db push --include-all 実行結果の確認報告
+日付: 2026-07-04
+状態: db push成功・全6項目の確認OK。git pushは未実行（指示どおり）
+
+================================================================
+1. db push --include-all の実行結果
+================================================================
+
+成功。エラーなし。CLI出力:
+
+  Applying migration 20260623000000_add_purchase_token.sql...
+  Applying migration 20260704000000_add_events.sql...
+  Finished supabase db push.
+
+適用されたのは上記2件のみ（dry-runでの事前確認どおり）。
+
+supabase migration list でも、ローカル7件とリモート履歴7件が
+完全に一致していることを確認済み（20260615000000〜20260704000000、
+local/remoteのずれなし）。
+
+================================================================
+2. purchase_tokenカラムの存在確認
+================================================================
+
+OK。user_entitlements.purchase_token をservice roleでselect → エラーなし。
+（db push前は 42703 column does not exist だった）
+
+================================================================
+3. eventsテーブルの存在確認
+================================================================
+
+OK。service roleでselect → 存在、現在0行。
+
+補足（db push直後の追加検証で確認済み）:
+- service roleでのinsert → 成功（テスト行は即削除済み）
+- 許可外イベント名（plus_cta_view）のinsert → 23514 CHECK制約違反で
+  拒否 ＝ DBレベルのホワイトリストが機能
+
+================================================================
+4. eventsのRLS・ポリシー確認
+================================================================
+
+OK。実際にanonキー（client/.envのVITE_SUPABASE_ANON_KEY、
+本番clientが使うものと同一）で試行した結果:
+
+- anon insert → 拒否。code=42501
+  「new row violates row-level security policy for table "events"」
+  ＝ RLSが有効で、かつinsertを許可するpolicyが存在しない
+- anon select → エラーなしだが0件（RLSにより行が不可視）
+  ＝ selectを許可するpolicyも存在しない
+
+書き込み経路はserver（service role）経由のみであることを実証。
+
+================================================================
+5. 既存テーブルの無事確認
+================================================================
+
+OK。service roleで各テーブルにアクセスし、全テーブル正常:
+
+  transcripts              OK（61行）
+  guest_usage              OK（0行）
+  user_entitlements        OK（1行）
+  usage_periods            OK（2行）
+  profiles                 OK（1行）
+  transcript_full_summaries OK（0行）
+
+================================================================
+6. /api/billing/verify のカラム欠落問題
+================================================================
+
+解消を確認。billing.js 103行目（verify）・205行目（webhook）と
+同型のクエリ
+  user_entitlements.select(...).eq('purchase_token', ...)
+をservice roleで実行 → エラーなしで正常応答（該当0件）。
+db push前はこのクエリが 42703 で失敗する状態だった。
+
+※ Google Play検証を含む /api/billing/verify エンドポイント全体の
+  疎通確認（実purchase_tokenでの検証）は、本番環境でのユーザー確認事項。
+
+================================================================
+現在の状態
+================================================================
+
+- migration: ローカル・リモート履歴とも7件で完全一致
+- git push: 未実行。origin/mainより5コミット先行
+    cf903a4 feat: client発火5イベントとanalytics送信ヘルパー追加
+    fea76f9 feat: transcribe.jsにtranscription系3イベント記録を追加
+    88e862a feat: POST /api/events エンドポイント追加
+    146fd0e feat: eventsサニタイズ・insertサービスとテスト追加
+    2e8f9e9 feat: eventsテーブルのmigration追加（S01効果検証 Phase 1）
+- 作業ツリー: ソースコードの未コミット変更なし
+
+以上。git pushの指示をお待ちします。

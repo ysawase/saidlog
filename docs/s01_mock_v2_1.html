@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>S01 v2.1 モック</title>
+<style>
+/* =================================================================
+   BASE
+   ================================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background: #e5e7eb;
+  padding: 24px;
+}
+.preview-label {
+  font-size: 0.78rem;
+  color: #4b5563;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.phone {
+  width: 375px;
+  background: #f7f8fc;
+  border: 2px solid #6b7280;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.20);
+}
+
+/* =================================================================
+   HEADER
+   ================================================================= */
+.hd {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 9px 16px 7px;
+}
+.hd-r1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #2563eb;
+  flex-shrink: 0;
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+.brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #111827;
+  line-height: 1.15;
+}
+.brand-tagline {
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+/* 履歴ボタン：ピル型アウトライン（アカウントより視覚的に強く） */
+.hd-hist-btn {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-family: inherit;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.hd-r2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.status-txt {
+  font-size: 0.67rem;
+  color: #6b7280;
+}
+.acct-details { position: relative; }
+.acct-details summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: #374151;
+  padding: 3px 9px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.acct-details summary::-webkit-details-marker { display: none; }
+.acct-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 30;
+  overflow: hidden;
+  min-width: 170px;
+  font-size: 0.8rem;
+}
+.acct-email {
+  padding: 8px 14px;
+  color: #6b7280;
+  font-size: 0.72rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.acct-row {
+  padding: 9px 14px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+.acct-row:last-child { border-bottom: none; }
+
+/* =================================================================
+   HERO
+   ================================================================= */
+.hero {
+  padding: 18px 20px 0;
+  text-align: center;
+}
+.hero-h {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #111827;
+  margin-bottom: 10px;
+}
+.hero-sub {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #4b5563;
+  margin-bottom: 16px;
+}
+
+/* ---- 3ステップ UIミニチュア ---- */
+.steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 18px;
+}
+.step-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.step-card {
+  width: 92px;
+  min-height: 62px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 7px 7px 6px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.step-label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+  line-height: 1.35;
+}
+.step-arrow-col {
+  padding-top: 24px;
+  flex-shrink: 0;
+  color: #9ca3af;
+}
+
+/* Step 1: 録音カード（配色現状維持） */
+.rec-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+}
+.rec-timer {
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #374151;
+  font-variant-numeric: tabular-nums;
+  flex: 1;
+}
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 22px;
+  margin-bottom: 6px;
+}
+.wf-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: #3b82f6;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+.rec-stop-btn {
+  display: block;
+  width: 100%;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 7px;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 3px 0;
+  text-align: center;
+  font-family: inherit;
+}
+
+/* Step 2: 会議メモカード（青見出し・淡青ブロック・緑チェック） */
+.memo-heading {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #1d4ed8;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #bfdbfe;
+}
+.memo-block {
+  background: #eff6ff;
+  border-radius: 3px;
+  padding: 2px 3px;
+  margin-bottom: 3px;
+}
+.memo-block:last-child { margin-bottom: 0; }
+.memo-block-label {
+  font-size: 5.5px;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.memo-check-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.memo-check-row:last-child { margin-bottom: 0; }
+.memo-check-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+.memo-textline {
+  height: 3.5px;
+  background: #bfdbfe;
+  border-radius: 2px;
+}
+
+/* Step 3: 履歴カード（青見出し・会議メモ名・カラーチップ） */
+.hist-card-head {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #1d4ed8;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #bfdbfe;
+}
+.hist-item {
+  padding: 3px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.hist-item:last-child { border-bottom: none; }
+.hist-name {
+  font-size: 7px;
+  font-weight: 500;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.hist-meta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.hist-date { font-size: 6px; color: #9ca3af; }
+.hist-chip {
+  font-size: 5.5px;
+  border-radius: 2px;
+  padding: 1px 3px;
+  white-space: nowrap;
+}
+.hist-chip.transcript { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+.hist-chip.preview    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.hist-chip.done       { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+/* ---- 主CTA ---- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  min-width: 220px;
+  padding: 0 28px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+.upload-hint {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 18px 0 8px;
+}
+
+/* ---- 補助CTA ---- */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 20px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.trust-txt {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 16px 0 14px;
+  line-height: 1.5;
+}
+
+/* ---- 無料枠ミニ説明 ---- */
+.free-note {
+  background: #f8faff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: left;
+  margin-bottom: 14px;
+}
+.free-note-body {
+  font-size: 0.75rem;
+  color: #374151;
+  line-height: 1.65;
+  margin-bottom: 9px;
+}
+.free-note-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #2563eb;
+  text-decoration: none;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 5px 12px;
+  background: #fff;
+  font-weight: 500;
+}
+
+/* ---- 折りたたみ ---- */
+.dtl {
+  text-align: left;
+  font-size: 0.75rem;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
+  padding: 12px 0 26px;
+}
+.dtl summary {
+  cursor: pointer;
+  color: #374151;
+  font-weight: 500;
+  font-family: inherit;
+}
+.dtl ul {
+  margin-top: 8px;
+  padding-left: 1.4em;
+  line-height: 2;
+}
+
+/* =================================================================
+   PRICING SECTION
+   ================================================================= */
+.pricing {
+  background: #fff;
+  border-top: 3px solid #f1f5f9;
+  padding: 28px 20px 32px;
+}
+.pricing-h {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 2カラム比較 */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.plan-col {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.plan-col.plus { border-color: #93c5fd; }
+
+.plan-head {
+  padding: 10px 10px 8px;
+  background: #f9fafb;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+.plan-col.plus .plan-head {
+  background: #eff6ff;
+  border-bottom-color: #bfdbfe;
+}
+.plan-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4b5563;
+}
+.plan-col.plus .plan-name { color: #1d4ed8; }
+
+.plan-rows { padding: 6px 10px; }
+.plan-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 5px 0;
+  font-size: 0.71rem;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  line-height: 1.4;
+}
+.plan-row:last-child { border-bottom: none; }
+.mark-ok { color: #16a34a; font-size: 0.68rem; flex-shrink: 0; margin-top: 1px; }
+.mark-no { color: #9ca3af; font-size: 0.68rem; flex-shrink: 0; margin-top: 1px; }
+.plan-row-txt.dimmed { color: #9ca3af; }
+.plan-row-price {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.78rem;
+}
+.plan-col.plus .plan-row-price { color: #1d4ed8; }
+
+.plan-cta-wrap { padding: 2px 10px 10px; }
+.plan-cta {
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.73rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+}
+
+/* ---- 無料枠とSaidLog Plusについて ---- */
+.why-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+}
+.why-h {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 9px;
+}
+.why-body {
+  font-size: 0.75rem;
+  color: #4b5563;
+  line-height: 1.75;
+  margin-bottom: 18px;
+}
+
+/* 処理フロー図 */
+.flow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+.flow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+.flow-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.flow-lbl {
+  font-size: 0.6rem;
+  color: #4b5563;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+}
+.flow-arrow-col {
+  padding-top: 12px;
+  flex-shrink: 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+.flow-note {
+  font-size: 0.7rem;
+  color: #6b7280;
+  line-height: 1.55;
+  text-align: center;
+}
+
+/* =================================================================
+   S04 履歴 視認確認セクション
+   ================================================================= */
+.s04-section { margin-top: 40px; }
+
+.s04-frame {
+  width: 375px;
+  background: #f7f8fc;
+  border: 2px solid #6b7280;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 36px rgba(0,0,0,0.20);
+}
+.s04-hd {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.s04-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+.s04-close {
+  font-size: 1rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+.s04-list {
+  background: #fff;
+  padding: 0 16px;
+}
+.s04-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+}
+.s04-item:last-child { border-bottom: none; }
+.s04-item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+.s04-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s04-item-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+.s04-item-chip {
+  font-size: 0.7rem;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-weight: 500;
+}
+.s04-item-chip.full { background: #eff6ff; color: #1d4ed8; }
+.s04-item-chip.prev { background: #f3f4f6; color: #374151; }
+
+.s04-limit-bar {
+  background: #f8faff;
+  border-top: 1px solid #dbeafe;
+  padding: 16px 20px 20px;
+  text-align: center;
+}
+.s04-limit-note {
+  font-size: 0.82rem;
+  color: #374151;
+  margin-bottom: 6px;
+}
+.s04-limit-cta-txt {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  margin-bottom: 14px;
+}
+.s04-limit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-width: 200px;
+  padding: 0 24px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+</style>
+</head>
+<body>
+<p class="preview-label">S01 v2.1 モック — スマートフォン幅 375px</p>
+<div class="phone">
+
+  <!-- ==================================================
+       HEADER
+       ================================================== -->
+  <div class="hd">
+    <div class="hd-r1">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">
+          <span class="brand-name">SaidLog</span>
+          <span class="brand-tagline">AI会議メモ</span>
+        </div>
+      </div>
+      <button class="hd-hist-btn">履歴</button>
+    </div>
+    <div class="hd-r2">
+      <span class="status-txt">無料プラン | 今月の利用: 0秒 / 1時間</span>
+      <details class="acct-details">
+        <summary>アカウント ▾</summary>
+        <div class="acct-dropdown">
+          <div class="acct-email">ysawase@gmail.com</div>
+          <div class="acct-row">購入を復元</div>
+          <div class="acct-row">ログアウト</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       HERO
+       ================================================== -->
+  <div class="hero">
+    <h2 class="hero-h">録音するだけで、<br>会議メモができる</h2>
+    <p class="hero-sub">文字起こしとAI要約を自動で整理。<br>あとですぐ見返せます。</p>
+
+    <!-- 3ステップ UIミニチュア -->
+    <div class="steps">
+
+      <!-- Step 1: 録音する -->
+      <div class="step-col">
+        <div class="step-card">
+          <div class="rec-header">
+            <div class="rec-dot"></div>
+            <span class="rec-timer">01:24</span>
+          </div>
+          <div class="waveform">
+            <div class="wf-bar" style="height:9px"></div>
+            <div class="wf-bar" style="height:16px"></div>
+            <div class="wf-bar" style="height:20px"></div>
+            <div class="wf-bar" style="height:11px"></div>
+            <div class="wf-bar" style="height:22px"></div>
+            <div class="wf-bar" style="height:13px"></div>
+            <div class="wf-bar" style="height:18px"></div>
+            <div class="wf-bar" style="height:8px"></div>
+            <div class="wf-bar" style="height:15px"></div>
+          </div>
+          <div class="rec-stop-btn">■ 停止</div>
+        </div>
+        <span class="step-label">録音する</span>
+      </div>
+
+      <div class="step-arrow-col">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <polyline points="14 6 20 12 14 18"/>
+        </svg>
+      </div>
+
+      <!-- Step 2: 会議メモに整理 -->
+      <div class="step-col">
+        <div class="step-card">
+          <div class="memo-heading">会議メモ</div>
+          <div class="memo-block">
+            <div class="memo-block-label">決定事項</div>
+            <div class="memo-check-row">
+              <div class="memo-check-dot"></div>
+              <div class="memo-textline" style="width:calc(100% - 6px)"></div>
+            </div>
+            <div class="memo-check-row">
+              <div class="memo-check-dot"></div>
+              <div class="memo-textline" style="width:calc(70% - 6px)"></div>
+            </div>
+          </div>
+          <div class="memo-block">
+            <div class="memo-block-label">次のアクション</div>
+            <div class="memo-check-row">
+              <div class="memo-check-dot"></div>
+              <div class="memo-textline" style="width:calc(100% - 6px)"></div>
+            </div>
+            <div class="memo-check-row">
+              <div class="memo-check-dot"></div>
+              <div class="memo-textline" style="width:calc(60% - 6px)"></div>
+            </div>
+          </div>
+        </div>
+        <span class="step-label">会議メモに<br>整理</span>
+      </div>
+
+      <div class="step-arrow-col">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <polyline points="14 6 20 12 14 18"/>
+        </svg>
+      </div>
+
+      <!-- Step 3: 履歴で見返す -->
+      <div class="step-col">
+        <div class="step-card">
+          <div class="hist-card-head">履歴</div>
+          <div class="hist-item">
+            <div class="hist-name">週次MTG</div>
+            <div class="hist-meta">
+              <span class="hist-date">7/2</span>
+              <span class="hist-chip done">要約済み</span>
+            </div>
+          </div>
+          <div class="hist-item">
+            <div class="hist-name">営業会議</div>
+            <div class="hist-meta">
+              <span class="hist-date">7/1</span>
+              <span class="hist-chip preview">要約プレビュー</span>
+            </div>
+          </div>
+          <div class="hist-item">
+            <div class="hist-name">1on1メモ</div>
+            <div class="hist-meta">
+              <span class="hist-date">6/30</span>
+              <span class="hist-chip done">要約済み</span>
+            </div>
+          </div>
+        </div>
+        <span class="step-label">履歴で<br>見返す</span>
+      </div>
+
+    </div><!-- .steps -->
+
+    <!-- 主CTA -->
+    <button class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="6" height="12" rx="3"/>
+        <path d="M19 10a7 7 0 01-14 0"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+      録音を開始する
+    </button>
+
+    <p class="upload-hint">録音済みの音声はこちら</p>
+
+    <!-- 補助CTA -->
+    <button class="btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+      音声ファイルを選ぶ
+    </button>
+
+    <p class="trust-txt">録音データは会議メモ作成のために処理されます。</p>
+
+    <!-- 無料枠ミニ説明 -->
+    <div class="free-note">
+      <p class="free-note-body">無料プランは月60分まで試せます。<br>月10時間まで使うならSaidLog Plus。</p>
+      <a class="free-note-link" href="#pricing">
+        無料枠と料金を見る
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <polyline points="6 13 12 19 18 13"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- 折りたたみ -->
+    <details class="dtl">
+      <summary>録音・アップロード前の確認</summary>
+      <ul>
+        <li>対応フォーマット：mp3 / mp4 / wav / m4a / webm</li>
+        <li>ファイルサイズ上限：50MB（超える場合は分割してください）</li>
+        <li>3分以上の音声でAI要約を試せます（無料）</li>
+      </ul>
+    </details>
+
+  </div><!-- .hero -->
+
+  <!-- ==================================================
+       PRICING
+       ================================================== -->
+  <div class="pricing" id="pricing">
+    <h2 class="pricing-h">無料で試せる範囲と料金</h2>
+
+    <div class="compare">
+
+      <!-- 無料プラン -->
+      <div class="plan-col">
+        <div class="plan-head">
+          <div class="plan-name">無料プラン</div>
+        </div>
+        <div class="plan-rows">
+          <div class="plan-row"><span class="mark-ok">✓</span><span class="plan-row-price">0円</span></div>
+          <div class="plan-row"><span class="mark-ok">✓</span>月60分まで</div>
+          <div class="plan-row"><span class="mark-ok">✓</span>履歴は直近3件まで表示</div>
+          <div class="plan-row"><span class="mark-ok">✓</span>要約プレビュー（3行、閲覧のみ）</div>
+          <div class="plan-row"><span class="mark-no">×</span><span class="plan-row-txt dimmed">詳細要約（フル）</span></div>
+          <div class="plan-row"><span class="mark-no">×</span><span class="plan-row-txt dimmed">コピー・エクスポート</span></div>
+        </div>
+      </div>
+
+      <!-- SaidLog Plus -->
+      <div class="plan-col plus">
+        <div class="plan-head">
+          <div class="plan-name">SaidLog Plus</div>
+        </div>
+        <div class="plan-rows">
+          <div class="plan-row"><span class="mark-ok">✓</span><span class="plan-row-price">月680円</span></div>
+          <div class="plan-row"><span class="mark-ok">✓</span>月10時間</div>
+          <div class="plan-row"><span class="mark-ok">✓</span>履歴は直近30件まで表示</div>
+          <div class="plan-row"><span class="mark-ok">✓</span>詳細要約</div>
+          <div class="plan-row"><span class="mark-ok">✓</span>コピー・エクスポート</div>
+        </div>
+        <div class="plan-cta-wrap">
+          <button class="plan-cta">SaidLog Plusに進む</button>
+        </div>
+      </div>
+
+    </div><!-- .compare -->
+
+    <!-- 無料枠とSaidLog Plusについて -->
+    <div class="why-section">
+      <p class="why-h">無料枠とSaidLog Plusについて</p>
+      <p class="why-body">音声を文字に変換し、AIで会議メモに整理する処理には、録音時間が長いほど処理量が増えます。議事録・文字起こし・AI処理サービスでは一般的にコストがかかる部分ですが、SaidLogでは無料で試せる範囲を用意し、継続して使いやすいように月680円・10時間のPlusプランにしています。</p>
+
+      <!-- 処理フロー図 -->
+      <div class="flow">
+        <div class="flow-item">
+          <div class="flow-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round">
+              <line x1="12" y1="2" x2="12" y2="22"/>
+              <line x1="8"  y1="6" x2="8"  y2="18"/>
+              <line x1="4"  y1="9" x2="4"  y2="15"/>
+              <line x1="16" y1="6" x2="16" y2="18"/>
+              <line x1="20" y1="9" x2="20" y2="15"/>
+            </svg>
+          </div>
+          <span class="flow-lbl">録音<br>データ</span>
+        </div>
+        <div class="flow-arrow-col">›</div>
+        <div class="flow-item">
+          <div class="flow-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round">
+              <line x1="3" y1="6"  x2="21" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="3" y1="14" x2="21" y2="14"/>
+              <line x1="3" y1="18" x2="14" y2="18"/>
+            </svg>
+          </div>
+          <span class="flow-lbl">文字<br>起こし</span>
+        </div>
+        <div class="flow-arrow-col">›</div>
+        <div class="flow-item">
+          <div class="flow-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2.5"/>
+              <line x1="7" y1="8"  x2="17" y2="8"/>
+              <line x1="7" y1="12" x2="15" y2="12"/>
+              <line x1="7" y1="16" x2="13" y2="16"/>
+            </svg>
+          </div>
+          <span class="flow-lbl">AI<br>要約</span>
+        </div>
+        <div class="flow-arrow-col">›</div>
+        <div class="flow-item">
+          <div class="flow-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 7 7 10 12 5"/>
+              <line x1="15" y1="7" x2="21" y2="7"/>
+              <polyline points="4 13 7 16 12 11"/>
+              <line x1="15" y1="13" x2="21" y2="13"/>
+              <polyline points="4 19 7 22 12 17"/>
+              <line x1="15" y1="19" x2="21" y2="19"/>
+            </svg>
+          </div>
+          <span class="flow-lbl">会議<br>メモ</span>
+        </div>
+      </div><!-- .flow -->
+
+      <p class="flow-note">これらの処理にコストがかかるため、無料枠には上限があります。</p>
+    </div><!-- .why-section -->
+
+  </div><!-- .pricing -->
+
+</div><!-- .phone -->
+
+<!-- ==================================================
+     S04 履歴 視認確認セクション
+     ================================================== -->
+<div class="s04-section">
+  <p class="preview-label">S04 履歴（視認確認用） — 無料プラン・件数制限の表示</p>
+  <div class="s04-frame">
+
+    <!-- ヘッダー -->
+    <div class="s04-hd">
+      <span class="s04-title">履歴</span>
+      <span class="s04-close">✕</span>
+    </div>
+
+    <!-- 履歴リスト（直近3件） -->
+    <div class="s04-list">
+      <div class="s04-item">
+        <span class="s04-item-name">週次MTG 7/2</span>
+        <div class="s04-item-meta">
+          <span class="s04-item-date">2026/07/02 14:30</span>
+          <span class="s04-item-chip full">要約済み</span>
+        </div>
+      </div>
+      <div class="s04-item">
+        <span class="s04-item-name">営業会議 7/1</span>
+        <div class="s04-item-meta">
+          <span class="s04-item-date">2026/07/01 10:00</span>
+          <span class="s04-item-chip prev">要約プレビュー</span>
+        </div>
+      </div>
+      <div class="s04-item">
+        <span class="s04-item-name">1on1メモ 6/30</span>
+        <div class="s04-item-meta">
+          <span class="s04-item-date">2026/06/30 15:00</span>
+          <span class="s04-item-chip full">要約済み</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 制限バナー + CTA -->
+    <div class="s04-limit-bar">
+      <p class="s04-limit-note">無料プランでは直近3件まで表示されます</p>
+      <p class="s04-limit-cta-txt">SaidLog Plusなら直近30件まで・月680円</p>
+      <button class="s04-limit-btn">SaidLog Plusに進む</button>
+    </div>
+
+  </div><!-- .s04-frame -->
+</div><!-- .s04-section -->
+
+</body>
+</html>

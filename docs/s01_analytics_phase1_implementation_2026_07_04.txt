@@ -1,0 +1,149 @@
+S01効果検証イベント（Phase 1）実装完了報告
+日付: 2026-07-04
+状態: 全5ステップ完了・ローカルcommit済み・push未実施・migration未適用
+
+================================================================
+コミット一覧（5コミット、いずれもローカルのみ）
+================================================================
+
+1. 2e8f9e9 feat: eventsテーブルのmigration追加（S01効果検証 Phase 1）
+   新規: supabase/migrations/20260704000000_add_events.sql
+   ※ supabase db push は未実行。ゆうの確認後に適用する
+
+2. 146fd0e feat: eventsサニタイズ・insertサービスとテスト追加
+   新規: server/services/events.js（138行）
+   新規: tests/eventsSanitize.test.mjs（222行）
+
+3. 88e862a feat: POST /api/events エンドポイント追加
+   新規: server/routes/events.js
+   修正: server/app.js（import 1行＋app.use 1行のみ）
+
+4. fea76f9 feat: transcribe.jsにtranscription系3イベント記録を追加
+   修正: server/routes/transcribe.js（+48行/-2行）
+
+5. cf903a4 feat: client発火5イベントとanalytics送信ヘルパー追加
+   新規: client/src/lib/analytics.js
+   修正: client/src/App.jsx、client/src/api.js、
+         client/src/components/Recorder.jsx（onRecordStart prop追加のみ）、
+         client/src/components/AuthModal.jsx
+
+================================================================
+実装内容
+================================================================
+
+■ eventsテーブル（migration）
+- 8イベント名・全enum列をCHECK制約で固定（自由文字列はDBレベルで拒否）
+- anonymous_session_id は uuid型・NULL許容（sessionId無し/不正時はnull保存）
+- auth.usersへの外部キーなし（raw user_id非保存、削除バッチ単純化）
+- occurred_at インデックス（将来の30〜90日削除に対応）
+- RLS有効・クライアント向けポリシーなし＝anon/authenticatedから
+  読み書き不可。書き込みはserver（service role）経由のみ
+
+■ server/services/events.js（全イベントの唯一の書き込み経路）
+- sanitizeEvent(): event_nameホワイトリスト（8種のみ）、enum列は
+  許可値以外をfallbackに丸め、出力は固定キーのみ（未知フィールドは
+  構造的に保持不可能）
+- sanitizeSessionId(): UUID形式のみ通過。36文字超は即拒否。
+  email・URL・ファイル名・guest_id形式・自由文字列はすべてnullに落ち、
+  イベント自体は保存される（analytics破棄のみ、本体に影響なし）
+- sanitizeMetadata(): 許可キー空集合 → metadata_jsonは常に'{}'
+- page_path: /で始まる安全なパス形式のみ（クエリ・URL・長文は拒否）
+- insertEvent(): 一切throwしない。検証NG・Supabase未設定・insert失敗
+  すべてfalseを返すだけ
+
+■ POST /api/events（server/routes/events.js）
+- optionalAuth適用。auth_state / actor_typeはAuthorizationヘッダーから
+  サーバーが判定（クライアント申告に依存しない）
+- 常に202を即返す（fire-and-forget）
+- metadata_jsonは受け取らず常に'{}'を渡す
+
+■ transcribe.js（サーバー発火3イベント）
+- transcription_request: バリデーション通過直後（ゲストガード前）に記録
+- transcription_success: STT成功後、実測audioDurationSecの丸め区分で記録
+- transcription_error: sttError分岐で記録。error_categoryは
+  classifyTranscriptionError()の分類コードのみをmapErrorCategory()で
+  変換（AUTH_ERROR→auth等）。rawメッセージはeventsに一切渡さない
+- sessionIdはbodyの任意フィールド。sanitizeSessionId()で検証し、
+  不正・欠落時はnullでイベント記録（文字起こし本体は影響ゼロ）
+- ゲストガード403（体験済み・15分超）とプランゲート403は
+  transcription_errorに含めない（request − success − error ＝ ブロック数）
+- plan_stateはgetEntitlement()で判定（ume→free、take→plus、
+  未ログイン→unknown）。取得失敗時はunknownのまま継続
+- device_categoryはUAの正規表現判定でカテゴリのみ保存（UA全文は不保存）
+
+■ client（5イベント）
+- client/src/lib/analytics.js:
+  - getOrCreateSessionId(): crypto.randomUUID()をsessionStorageで保持
+    （キー: saidlog_session_id）。訪問単位でタブを閉じると消える。
+    user_id / guest_id / emailから導出しない
+  - trackEvent(): fetch(keepalive)でPOST /api/events。ログイン時は
+    Authorizationヘッダー付与（sendBeaconはヘッダー不可のため不採用）。
+    失敗・例外はすべて握りつぶす
+- s01_view: App.jsxマウント時にuseRefガードで1ページロード1回
+- s01_record_click: RecorderにonRecordStart propを追加し、
+  App.jsxから注入（Recorder自体にトラッキングコードを持たせない）
+- s01_upload_click: 「音声ファイルを選ぶ」ボタンのonClick
+- auth_modal_open: openAuthModal(source, mode)ヘルパーに集約し、
+  showAuthModal監視のuseEffectで発火。source内訳:
+    header（ヘッダーのログインボタン）
+    guest_gate（ゲスト体験済みガード2箇所）
+    plus_cta（アップグレード導線・TranscriptViewの登録CTA）
+- signup_submit: AuthModal handleSubmitのsignup分岐、signUp呼び出し
+  直前に発火（成否問わず。入力値は送らない）
+- api.js requestTranscription: bodyにsessionIdを追加送信
+  （analytics専用の任意フィールド。無くてもAPIは従来どおり動く）
+
+================================================================
+必須条件の遵守状況
+================================================================
+
+1. sessionId任意 … OK。無しでも文字起こしは従来どおり動作。
+   無し/不正時はイベントのanonymous_session_id=nullで記録
+2. サーバー側検証 … OK。UUID形式のみ・36文字超即拒否・不正値は
+   analytics側でnull化のみ（本体を失敗させない）
+3. analytics専用 … OK。transcripts / guest_usage / billing / plans
+   への保存・参照なし。認証・課金・制限判定に不使用。
+   user_id / guest_idから導出しない
+4. metadata許可キー制 … OK。Phase 1は許可キー空で常に'{}'。
+   クライアント値はサーバーで全破棄
+5. 8イベント限定 … OK。DBのCHECK制約とサーバーのホワイトリストの
+   二重で強制。見送りイベントは未実装
+6. 影響範囲限定 … OK。transcripts保存仕様・guest_usage・課金ロジック・
+   S01/AuthModal文言は無変更。文字起こし本体のフローは
+   insertEvent（throwしない）の挿入のみ
+
+================================================================
+テスト結果
+================================================================
+
+npm test: 48件全パス（うちeventsSanitize.test.mjs 15件）
+npm --prefix client run build: 成功
+
+テストで確認済みの項目:
+- 許可8イベントのみ受理、許可外（見送りイベント・SQL文字列等）は拒否
+- 禁止キー入りmetadata（email/fileName/audioUrl/transcript/summary/
+  rawError/userAgent/ip/userId/guestId）が全破棄され'{}'になる
+- sessionId不正値（email、URL、日本語ファイル名、guest_id形式、
+  1000文字、UUID+1文字）がすべてnullに落ちる
+- sessionId不正でもイベント自体は保存対象になる（本体を壊さない）
+- 全フィールドに禁止情報を混入させてもJSON化した保存行に
+  email / URL / ファイル名 / UA / IP / 本文 / rawエラーが出現しない
+- 音声長が3区分に丸められ生の秒数が残らない
+- error_categoryマッピングが正しく、分類コード以外はunknownに落ちる
+
+※ POST /api/eventsのHTTP経由の統合テストは未実装（既存testsに
+  HTTPテストの前例がなく、保存経路は全てsanitizeEvent/insertEventを
+  通るため単体テストでカバーされる構成）
+
+================================================================
+残作業（ゆうの確認・操作が必要なもの）
+================================================================
+
+1. migrationのSupabase適用（ゆう確認後）:
+     supabase db push
+   ※ eventsテーブル追加のみ。既存テーブルへの変更なし
+2. git push origin main（指示があり次第）
+3. 動作確認（適用後）: S01を開く → Supabaseのeventsテーブルに
+   s01_viewが1行入り、本文・emailなどが含まれないことを目視確認
+
+以上。

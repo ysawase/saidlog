@@ -1,0 +1,278 @@
+S01効果検証イベント（Phase 1）実装前調査報告
+日付: 2026-07-04
+状態: 調査のみ（実装・コード変更なし）
+
+================================================================
+1. migrationファイルの作成方針
+================================================================
+
+■ 既存形式の確認
+supabase/migrations/ 配下は「YYYYMMDDHHMMSS_名前.sql」形式のプレーンSQL。
+既存6ファイルの共通パターン:
+- CREATE TABLE IF NOT EXISTS public.xxx
+- 列挙値は CHECK 制約で固定（例: plan_id IN ('ume','take')）
+- RLS は ALTER TABLE ... ENABLE ROW LEVEL SECURITY
+- ポリシーは DO $$ ... EXCEPTION WHEN duplicate_object THEN NULL で冪等化
+- transcript_full_summaries は「RLS有効・クライアント向けポリシーなし
+  （service role経由のみ）」の前例あり → events も同方式を踏襲
+
+■ 新規ファイル案: supabase/migrations/20260704000000_add_events.sql
+
+CREATE TABLE IF NOT EXISTS public.events (
+  id                    bigserial PRIMARY KEY,
+  event_name            text NOT NULL CHECK (event_name IN (
+                          's01_view', 's01_record_click', 's01_upload_click',
+                          'transcription_request', 'transcription_success',
+                          'transcription_error', 'auth_modal_open',
+                          'signup_submit')),
+  occurred_at           timestamptz NOT NULL DEFAULT now(),
+  anonymous_session_id  uuid NOT NULL,
+  actor_type            text NOT NULL DEFAULT 'unknown'
+                          CHECK (actor_type IN ('guest', 'user', 'unknown')),
+  auth_state            text NOT NULL DEFAULT 'guest'
+                          CHECK (auth_state IN ('guest', 'logged_in')),
+  plan_state            text NOT NULL DEFAULT 'unknown'
+                          CHECK (plan_state IN ('unknown', 'free', 'plus')),
+  source                text CHECK (source IN
+                          ('s01', 'auth_modal', 'history', 'plus_cta',
+                           'header', 'guest_gate')),
+  page_path             text,
+  device_category       text NOT NULL DEFAULT 'unknown'
+                          CHECK (device_category IN ('mobile', 'desktop', 'unknown')),
+  result                text CHECK (result IN ('success', 'error')),
+  error_category        text CHECK (error_category IN
+                          ('auth', 'rate_limit', 'timeout',
+                           'provider_response', 'audio_processing', 'unknown')),
+  audio_duration_bucket text CHECK (audio_duration_bucket IN
+                          ('0-3m', '3-15m', '15m+')),
+  stt_provider          text CHECK (stt_provider IN
+                          ('groq', 'amivoice', 'assemblyai', 'unknown')),
+  metadata_json         jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX IF NOT EXISTS events_occurred_at_idx ON public.events (occurred_at);
+CREATE INDEX IF NOT EXISTS events_name_occurred_idx ON public.events (event_name, occurred_at);
+
+ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+-- ポリシーは一切作らない（anon/authenticatedから読み書き不可）。
+-- 書き込みはサーバー（service role）経由のみ。
+
+■ 設計上のポイント
+- auth.users への外部キーを持たない（raw user_id非保存の要件と一致。
+  ユーザー削除との連動も不要になり、保持期間削除が単純なDELETEで済む）
+- occurred_at に単独インデックス → 将来の
+  DELETE FROM events WHERE occurred_at < now() - interval '90 days'
+  がインデックススキャンで実行可能。削除バッチは既存の
+  /api/cleanup（Vercel Cron日次）に1クエリ追加するだけで実装できる
+- CHECK制約により、自由文字列（rawエラー等）はDBレベルでも入らない
+
+================================================================
+2. 8イベントの発火場所
+================================================================
+
+【client側】
+
+(1) s01_view
+  場所: client/src/App.jsx AppInner
+  方法: useEffect でマウント時に1回発火（S01はstatus==='idle'の初期画面
+        なので、ページロード＝S01表示とみなせる）。
+        「やり直す」でidleに戻るたびに発火させると重複計上になるため、
+        useRefフラグで1ページロード1回に制限する。
+  source: 's01'
+
+(2) s01_record_click
+  場所: client/src/components/Recorder.jsx の handleStart（83行目）
+  方法: Recorder は汎用コンポーネントなので、トラッキングコードを
+        直書きせず、App.jsx から onRecordStart プロップを渡して
+        handleStart 冒頭で呼ぶ形を推奨（S01以外で使う場合も汚染しない）
+  source: 's01'
+
+(3) s01_upload_click
+  場所: client/src/App.jsx の「音声ファイルを選ぶ」ボタン
+        （s01-file-btn、fileInputRef.current?.click() の onClick、389行目付近）
+  方法: onClick内で発火。ファイル選択ダイアログを開いた意図の計測
+  source: 's01'
+
+(4) auth_modal_open
+  場所: client/src/App.jsx。setShowAuthModal(true) の呼び出し箇所は3つ:
+        - ヘッダー「ログイン」ボタン（263行目）→ source: 'header'
+        - ゲスト体験済みガード（103・159行目）→ source: 'guest_gate'
+        - アップグレード導線 not_logged_in（241行目）→ source: 'plus_cta'
+  方法: showAuthModal が true になった時の useEffect で発火し、
+        直前にセットする発火元stateを source に入れる。
+        （3箇所それぞれに直接送信を書くより漏れ・重複が防げる）
+
+(5) signup_submit
+  場所: client/src/components/AuthModal.jsx の handleSubmit（17行目）、
+        mode === 'signup' 分岐で supabase.auth.signUp 呼び出しの直前
+  方法: 送信「試行」の計測なので成否を問わず発火。email等は一切送らない
+  source: 'auth_modal'
+
+【server側】（3イベントとも server/routes/transcribe.js 内）
+
+(6) transcription_request
+  場所: POST /api/transcribe ハンドラー、filePath検証通過後
+        （27行目以降、ゲストガードの前）
+  取得情報: auth_state（optionalAuthのreq.userId有無）、
+        stt_provider（32行目のprovider変数）、
+        audio_duration_bucket（req.body.durationSecondsから丸め）
+
+(7) transcription_success
+  場所: STT成功後（134行目 console.log 付近）
+  取得情報: result='success'、audio_duration_bucket は実測
+        result.audioDurationSec から丸め、stt_provider
+
+(8) transcription_error
+  場所: sttError 分岐（127行目）
+  取得情報: result='error'、error_category は既存の
+        classifyTranscriptionError(err) の分類コードをマッピング:
+          AUTH_ERROR        → auth
+          RATE_LIMIT        → rate_limit
+          TIMEOUT           → timeout
+          PROVIDER_ERROR    → provider_response
+          AUDIO_ERROR       → audio_processing
+          UNKNOWN／その他    → unknown
+        rawメッセージ部分（buildTranscriptionErrorCodeの短縮文）は
+        eventsには一切保存しない（分類コードのみ）
+
+  ※判断ポイント: ゲストガードの403（GUEST_TRIAL_USED /
+    GUEST_TRIAL_TOO_LONG）やプランゲート403は「STT失敗」ではなく
+    「ポリシーブロック」のため、Phase 1では transcription_error に
+    含めない方針を推奨。requestは発火済みなので
+    「request数 − success数 − error数 = ブロック数」として把握可能。
+
+================================================================
+3. イベント送信方式の比較・推奨
+================================================================
+
+■ 案A: クライアントからSupabaseへ直接insert（anonキー + RLS INSERTポリシー）
+  利点: サーバー実装不要、実装量最小
+  欠点:
+  - anonロールにINSERTを開放する必要があり、任意クライアントが
+    events テーブルへ自由に書き込める（スパム・偽データ・肥大化）
+  - 「入れてよいキーの限定」「禁止情報の遮断」をサーバーで強制できず、
+    CHECK制約で防げない metadata_json の中身を検証する場所がない
+  - テーブル名・スキーマがクライアントコードに露出
+
+■ 案B: サーバー経由 POST /api/events を新設（推奨）
+  利点:
+  - RLSポリシーゼロのままにできる（transcript_full_summariesと同じ
+    「service role専用テーブル」パターンで既存方針と一貫）
+  - event_name/enum値のホワイトリスト検証、metadata_jsonのキー制限、
+    ペイロードサイズ制限をサーバー1箇所で強制できる
+    →「禁止情報が保存されない」テストがこの検証関数の単体テストとして書ける
+  - auth_state / actor_type をサーバーが Authorizationヘッダー
+    （既存 optionalAuth ミドルウェア）から判定でき、クライアント申告に
+    依存しない
+  欠点: ルート1本とサービス1本の追加実装が必要（小規模）
+
+■ 推奨構成（案B）
+  - server/routes/events.js  … POST /api/events（optionalAuth適用）。
+    client発火の5イベント用。fire-and-forget前提で常に202を即返す
+  - server/services/events.js … insertEvent(payload) 共通ヘルパー。
+    ホワイトリスト検証・サニタイズはここに集約し、
+    transcribe.js のサーバー発火3イベントも同じ関数を通す
+    （＝禁止情報遮断のコードパスが1本になる）
+  - client/src/lib/analytics.js … trackEvent(eventName, fields) ヘルパー。
+    navigator.sendBeacon（fallback: fetch keepalive）で送信、
+    失敗は握りつぶしてUXに影響させない
+  - app.js に app.use('/api', eventsRouter) を1行追加
+
+■ plan_state の決め方
+  - server発火イベント: transcribe.js は既に canStartTranscription →
+    getEntitlement を呼んでいるため、その結果を流用できる
+    （ume→free、take→plus、未ログイン→unknown）。追加クエリ不要
+  - client発火イベント: App.jsx の accountStatus?.planId から同マッピング。
+    取得前/失敗時は 'unknown'。クライアント申告値だが分析用途なら許容
+    （毎イベントでサーバーがDB照会するコストと釣り合わない）
+
+■ device_category の決め方
+  - client発火: window.matchMedia('(max-width: 768px)') 等で
+    mobile/desktop を判定し、カテゴリ文字列のみ送信
+  - server発火: User-Agentヘッダーを正規表現でmobile判定し、
+    カテゴリのみ保存（UA全文はログにもDBにも残さない）
+
+■ metadata_json の扱い
+  Phase 1では専用カラムで全用途をカバーできるため、許可キーは空
+  （常に '{}'）を推奨。サーバー側サニタイズで未知キーを全破棄する
+  実装にしておき、Phase 2でキーを追加する時はホワイトリストへの
+  追記＋テスト追加をセットで行う。
+
+================================================================
+4. anonymous_session_id の生成・保持設計
+================================================================
+
+■ 生成
+  crypto.randomUUID() による純ランダムUUID。
+  email / user_id / guest_id / 端末情報からの導出・ハッシュ化は行わない
+  （既存 guestId.js の 'guest_' + UUID とは完全に別物として新規生成。
+  saidlog_guest_id の値を再利用・参照しないこと）。
+
+■ 保持: sessionStorage を推奨（キー: saidlog_session_id）
+  - localStorage案: ブラウザ永続の匿名端末IDになる。ファネルは跨日で
+    追えるが「実質的な端末識別子」に近づき、Phase 1の
+    プライバシー方針（個人・端末の特定回避）と相性が悪い
+  - sessionStorage案（推奨）: タブを閉じると消える訪問単位のID。
+    Phase 1の目的（S01表示→録音/アップロード→文字起こし→登録の
+    同一訪問内ファネル計測）には十分で、より privacy-preserving。
+    保持期間30〜90日でIDの寿命が訪問単位なら、削除後に個人へ
+    再結合できるリスクも実質ゼロ
+
+■ 実装: client/src/lib/analytics.js 内に getOrCreateSessionId() を実装
+  function getOrCreateSessionId() {
+    let id = sessionStorage.getItem('saidlog_session_id');
+    if (!id) { id = crypto.randomUUID(); sessionStorage.setItem(...); }
+    return id;
+  }
+
+■ server発火イベントへの引き渡し
+  transcription_request/success/error にも同じsession_idを付けないと
+  クライアント側ファネルと接続できない。
+  → POST /api/transcribe のbodyに任意フィールド sessionId を追加し、
+    サーバーはUUID形式バリデーション後、イベント記録のみに使用する
+    （transcripts等には保存しない）。形式不正・欠落時は
+    ランダムUUIDを採番して記録（ファネル接続は諦めるが行は残す）。
+  ※既存エンドポイントへの後方互換な任意フィールド追加のみで、
+    transcripts / billing / plans / guest_usage には一切触れない
+
+================================================================
+5. テスト方針（「禁止情報が保存されない」ことの確認）
+================================================================
+
+tests/eventsSanitize.test.mjs（node:test、既存tests/と同形式）を新設し、
+server/services/events.js のサニタイズ関数を純関数として単体テスト:
+
+- event_name がホワイトリスト外 → 拒否される
+- actor_type / auth_state / plan_state / source / device_category /
+  result / error_category / audio_duration_bucket / stt_provider の
+  enum外の値 → 拒否 or 'unknown' に丸められる
+- metadata_json に任意キー（email, fileName, url, message, userId,
+  guestId 等を含む）を入れても全て破棄され '{}' になる
+- ペイロードに email / filename / 本文らしき長文 / rawエラー文字列を
+  紛れ込ませても、insert対象オブジェクトのどのフィールドにも
+  出現しない（JSON.stringifyして禁止パターンを検索するテスト）
+- error_category へ classifyTranscriptionError の分類コードを渡した
+  ときのマッピングが正しい（rawメッセージ部分が混入しない）
+
+================================================================
+6. 実装ステップ案（次回作業の順序）
+================================================================
+
+1. migration作成: supabase/migrations/20260704000000_add_events.sql → commit
+2. server/services/events.js（サニタイズ＋insert）
+   ＋ tests/eventsSanitize.test.mjs → npm test → commit
+3. server/routes/events.js ＋ app.js 登録 → commit
+4. transcribe.js にサーバー発火3イベント追加（sessionId受け取り含む）→ commit
+5. client/src/lib/analytics.js ＋ client発火5イベント
+   （App.jsx / Recorder.jsx prop / AuthModal.jsx）→ commit
+6. supabase db push でmigration適用（ゆう確認のうえ）
+
+変更ファイル想定:
+  新規: migration 1、server/services/events.js、server/routes/events.js、
+        client/src/lib/analytics.js、tests/eventsSanitize.test.mjs
+  修正: server/app.js（1行）、server/routes/transcribe.js、
+        client/src/App.jsx、client/src/components/Recorder.jsx（prop追加）、
+        client/src/components/AuthModal.jsx
+  不変: transcripts / billing / plans / guest_usage 関連、STT抽象化層
+
+以上。実装はまだ行っていません。

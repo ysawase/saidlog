@@ -1,0 +1,101 @@
+================================================================
+Plus CTA 安全化 最終まとめ
+2026-07-02
+================================================================
+
+■ 実施内容
+================================================================
+
+【1】upgradeGuard.js 新規作成
+  ファイル: client/src/lib/upgradeGuard.js
+  内容: getUpgradeMode({ user, accountStatus }) — 5段階優先判定
+    ① plus_active   : accountStatus?.planId === 'take'（最優先）
+    ② web           : !Capacitor.isNativePlatform()
+    ③ not_logged_in : !user（Native かつ未ログイン）
+    ④ loading       : accountStatus === null（user あり + 未取得）
+    ⑤ purchase      : それ以外（購入可能）
+
+【2】App.jsx 変更
+  - billing import に purchaseTake を追加
+  - upgradeGuard import を追加
+  - const busy の直後に upgradeMode / handleUpgrade を追加
+    （handleUpgrade: purchase → purchaseTake、not_logged_in → AuthModal）
+  - HistoryList props: planId/historyLimit → upgradeMode/onUpgrade
+  - TranscriptView props: onPurchaseComplete → upgradeMode/onUpgrade
+
+【3】HistoryList.jsx 変更
+  - import { purchaseTake } を削除
+  - props: { onSelect, planId } → { onSelect, upgradeMode, onUpgrade }
+  - CTA セクション（S04）: planId === 'ume' の直接判定を廃止し、
+    upgradeMode の3分岐に変更
+      web     → 静的テキスト（TODO: ストアリンクに差し替え）
+      loading → disabled「確認中...」
+      purchase→ onUpgrade を呼ぶ「SaidLog Plusに進む」
+
+【4】TranscriptView.jsx 変更
+  - import { purchaseTake } を削除
+  - props: onPurchaseComplete を削除、upgradeMode/onUpgrade を追加
+  - S08-E（showCopyModal ログイン済み分岐）: 4分岐
+      plus_active → 「SaidLog Plus利用中です」テキスト
+      web         → 静的テキスト（TODO: ストアリンクに差し替え）
+      loading     → disabled「確認中...」
+      purchase    → setShowCopyModal(false) + onUpgrade()
+  - S08-P（summary-blur-wrapper、最高リスク箇所）: 5分岐
+      plus_active → null（表示なし）
+      web         → 静的テキスト（TODO: ストアリンクに差し替え）
+      loading     → disabled「確認中...」
+      not_logged_in → onUpgrade()「無料登録 / ログイン」
+      purchase    → onUpgrade()「SaidLog Plusに進む」
+
+================================================================
+■ レビューで発見・追加修正した不整合
+================================================================
+
+  S08-E（showCopyModal ログイン済み分岐）で plus_active 分岐が漏れていた。
+  初期実装では web / loading / デフォルト の3分岐のみで、
+  Plus 利用中ユーザー（plus_active）がモーダルを開いた場合に
+  デフォルト分岐へ落ちて「SaidLog Plusに進む」ボタンが表示される
+  バグ（Plus利用中への再購入CTA表示）が残存していた。
+
+  最終コードレビュー時に発見し、先頭に plus_active 分岐を追加して修正。
+  → 4分岐（plus_active / web / loading / デフォルト）に変更。
+
+================================================================
+■ purchaseTake 呼び出しの集約
+================================================================
+
+  変更前: HistoryList.jsx / TranscriptView.jsx（2箇所）が
+          purchaseTake を直接 import して呼び出し。
+          未ログイン・Web 環境でのガードなし、エラー catch なし。
+
+  変更後: purchaseTake の呼び出しは App.jsx の handleUpgrade 内1箇所のみ。
+          - upgradeMode === 'purchase'（Native + ログイン済み + 無料プラン）の場合のみ呼ぶ
+          - try/catch で購入失敗時のエラーハンドリングあり
+          - 購入成功後に getAccountStatus() で accountStatus を更新
+
+  HistoryList / TranscriptView は onUpgrade prop 経由で
+  handleUpgrade を呼ぶだけ（billing.js を知らない設計）。
+
+================================================================
+■ コミット・push 状況
+================================================================
+
+  コミット1: b175537  fix: guard plus upgrade cta by environment and auth
+    変更: upgradeGuard.js（新規）、App.jsx、HistoryList.jsx、
+          TranscriptView.jsx、docs 2件
+
+  コミット2: 81d5b57  fix: add plus_active branch to S08-E upgrade modal
+    変更: TranscriptView.jsx（S08-E への plus_active 分岐追加）
+
+  push: 未実施
+
+================================================================
+■ 残タスク
+================================================================
+
+  - git push（任意のタイミングで実施）
+  - TODO: Google Play 申請完了後、Web 環境向け静的テキストを
+          ストアリンクに差し替える（3箇所にコメント挿入済み）
+  - S01 v2.1 UI 本実装（別タスク）
+
+================================================================

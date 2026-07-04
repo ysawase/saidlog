@@ -1,0 +1,62 @@
+================================================================
+最終コードレビュー — Plus CTA 安全化 実装箇所
+2026-07-02
+================================================================
+
+■ 1. TranscriptView.jsx — S08-P（summary-blur-wrapper内、5分岐）
+================================================================
+  該当行: 301〜313
+
+  {upgradeMode === 'plus_active' ? null
+   : upgradeMode === 'web' ? (
+    <p style={{ fontSize: '0.9rem', color: '#4b5563', margin: 0 }}>
+      SaidLog PlusはAndroidアプリ版でご利用いただけます。
+      {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+    </p>
+   ) : upgradeMode === 'loading' ? (
+    <button className="btn summary-upgrade-btn" disabled>確認中...</button>
+   ) : upgradeMode === 'not_logged_in' ? (
+    <button className="btn summary-upgrade-btn" onClick={onUpgrade}>無料登録 / ログイン</button>
+   ) : (
+    <button className="btn summary-upgrade-btn" onClick={onUpgrade}>SaidLog Plusに進む</button>
+   )}
+
+================================================================
+■ 2. TranscriptView.jsx — S08-E（showCopyModal ログイン済み分岐内、3分岐）
+================================================================
+  該当行: 208〜217
+
+  {upgradeMode === 'web' ? (
+    <p style={{ margin: '0 0 8px', fontSize: '0.875rem', color: '#4b5563' }}>
+      SaidLog PlusはAndroidアプリ版でご利用いただけます。
+      {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+    </p>
+  ) : upgradeMode === 'loading' ? (
+    <button className="btn primary" disabled>確認中...</button>
+  ) : (
+    <button className="btn primary" onClick={() => { setShowCopyModal(false); onUpgrade(); }}>SaidLog Plusに進む</button>
+  )}
+
+================================================================
+■ 3. HistoryList.jsx — CTAセクション（3分岐）
+================================================================
+  該当行: 94〜109
+
+  {(upgradeMode === 'web' || upgradeMode === 'purchase' || upgradeMode === 'loading') && (
+    <div style={{ marginTop: '1rem', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '0.8rem' }}>
+      <p style={{ margin: '0 0 4px', color: '#374151' }}>無料プランでは直近3件まで表示されます</p>
+      <p style={{ margin: '0 0 10px', color: '#6b7280' }}>SaidLog Plusなら直近30件まで・月680円</p>
+      {upgradeMode === 'web' ? (
+        <p style={{ margin: 0, color: '#4b5563', fontSize: '0.8rem' }}>
+          SaidLog PlusはAndroidアプリ版でご利用いただけます。
+          {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+        </p>
+      ) : upgradeMode === 'loading' ? (
+        <button className="btn primary" disabled style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>確認中...</button>
+      ) : (
+        <button className="btn primary" onClick={onUpgrade} style={{ fontSize: '0.8rem', padding: '6px 14px', marginBottom: 0 }}>SaidLog Plusに進む</button>
+      )}
+    </div>
+  )}
+
+================================================================

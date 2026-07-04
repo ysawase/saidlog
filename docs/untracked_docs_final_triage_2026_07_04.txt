@@ -1,0 +1,128 @@
+untracked docs 整理トリアージ
+日付: 2026-07-04
+対象: git status --short --untracked-files=all で列挙されたファイル計53件
+状態: 分類のみ（削除・コミットは未実施）
+
+================================================================
+分類1: 今後も参照価値がある記録
+（実装の根拠・調査結果・設計判断として残すべきもの）
+================================================================
+
+--- S01効果検証イベント Phase 1（今回のタスク）---
+docs/s01_analytics_phase1_investigation_2026_07_04.txt
+  → Phase 1設計の調査報告・推奨案。設計判断の根拠として有用
+docs/s01_analytics_phase1_implementation_2026_07_04.txt
+  → 実装完了報告。必須条件の遵守状況・テスト結果をまとめた記録
+docs/s01_events_final_push_2026_07_04.txt
+  → push完了報告。残存事項・ユーザー確認事項を記録
+docs/db_push_verification_2026_07_04.txt
+  → migration repair→db push後のDB確認結果。purchase_token欠落問題の
+    解消確認を含む。今後のDB状態把握の基準点として有用
+
+--- S01デザイン・UI（v2.1実装）---
+docs/s01_analytics_phase1_push_report_2026_07_04.txt
+  ※ 中断報告書（DB状態の食い違い発見の経緯）。migration repairの
+    判断根拠として残すと読みやすいが、db_push_verification_2026_07_04.txt
+    に経緯が引き継がれているため、参照価値は下位
+docs/s01_v2_1_impl_report.txt
+  → S01 v2.1実装完了報告。実装範囲・変更ファイルの記録
+docs/s01_v2_1_final_check_2026_07_03.txt
+  → S01 v2.1の最終確認結果
+docs/s01_mock_v2_1.html
+  → S01 v2.1のモックHTML。デザインの参照元として有用
+docs/screenshots/s01_firstview_2026_07_03.png
+docs/screenshots/s01_firstview_mobile_2026_07_03.png
+docs/screenshots/s01_flow_2026_07_03.png
+docs/screenshots/s01_flow_mobile_2026_07_03.png
+docs/screenshots/s01_pricing_2026_07_03.png
+docs/screenshots/s01_pricing_mobile_2026_07_03.png
+docs/screenshots/s01_step3_fixed_desktop_2026_07_03.png
+docs/screenshots/s01_step3_fixed_mobile_2026_07_03.png
+  → S01の実装確認スクリーンショット。before/after比較や
+    デザイン議論の参照に残す価値あり
+
+--- Plus CTA 安全化（2026-07-02）---
+docs/plus_cta_safety_investigation.md
+  → Plus CTA安全化の事前調査。設計判断の根拠として有用
+docs/plus_cta_safety_final_summary.txt
+  → Plus CTA安全化の実装まとめ
+docs/final_code_review.txt
+  → Plus CTA安全化のコードレビュー記録
+
+================================================================
+分類2: 一時的な確認用ファイルで、もう残す必要がないもの
+（作業進行中の中間チェック・diff出力・git log出力など）
+================================================================
+
+--- plan_rename 関連作業の中間チェック（完了済み作業）---
+docs/comment_cleanup_planrename.txt     → planリネーム作業中のコメント整理確認
+docs/commit_app_planrename.txt          → planリネームのapp.jsコミット確認
+docs/commit_historylist_planrename.txt  → planリネームのHistoryListコミット確認
+docs/commit_summarize_planrename.txt    → planリネームのsummarize確認
+docs/commit_transcriptview_planrename.txt → planリネームのTranscriptViewコミット確認
+docs/plan_rename_final_check.txt        → planリネームの最終チェック
+docs/plan_rename_final_verification.txt → planリネームの最終検証
+
+--- git log / build / deploy 単発チェック出力 ---
+docs/latest_commit_check.txt   → git logの出力（UTF-16。過去のコミット一覧）
+docs/latest_commits.txt        → git logの出力（同上、重複）
+docs/build_check.txt           → ビルド確認の1回限りの出力
+docs/vercel_deploy_check.txt   → Vercelデプロイ状況の確認出力
+docs/account_status_push_report.txt → account status APIのpush前確認出力
+docs/i18n_diff_check.txt       → i18nのdiff確認（1回限り）
+
+--- app.jsx / UI コンポーネント diff・確認（完了済み）---
+docs/app_jsx_diff_report.txt         → App.jsx差分の確認出力
+docs/transcriptview_card_fix.txt     → TranscriptView card修正のdiff出力
+docs/historylist_chip_color.txt      → HistoryListチップ色調整の確認
+docs/gpt_conditional_fix.txt         → GPT条件分岐修正の調査+修正レポート
+docs/gpt_conditional_fix_diff.txt    → 同上のdiff出力
+docs/plus_cta_final_audit.txt        → Plus CTAの最終audit出力
+docs/plus_cta_push_and_next_task.txt → Plus CTA pushと次タスクの中間メモ
+
+--- S01デザイン検討の途中経緯（v2.1で確定済み）---
+docs/s01_mock_options.html      → v2.1以前の選択肢モック（確定前）
+docs/s01_mock_report.txt        → 〃 モック検討レポート
+docs/s01_mock_v2.html           → v2（v2.1確定前の中間版）
+docs/s01_mock_v2_fix_report.txt → v2の修正レポート
+docs/s01_mock_v2_report.txt     → v2のレポート
+docs/s01_mock_v2_1_fix2_report.txt → v2.1の修正2レポート
+docs/s01_mock_v2_1_report.txt      → v2.1の途中レポート
+docs/s01_header_investigation.txt  → S01ヘッダー調査（実装前調査、適用済み）
+docs/s01_recorder_css_scope_check.txt → RecorderのCSSスコープ確認
+docs/s01_v2_1_pre_impl_check.txt   → v2.1実装前チェック（実装済み）
+docs/pricing_table_fact_check.txt  → 料金表のファクトチェック（確認済み）
+docs/screenshots/_take_s01_screenshots.mjs → スクリーンショット撮影スクリプト
+
+--- ルート直下のテストスクリプト ---
+test-assemblyai.mjs  → AssemblyAI接続テスト（一時的なデバッグ用）
+test-groq.mjs        → Groq接続テスト（同上）
+test-summarize.mjs   → 要約テスト（同上）
+
+================================================================
+分類3: 判断が難しいもの
+================================================================
+
+docs/s01_analytics_phase1_push_report_2026_07_04.txt
+  → 中断報告書として経緯を記録。db_push_verification_2026_07_04.txtで
+    引き継いでいるため重複だが、「なぜrepairが必要だったか」の
+    詳細経緯はここにある。ゆうが必要と感じれば残す、不要なら削除可
+
+================================================================
+件数まとめ
+================================================================
+
+分類1（残す）:  16件（docs 8件 + screenshots 8件）
+分類2（削除可）: 35件（docs 27件 + screenshots 1件 + test-*.mjs 3件 + 重複4件）
+分類3（要判断）:  1件
+
+================================================================
+追記: gitignore検討
+================================================================
+
+supabase/.temp/cli-latest は supabase CLI実行のたびに自動更新される
+キャッシュファイル（Mステータス）。.gitignoreに追加すると
+以後「modified」として出続けるノイズが消える。
+既存の.gitignoreにsupabase/.tempが除外されていなければ追加を推奨。
+
+以上。削除・コミットの指示をお待ちします。
