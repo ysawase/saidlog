@@ -1,0 +1,32 @@
+App.jsx ミニ説明部分（freeTrialBannerFree / freeTrialBannerGuest 出し分け）確認結果
+
+対象ファイル: client/src/App.jsx
+
+---
+
+該当箇所（393〜397行目）
+
+393	              {/* 無料枠ミニ説明 */}
+394	              <div className="s01-free-mini">
+395	                <p>{user ? t('app.s01.freeTrialBannerFree') : t('app.s01.freeTrialBannerGuest')}</p>
+396	                <a href="#s01-pricing">{t('app.s01.freeTrialLink')}</a>
+397	              </div>
+
+---
+
+判定条件
+
+判定は `user`（18行目 `const { user, signOut } = useAuth();` で取得）の truthy/falsy のみ。
+
+- upgradeMode（211行目 `const upgradeMode = getUpgradeMode({ user, accountStatus, accountStatusLoadState });`）は参照していない
+- accountStatus.planId === 'take'（Plus利用中判定）も参照していない
+
+実際の分岐は以下の2値のみ：
+- !user（未ログイン）→ freeTrialBannerGuest（「ログインせずに1回だけ試せます。保存・履歴には無料登録が必要です」）
+- user が truthy（ログイン済み）→ freeTrialBannerFree（「無料プランは月60分まで。月10時間まで使うならSaidLog Plus」）
+
+---
+
+結論
+
+ログイン済みでPlus（take プラン）利用中のユーザーに対しても、無料プラン向けの「無料プランは月60分まで〜」という文言がそのまま表示される。Plus利用中かどうかで文言を変える分岐はコード上存在しない。

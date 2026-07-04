@@ -1,0 +1,78 @@
+調査結果：再登録時の「確認メールを送信しました」表示について
+
+コード変更は行っていません（Read / WebSearch / WebFetch のみ）。
+
+---
+
+1. AuthModal.jsx の signUp 分岐処理（client/src/components/AuthModal.jsx L24-27）
+
+```js
+} else {
+  const { error } = await supabase.auth.signUp({ email, password })
+  if (error) setError(error.message)
+  else setDone(true)
+}
+```
+
+事実：
+- supabase.auth.signUp() の戻り値のうち error のみを分割代入で取り出しており、data は一切参照していない。
+- 分岐は error の有無の二値のみ。
+  - error があればメッセージ表示（setError）
+  - error が無ければ（＝nullであれば）内容を問わず setDone(true) → 「確認メールを送信しました」画面に遷移
+- data.user.identities や data.user の中身を見て「これは新規登録か、既存アカウントか」を判定するロジックは存在しない。
+
+---
+
+2. Supabase側の一般的な仕様（公式ドキュメント根拠）
+
+確認できた公式記載：
+
+supabase.com/docs/reference/javascript/auth-signup（signUpリファレンス）に以下の記載があります。
+
+"Be aware that if a user account exists in the system you may get back an error message that attempts to hide this information from the user."
+（訳：システムに既にユーザーアカウントが存在する場合、その情報をユーザーに隠すことを意図したエラーメッセージが返ってくることがある点に注意してください）
+
+また supabase.com/docs/guides/auth/auth-identity-linking（Identity Linking ガイド）には、OAuthで既に登録済みのメールアドレスに対してメール／パスワードでsignUpを試みたケースについて：
+
+"If you try to create an email account after previously signing up with OAuth using the same email, you'll receive an obfuscated user response with no verification email sent."
+（訳：同じメールアドレスで以前OAuth経由で登録していた場合にメールアカウントを作成しようとすると、確認メールは送信されないまま、難読化された(obfuscated) user レスポンスを受け取ります）
+
+要検証（公式ドキュメント本文では明言を確認できなかった部分）：
+- 「メール／パスワードで既に確認済みのアカウントに対して、再度メール／パスワードでsignUpした場合」に、data.user.identities が空配列になるという挙動自体は、GitHub Discussions（#16770、#29327）やコミュニティ記事で広く報告・利用されている検出方法ですが、Supabase公式スタッフによる正式な仕様確認コメントはこれらのDiscussion内には見当たりませんでした。挙動としては実運用上広く知られていますが、「identitiesが空＝既存メール」という判定条件そのものを謳う一次情報（公式リファレンス本文）は今回の検索範囲では見つからず、この部分は要検証とします。
+- また、「確認メールが実際に送信されない」のか「送信されるがトークンが無効/既存ユーザー宛」なのかという細部の挙動も、Supabaseプロジェクト側の設定（Confirm email の有無など）に依存する可能性があり、コードからは断定できません。
+
+結論として言えること：公式ドキュメントは「既存アカウントに対しては、その事実を隠すために意図的に成功したように見えるレスポンス（obfuscated response）を返すことがある」という設計方針を明言しています。これは今回ユーザーが確認した「成功メッセージは出るが実際にはメールが届かない」という挙動と整合的です。
+
+---
+
+3. AuthModal.jsx に「登録済みです」等の分岐があるか
+
+結論：分岐は存在しません。
+
+- 1.で確認した通り、handleSubmit は error の有無のみで分岐しており、data（＝identities配列を含むユーザーオブジェクト）を全く見ていません。
+- そのため、Supabase側が「既存メールアドレスのため実質何もしていない（確認メール送信なし）」obfuscatedレスポンス（error: null）を返してきた場合でも、コード上は新規登録成功時と完全に同一の分岐（setDone(true) → 「確認メールを送信しました」表示）を通ります。
+- 「このメールアドレスは登録済みです」「ログインをお試しください」といった、既存メールアドレス向けの別メッセージ・別分岐はコード内に存在しません。
+
+---
+
+まとめ
+
+| 確認項目 | 結果 |
+|---|---|
+| AuthModal.jsxはdataを見ているか | いいえ、errorのみ判定 |
+| Supabaseは既存メールで意図的に成功風レスポンスを返すか | 公式ドキュメントに明記あり（メール流出防止のため） |
+| identities空配列での判定は公式に明記されているか | 要検証（コミュニティでは広く利用されるが、一次情報での明言は未確認） |
+| AuthModal.jsxに既存メール向け分岐があるか | ない（新規登録と同一メッセージになる） |
+
+Sources:
+- JavaScript: signUp | Supabase Docs — https://supabase.com/docs/reference/javascript/auth-signup
+- Identity Linking | Supabase Docs — https://supabase.com/docs/guides/auth/auth-identity-linking
+- Handling Sign Up with Existing Email in Supabase · supabase · Discussion #16770 — https://github.com/orgs/supabase/discussions/16770
+- Supabase auth signup for already existing email id and a potential security vulnerability · supabase · Discussion #29327 — https://github.com/orgs/supabase/discussions/29327
+
+---
+
+変更していないこと：
+- コード変更なし
+- commitなし
+- pushなし
