@@ -9,6 +9,7 @@ import deleteAccountRouter from './routes/deleteAccount.js';
 import accountRouter from './routes/account.js';
 import historyRouter from './routes/history.js';
 import billingRouter from './routes/billing.js';
+import eventsRouter from './routes/events.js';
 import { supabaseConfigured } from './services/storage.js';
 import { cleanupOldFiles, runRetentionCleanup } from './services/cleanup.js';
 
@@ -54,6 +55,7 @@ app.use('/api', deleteAccountRouter);
 app.use('/api', accountRouter);
 app.use('/api', historyRouter);
 app.use('/api/billing', billingRouter);
+app.use('/api', eventsRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
