@@ -210,6 +210,16 @@ function AppInner() {
 
   const upgradeMode = getUpgradeMode({ user, accountStatus, accountStatusLoadState });
 
+  // S01ミニ説明：未ログイン / ログイン済み無料 / ログイン済みPlus の3状態のみで出し分ける。
+  // accountStatus取得中・取得失敗時は「無料プラン」と断定できないため何も表示しない。
+  const s01FreeMiniKey = !user
+    ? 'app.s01.freeTrialBannerGuest'
+    : accountStatusLoadState !== 'success'
+      ? null
+      : accountStatus?.planId === 'take'
+        ? 'app.s01.freeTrialBannerPlus'
+        : 'app.s01.freeTrialBannerFree';
+
   const handleUpgrade = async () => {
     if (upgradeMode === 'purchase') {
       try {
@@ -392,7 +402,7 @@ function AppInner() {
 
               {/* 無料枠ミニ説明 */}
               <div className="s01-free-mini">
-                <p>{user ? t('app.s01.freeTrialBannerFree') : t('app.s01.freeTrialBannerGuest')}</p>
+                {s01FreeMiniKey && <p>{t(s01FreeMiniKey)}</p>}
                 <a href="#s01-pricing">{t('app.s01.freeTrialLink')}</a>
               </div>
 
