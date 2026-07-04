@@ -392,7 +392,7 @@ function AppInner() {
 
               {/* 無料枠ミニ説明 */}
               <div className="s01-free-mini">
-                <p>{t('app.s01.freeTrialBanner')}</p>
+                <p>{user ? t('app.s01.freeTrialBannerFree') : t('app.s01.freeTrialBannerGuest')}</p>
                 <a href="#s01-pricing">{t('app.s01.freeTrialLink')}</a>
               </div>
 
