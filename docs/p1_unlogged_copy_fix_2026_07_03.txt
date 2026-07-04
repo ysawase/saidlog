@@ -1,0 +1,96 @@
+P1「未ログイン導線の説明整理」実装完了報告
+
+対象：確定文言5項目の反映（仕様変更なし）
+
+---
+
+## 1. 実装内容
+
+### 1-1. 未ログイン時のS01ミニ説明文言
+- 変更ファイル: client/src/i18n.js（ja/en）, client/src/App.jsx
+- キー: app.s01.freeTrialBannerGuest（新規、旧 freeTrialBanner を分割）
+- 確定文言（ja）: 「ログインせずに1回だけ試せます。保存・履歴には無料登録が必要です」
+- 表示条件: App.jsx の s01-free-mini 部分で `!user` の場合にこのキーを表示
+
+### 1-2. ログイン済み無料プラン時のミニ説明
+- キー: app.s01.freeTrialBannerFree（新規）
+- 確定文言（ja）: 「無料プランは月60分まで。月10時間まで使うならSaidLog Plus」
+- 表示条件: App.jsx の s01-free-mini 部分で `user` が真の場合にこのキーを表示
+- 備考: ログイン状態（user の有無）のみで分岐しており、プラン種別（無料/Plus）では分岐していない。今回の指示では「未ログイン」「ログイン済み無料プラン」の2状態のみが定義されていたため、ログイン済みPlusユーザーも同じ文言（freeTrialBannerFree）を表示する。Plus利用中ユーザー向けの別文言分岐は今回の指示範囲外のため実装していない。
+
+### 1-3. 折りたたみ内の「3分以上の音声で〜」文言
+- 変更ファイル: client/src/i18n.js（ja/en）
+- キー: app.s01.detailsTrial
+- 確定文言（ja）: 「3分以上の音声では、文字起こしに加えて会議メモ化のプレビューを試せます」
+
+### 1-4. 登録モーダルの見出し・補足文・ボタン文言
+- 変更ファイル: client/src/i18n.js（ja/en）, client/src/components/AuthModal.jsx
+- 見出し（auth.signup）: 「無料アカウントを作成」
+- 補足文（auth.signupNotice、新規キー）: 「会議メモの保存・履歴利用のために、メールアドレスで登録します。」
+  - AuthModal.jsx で mode === 'signup' の時のみ、見出し直下に表示するよう追加
+- ボタン（auth.submit.signup）: 「確認メールを送る」
+
+### 1-5. 登録後メッセージ
+- 変更ファイル: client/src/i18n.js（ja/en）
+- キー: auth.confirmEmail
+- 確定文言（ja）: 「確認メールを送信しました。メール内のリンクからログインしてください。届かない場合は、迷惑メールフォルダを確認し、登録済みの方はログインをお試しください。」
+- 「このメールアドレスは登録済みです」等の分岐文言は追加していない（今回の指示通り）
+
+---
+
+## 2. 実装範囲外（今回やっていないこと）
+
+- 未ログイン試用の回数制限変更なし
+- guestId仕様変更なし
+- guest_usage変更なし
+- guest結果の保存実装なし
+- guest→user移行実装なし
+- 認証ロジック変更なし
+- Supabase Auth設定変更なし
+- billing.js変更なし
+- DB変更なし
+- plans.js変更なし
+- STT処理変更なし
+- 効果計測イベント実装なし
+
+---
+
+## 3. 確認結果
+
+1. 未ログイン時に「ログインせずに1回だけ試せます。保存・履歴には無料登録が必要です」が出ること → OK（i18n.js / App.jsx の条件分岐で確認）
+2. ログイン済み無料プラン時に「無料プランは月60分まで。月10時間まで使うならSaidLog Plus」が出ること → OK
+3. 未ログイン時に「無料プランは月60分まで」と誤表示されないこと → OK（!user分岐でfreeTrialBannerGuestのみ表示）
+4. ログイン済み無料プラン時に未ログイン向け文言が出ないこと → OK（user分岐でfreeTrialBannerFreeのみ表示）
+5. 折りたたみ内の3分以上文言が確定文言になっていること → OK
+6. 登録モーダルの見出し・補足文・ボタンが確定文言になっていること → OK
+7. 登録後メッセージが確定文言になっていること → OK
+8. 「このメールアドレスは登録済みです」系の文言を出していないこと → OK（該当文言は追加していない）
+9. 「月3回」が残っていないこと → client/src配下には元々存在せず（旧handover文書内にのみ残存、UI文言とは無関係）。今回変更したUI文言にも含まれない
+10. 「3行要約コピー可」が残っていないこと → client/src配下には元々存在せず（同上）。今回変更したUI文言にも含まれない
+11. buildが成功すること → OK（`npm --prefix client run build` 成功。既存のchunk size警告のみ、エラーなし）
+12. 仕様変更をしていないこと → OK（文言変更とログイン状態による表示分岐のみ。トライアル回数・課金・DB・認証ロジックは無変更）
+
+---
+
+## 4. 変更ファイル
+
+- client/src/i18n.js（ja/en 両方のリソース文言）
+- client/src/App.jsx（s01-free-mini のログイン状態分岐）
+- client/src/components/AuthModal.jsx（signupNotice の追加表示）
+
+---
+
+## 5. commit構成
+
+1. a0945e2 copy: clarify S01 guest and free plan guidance
+   - client/src/App.jsx, client/src/i18n.js（S01ミニ説明・折りたたみ内文言）
+2. ca5c452 copy: clarify signup email confirmation flow
+   - client/src/i18n.js, client/src/components/AuthModal.jsx（登録モーダル・登録後メッセージ）
+3. docs: record P1 unlogged copy fix
+   - docs/p1_unlogged_copy_fix_2026_07_03.txt（本ファイル）
+
+---
+
+## 6. push
+
+pushは行っていません。
