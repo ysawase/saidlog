@@ -1,5 +1,37 @@
 import { BUCKET, getSupabase, supabaseConfigured } from './storage.js';
 
+const STALE_THRESHOLD_MS = 60 * 60 * 1000; // 1時間
+
+/**
+ * 'transcribing' のまま1時間以上経過したtranscript行を 'failed' に更新する。
+ * Vercelタイムアウト・プロセスクラッシュで更新処理に到達できなかった行の回収用。
+ * usage_periodsは一切更新しない（事前insertの課金は発生していないため）。
+ * @param {{ supabase?: object, now?: number }} [_deps] テスト用依存注入（省略時は本番クライアント）
+ * @returns {Promise<number>} 更新した行数（エラー時は0）
+ */
+export async function cleanupStaleTranscribing(_deps = {}) {
+  const supabase = _deps.supabase ?? (supabaseConfigured() ? getSupabase() : null);
+  if (!supabase) return 0;
+
+  try {
+    const threshold = new Date((_deps.now ?? Date.now()) - STALE_THRESHOLD_MS).toISOString();
+    const { data, error } = await supabase
+      .from('transcripts')
+      .update({ transcription_status: 'failed', error_code: 'STALE_TRANSCRIBING' })
+      .eq('transcription_status', 'transcribing')
+      .lt('created_at', threshold)
+      .select('id');
+
+    if (error) throw new Error(error.message);
+    const count = data?.length ?? 0;
+    if (count > 0) console.log(`stale transcribing クリーンアップ: ${count}件をfailedに更新`);
+    return count;
+  } catch (err) {
+    console.error('stale transcribing クリーンアップ失敗:', err.message);
+    return 0;
+  }
+}
+
 /** audio_retention テーブルの保持期限切れレコードをストレージとDBから削除する。 */
 export async function runRetentionCleanup() {
   if (!supabaseConfigured()) return 0;

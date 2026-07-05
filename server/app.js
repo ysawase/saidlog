@@ -11,7 +11,7 @@ import historyRouter from './routes/history.js';
 import billingRouter from './routes/billing.js';
 import eventsRouter from './routes/events.js';
 import { supabaseConfigured } from './services/storage.js';
-import { cleanupOldFiles, runRetentionCleanup } from './services/cleanup.js';
+import { cleanupOldFiles, runRetentionCleanup, cleanupStaleTranscribing } from './services/cleanup.js';
 
 // server/.env を明示パスで読む（ローカル開発用。Vercel上はダッシュボードの
 // 環境変数が使われ、.envが無くてもno-opになる）
@@ -40,7 +40,8 @@ async function handleCleanup(req, res, next) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     const [deleted, retentionDeleted] = await Promise.all([cleanupOldFiles(), runRetentionCleanup()]);
-    res.json({ ok: true, deleted, retentionDeleted });
+    const staleFixed = await cleanupStaleTranscribing();
+    res.json({ ok: true, deleted, retentionDeleted, staleFixed });
   } catch (err) {
     next(err);
   }
