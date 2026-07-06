@@ -2,6 +2,9 @@
 // timeslice 5秒でチャンクを受け取り、メモリ保持と並行して recordingDb へ
 // 逐次保存する（ブラウザクラッシュ時は IndexedDB 側から復元）。
 // 録音中は Wake Lock で画面消灯を防ぐ（非対応ブラウザでは黙ってスキップ）。
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { saveChunk } from './recordingDb.js';
 import { SIZE_WARNING_BYTES } from '../constants/limits.js';
 
@@ -28,8 +31,27 @@ export function recordingFileName(mimeType) {
   return `SaidLog-${stamp}.${extensionOf(mimeType)}`;
 }
 
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 /** Blobを端末にダウンロード保存する */
-export function downloadBlob(blob, filename) {
+export async function downloadBlob(blob, filename) {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const data = await blobToBase64(blob);
+      const { uri } = await Filesystem.writeFile({ path: filename, data, directory: Directory.Cache });
+      await Share.share({ files: [uri] });
+    } catch {
+      alert('保存に失敗しました');
+    }
+    return;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

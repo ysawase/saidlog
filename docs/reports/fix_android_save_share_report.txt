@@ -1,0 +1,62 @@
+﻿# Android版「保存」機能修正完了報告
+日時: 2026-07-06
+
+## 変更ファイル一覧
+- client/src/lib/recorder.js（downloadBlob修正）
+- client/src/utils/export.js（triggerDownload廃止・共通化）
+- package.json（@capacitor/filesystem, @capacitor/share追加）
+- package-lock.json（同上）
+- android/app/capacitor.build.gradle（cap syncによる自動更新）
+- android/capacitor.settings.gradle（cap syncによる自動更新）
+
+## downloadBlob() の分岐実装の要約
+
+recorder.js に以下を追加：
+- インポート: Capacitor(@capacitor/core), Filesystem/Directory(@capacitor/filesystem), Share(@capacitor/share)
+- blobToBase64() ヘルパー関数（FileReader で DataURL → base64文字列を取得）
+- downloadBlob() を async 化し、Capacitor.isNativePlatform() で分岐：
+  - Native時: blob → base64 → Filesystem.writeFile(Directory.Cache) → Share.share({files:[uri]})
+    エラー時は alert('保存に失敗しました') のみ（ファイルパス等はログ出力しない）
+  - Web時: 既存の URL.createObjectURL + <a download> + click() を維持
+- 呼び出し元（Recorder.jsx / App.jsx）は変更なし（awaitなしでも動作に支障なし）
+
+## export.js の修正内容
+
+- triggerDownload(url, filename) を削除
+- Capacitor / downloadBlob を import
+- exportTxt / exportDocx: triggerDownload(URL.createObjectURL(blob), filename)
+  → await downloadBlob(blob, filename) に統一（Blob直接渡し）
+- exportPdf:
+  - Web時: pdfMake.createPdf(docDef).download(filename) — 変更なし
+  - Native時: pdfMake.createPdf(docDef).getBlob(cb) でBlob取得後、downloadBlob(blob, filename)
+
+## Web版PDFエクスポートの既存動作確認
+- ファイル名: formatFilename('pdf') を事前に計算して両分岐に同一値を渡しているため変化なし ✅
+- 保存タイミング: else { pdfMake.createPdf(docDef).download(filename) } がそのまま実行されるため変化なし ✅
+- エラー時の挙動: pdfmakeの.download()内部処理は変更していないため変化なし ✅
+
+## git status
+modified: android/app/capacitor.build.gradle（cap sync自動更新）
+modified: android/capacitor.settings.gradle（cap sync自動更新）
+modified: client/src/lib/recorder.js
+modified: client/src/utils/export.js
+modified: package.json
+modified: package-lock.json
+コミット・pushは未実施
+
+## ビルド・cap sync 結果
+- npm --prefix client run build: 成功（300モジュール、エラーなし）
+- npx cap sync android: 成功
+  Found 4 Capacitor plugins for android:
+    @capacitor/filesystem@8.1.2
+    @capacitor/share@8.0.1
+    @capgo/capacitor-audio-recorder@8.2.1
+    capacitor-plugin-cdv-purchase@13.17.2
+
+## 実機確認で見るべきポイント
+1. 録音停止後「端末に保存」→ Androidシェアシートが開くこと（初回確認）
+2. 文字起こし後「録音を保存」→ 同様にシェアシートが開くこと
+3. シェアシートから「ファイルに保存」等を選んでファイルが保存されること
+4. Web版（Vercel）での「端末に保存」が引き続き <a download> 方式で動作すること
+5. Web版でのテキスト/Word/PDFエクスポートが引き続き正常動作すること
+6. シェアシートキャンセル時にエラーが出ないこと（Share.share()はキャンセルで正常終了する）

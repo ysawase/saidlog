@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core';
+import { downloadBlob } from '../lib/recorder.js';
+
 function formatFilename(ext) {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
@@ -17,19 +20,11 @@ function buildLines(utterances, names) {
   return utterances.map((u) => `[${formatTime(u.startMs)}] ${names[u.speaker]}：${u.text}`);
 }
 
-function triggerDownload(url, filename) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 export async function exportTxt(utterances, names, summary) {
   const lines = buildLines(utterances, names);
   if (summary) lines.push('', '--- AI要約 ---', summary);
   const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-  triggerDownload(URL.createObjectURL(blob), formatFilename('txt'));
+  await downloadBlob(blob, formatFilename('txt'));
 }
 
 export async function exportDocx(utterances, names, summary) {
@@ -39,7 +34,7 @@ export async function exportDocx(utterances, names, summary) {
   const paragraphs = lines.map((l) => new Paragraph({ children: [new TextRun(l)] }));
   const doc = new Document({ sections: [{ children: paragraphs }] });
   const blob = await Packer.toBlob(doc);
-  triggerDownload(URL.createObjectURL(blob), formatFilename('docx'));
+  await downloadBlob(blob, formatFilename('docx'));
 }
 
 let pdfMakeReady = null;
@@ -110,13 +105,19 @@ export async function exportPdf(utterances, names, summary) {
     content.push({ text: summary });
   }
 
-  pdfMake
-    .createPdf({
-      content,
-      defaultStyle: { font: 'NotoSansJP', fontSize: 11 },
-      pageSize: 'A4',
-      pageOrientation: 'portrait',
-      pageMargins: [40, 40, 40, 40],
-    })
-    .download(formatFilename('pdf'));
+  const docDef = {
+    content,
+    defaultStyle: { font: 'NotoSansJP', fontSize: 11 },
+    pageSize: 'A4',
+    pageOrientation: 'portrait',
+    pageMargins: [40, 40, 40, 40],
+  };
+  const filename = formatFilename('pdf');
+
+  if (Capacitor.isNativePlatform()) {
+    const blob = await new Promise((resolve) => pdfMake.createPdf(docDef).getBlob(resolve));
+    await downloadBlob(blob, filename);
+  } else {
+    pdfMake.createPdf(docDef).download(filename);
+  }
 }
