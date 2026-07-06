@@ -1,0 +1,76 @@
+﻿# 問題1修正完了報告
+日時: 2026-07-06
+
+## 変更したファイルと変更内容の要約
+
+### 1. client/src/lib/adapters/index.js（修正）
+
+変更前:
+  start() - 権限確認なしに startRecording() を直接呼び出していた
+  stop()  - Blob のみ返していた（{ blob, mimeType, durationMs } 形式ではなかった）
+
+変更後:
+  start() - requestPermissions() を先に呼び、recordAudio !== 'granted' の場合は
+            name='NotAllowedError' の例外をthrow（Recorder.jsx が errorMic メッセージを表示）
+            権限付与確認後に startRecording() を呼ぶ
+  stop()  - { blob, mimeType, durationMs } 形式で返すよう修正
+
+### 2. client/src/lib/adapters/NativeRecorderAdapter.js（削除）
+  デッドコード確認済みのため削除。
+  インポート名が誤り（AudioRecorder → 実際は CapacitorAudioRecorder）で動作不可な実装。
+  index.js からインポートされていないことを確認済み。
+
+## 権限リクエストの実装方法
+
+  start() 冒頭で requestPermissions() を呼び出し、
+  返り値の recordAudio フィールドが 'granted' かどうかを確認する。
+  'granted' でない場合（'denied' / 'prompt' / 'prompt-with-rationale'）は
+  NotAllowedError をthrowし、Recorder.jsx のエラー表示分岐（t('recorder.errorMic')）に乗せる。
+
+  requestPermissions() は内部でシステムダイアログを表示する（初回のみ）ため、
+  ユーザーが許可/拒否した直後の状態を返す。
+
+## stop() 戻り値変換の実装方法
+
+  uri→Blob変換:
+    Capacitor.convertFileSrc(result.uri) でネイティブURIをWebView参照可能なURLに変換し、
+    fetch() → response.blob() で Blob を取得する。
+    Capacitor は既存インポート（import { Capacitor } from '@capacitor/core'）があり追加不要だった。
+
+  duration の単位:
+    型定義（definitions.d.ts）の JSDoc に "The duration of the recording in milliseconds" と
+    明記されていることを確認。秒→ミリ秒変換は不要で、result.duration をそのまま durationMs に使用。
+    null/undefined の場合は ?? 0 でフォールバック。
+
+  mimeType のハードコード:
+    Android/iOS（uri ルート）: 'audio/mp4' をハードコード
+    Web（blob ルート）: 'audio/webm' をハードコード
+    ★ 検証ポイント: 実機確認で「文字起こし」ボタン押下後、Vercel上の文字起こしAPIが
+       audio/mp4 を受理するか確認すること。
+       拒否される場合は mimeType の調整またはサーバー側の受け入れ形式確認が必要。
+
+## NativeRecorderAdapter.js の削除結果
+
+  削除完了。git status で "deleted: client/src/lib/adapters/NativeRecorderAdapter.js" を確認済み。
+
+## git status の結果
+
+  On branch main（origin/main と同期済み）
+  Changes not staged for commit:
+    deleted:  client/src/lib/adapters/NativeRecorderAdapter.js
+    modified: client/src/lib/adapters/index.js
+  コミット・pushは未実施（指示通り）
+
+## ビルド結果
+
+  npm --prefix client run build: 成功（5.98s、292モジュール変換、エラーなし）
+  npx cap sync android: 成功（0.167s）
+  ※ チャンクサイズ警告（pdfmake等 500KB超）は既存の警告であり今回の修正対象外
+
+## 実機確認で特に見るべきポイント
+
+  1. 録音ボタン押下 → マイク権限ダイアログが表示されること（初回）
+  2. 権限付与後 → 録音開始・停止 → 録音時間とファイルサイズが正しく表示されること
+     （durationMs が 0 でないこと、blob.size が妥当な値であること）
+  3. 「文字起こし」ボタン → APIが audio/mp4 を受理するか確認（★重要検証ポイント）
+  4. 権限を拒否した場合 → 「マイクへのアクセスが拒否されました」系のエラーが表示されること
