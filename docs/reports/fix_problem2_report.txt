@@ -1,0 +1,29 @@
+﻿# 問題2修正完了報告
+日時: 2026-07-06
+
+## 変更したファイルと変更内容
+
+### 1. client/.env（gitignore対象・コミットなし）
+- 追加した行: VITE_API_BASE=https://saidlog.vercel.app
+- 既存の VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY は変更なし
+
+### 2. client/.env.example（新規作成・コミット対象）
+- 内容:
+  VITE_SUPABASE_URL=your_supabase_url
+  VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+  # Androidビルド時は必須。Capacitor WebViewは相対パスfetchがlocalhostに向かうため、本番API baseを明示する
+  VITE_API_BASE=https://saidlog.vercel.app
+
+## git status の結果
+- client/.env: gitignore対象のため変更として表示されない（正常）
+- client/.env.example: modified（新規内容で更新済み）
+- client/.env がgit管理に入っていないことを確認済み
+
+## ビルド結果
+- npm --prefix client run build: 成功（6.25s、292モジュール変換）
+- npx cap sync android: 成功（0.288s、android/app/src/main/assets/public へコピー完了）
+
+## 気づいた点
+- client/.env.example は以前空ファイルとして既にgit追跡されていた（Globで見つからなかったが git status でmodifiedと表示）
+- ビルド時にチャンクサイズ警告（pdfmake等 500KB超）があるが、今回の修正対象外
+- コミット・pushは実施していない（指示通り）
