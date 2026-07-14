@@ -1,7 +1,7 @@
 import express from 'express';
 import Anthropic from '@anthropic-ai/sdk';
 import { optionalAuth } from '../middleware/auth.js';
-import { getSummaryMode } from '../services/plan.js';
+import { getSummaryMode, getEntitlement, getVisibleMeetings } from '../services/plan.js';
 import { getSupabase } from '../services/storage.js';
 
 const router = express.Router();
@@ -71,6 +71,42 @@ const LOCKED_SECTIONS = {
 };
 
 const MIN_UTTERANCE_LENGTH = 100; // 文字数が少なすぎる場合はunavailable
+const MIN_SUMMARY_LENGTH = 10; // 生成された要約本文の最低文字数（異常な空応答の検出用）
+
+/**
+ * Anthropic APIを呼び出し、生成テキストを返す。
+ * SDKクライアント生成をこの関数に閉じ込めることで、
+ * テストで `@anthropic-ai/sdk` をモックし呼び出し回数・応答内容を直接検証できるようにする
+ * （tests/summarizeGeneration.test.mjs 参照）。
+ */
+export async function callAnthropic({ apiKey, prompt, transcript }) {
+  const client = new Anthropic({ apiKey });
+  const message = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'user',
+        content: `${prompt}\n\n---\n${transcript}`,
+      },
+    ],
+  });
+  return message.content[0]?.text;
+}
+
+/**
+ * フルAI要約トライアルのフラグ更新。
+ * 要約本文の保存が確認できた場合（新規保存 or 既存キャッシュ確認）にのみ呼ぶこと。
+ */
+async function markFullSummaryUsed(supabase, userId) {
+  try {
+    await supabase
+      .from('profiles')
+      .upsert({ id: userId, full_summary_used: true }, { onConflict: 'id' });
+  } catch (e) {
+    console.error('profiles upsert error:', e);
+  }
+}
 
 router.post('/summarize', optionalAuth, async (req, res, next) => {
   try {
@@ -111,53 +147,152 @@ router.post('/summarize', optionalAuth, async (req, res, next) => {
       ? await getSummaryMode(userId, null, audioDurationSec, userChoseFullTrial)
       : 'preview';
 
+    const supabase = getSupabase();
+
+    // userId・transcriptIdがある場合、所有者検証・履歴範囲チェック・キャッシュ確認の対象とする
+    // （所有者検証はAnthropic呼び出しより前に行い、他人のtranscriptIdは弾く）
+    if (userId && transcriptId) {
+      const { data: owned, error: ownerError } = await supabase
+        .from('transcripts')
+        .select('id')
+        .eq('id', transcriptId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (ownerError || !owned) {
+        return res.status(404).json({ error: '文字起こしデータが見つかりません' });
+      }
+
+      // プラン失効後の閲覧方針：無料プランでは「現在の履歴表示範囲」内のtranscriptのみ
+      // full要約の閲覧・生成対象とする（history.jsの可視範囲ロジックをそのまま再利用し、
+      // 新しい認可ルールを増やさない）。Plus在籍中は範囲制限なし。
+      const { planId } = await getEntitlement(userId);
+      let withinHistoryWindow = true;
+      if (planId === 'ume') {
+        const visibleLimit = await getVisibleMeetings(userId);
+        const { data: visibleRows } = await supabase
+          .from('transcripts')
+          .select('id')
+          .eq('user_id', userId)
+          .or('transcription_status.eq.completed,transcription_status.is.null')
+          .order('created_at', { ascending: false })
+          .limit(visibleLimit);
+        withinHistoryWindow = (visibleRows ?? []).some((r) => r.id === transcriptId);
+      }
+
+      if (!withinHistoryWindow) {
+        return res.status(403).json({ error: '無料プランの履歴表示範囲外のため閲覧できません' });
+      }
+
+      // キャッシュ確認：トライアル消費状態や現在のsummaryModeに関わらず、
+      // 既に生成済みのfull要約は履歴範囲内である限り再閲覧できる
+      // （無料トライアルで生成した1件も、トライアル消費後にpreview扱いへ落ちて
+      //   読めなくなることがないようにするため）。
+      const { data: cachedRow } = await supabase
+        .from('transcript_full_summaries')
+        .select('summary_full')
+        .eq('transcript_id', transcriptId)
+        .eq('user_id', userId)
+        .eq('template', template)
+        .maybeSingle();
+
+      if (cachedRow?.summary_full) {
+        if (userChoseFullTrial === true) {
+          await markFullSummaryUsed(supabase, userId);
+        }
+        return res.json({ summary: cachedRow.summary_full, summaryType: 'full', cached: true });
+      }
+
+      if (summaryMode === 'full') {
+        // キャッシュなし → 生成
+        const prompt = PROMPTS[template] ?? PROMPTS.bullets;
+        const generated = await callAnthropic({ apiKey, prompt, transcript });
+        const trimmed = typeof generated === 'string' ? generated.trim() : '';
+
+        // 生成結果の検証：文字列型・trim後非空・最低文字数を満たさない場合は保存せず失敗として扱う
+        if (typeof generated !== 'string' || trimmed.length < MIN_SUMMARY_LENGTH) {
+          console.error('[summarize] full要約の生成結果が不正なため保存をスキップしました');
+          return res.status(502).json({ error: 'AI要約の生成に失敗しました。時間をおいて再度お試しください' });
+        }
+
+        // 競合しない保存（INSERT ... ON CONFLICT DO NOTHING相当）。
+        // 同時リクエストで既に保存済みの場合は自分の生成結果を破棄し、既存行を正本として使う。
+        const { data: insertedRow, error: insertError } = await supabase
+          .from('transcript_full_summaries')
+          .upsert(
+            {
+              transcript_id: transcriptId,
+              user_id: userId,
+              template,
+              summary_full: generated,
+            },
+            { onConflict: 'transcript_id,template', ignoreDuplicates: true }
+          )
+          .select('summary_full')
+          .maybeSingle();
+
+        let finalSummary = generated;
+        let persisted = false;
+
+        if (insertError) {
+          console.error('summary保存エラー:', insertError);
+        } else if (insertedRow) {
+          persisted = true;
+        } else {
+          // 競合発生：既存行を再取得して正本とする
+          const { data: existingRow, error: refetchError } = await supabase
+            .from('transcript_full_summaries')
+            .select('summary_full')
+            .eq('transcript_id', transcriptId)
+            .eq('user_id', userId)
+            .eq('template', template)
+            .maybeSingle();
+          if (refetchError) {
+            console.error('既存summary再取得エラー:', refetchError);
+          } else if (existingRow?.summary_full) {
+            finalSummary = existingRow.summary_full;
+            persisted = true;
+          }
+        }
+
+        // summary_typeフラグ更新はベストエフォート（失敗してもレスポンスはブロックしない）
+        const { error: typeUpdateError } = await supabase
+          .from('transcripts')
+          .update({ summary_type: 'full' })
+          .eq('id', transcriptId)
+          .eq('user_id', userId);
+        if (typeUpdateError) console.error('summary_type更新エラー:', typeUpdateError);
+
+        // 保存成功が確認できた場合のみトライアルを消費する
+        if (persisted && userChoseFullTrial === true) {
+          await markFullSummaryUsed(supabase, userId);
+        }
+
+        return res.json({ summary: finalSummary, summaryType: 'full', cached: false });
+      }
+      // summaryMode !== 'full'（preview等）でキャッシュも無い場合は、
+      // ここでreturnせず下の通常フロー（preview生成等）へフォールスルーする
+    }
+
+    // ここに到達するのは preview モード（ゲスト含む）、
+    // full だが transcriptId が無く永続化できないケース、または
+    // 上のブロックでキャッシュが無く summaryMode!=='full' だったフォールスルーケース
+    // （いずれも従来どおりの一時生成のみ・transcript_full_summariesへの保存は行わない）
     const prompt = summaryMode === 'full'
       ? (PROMPTS[template] ?? PROMPTS.bullets)
       : PROMPTS.preview;
 
-    const client = new Anthropic({ apiKey });
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: `${prompt}\n\n---\n${transcript}`,
-        },
-      ],
-    });
+    const summary = (await callAnthropic({ apiKey, prompt, transcript })) ?? '';
 
-    const summary = message.content[0]?.text ?? '';
-
-    // DB保存
-    if (userId && transcriptId) {
+    if (userId && transcriptId && summaryMode === 'preview') {
       try {
-        if (summaryMode === 'full') {
-          await getSupabase()
-            .from('transcripts')
-            .update({ summary_type: 'full' })
-            .eq('id', transcriptId)
-            .eq('user_id', userId);
-        } else if (summaryMode === 'preview') {
-          await getSupabase()
-            .from('transcripts')
-            .update({ summary_preview: summary, summary_type: 'preview' })
-            .eq('id', transcriptId)
-            .eq('user_id', userId);
-        }
+        await supabase
+          .from('transcripts')
+          .update({ summary_preview: summary, summary_type: 'preview' })
+          .eq('id', transcriptId)
+          .eq('user_id', userId);
       } catch (e) {
         console.error('summary保存エラー:', e);
-      }
-    }
-
-    // フルAI要約トライアルのフラグ更新
-    if (userId && summaryMode === 'full' && userChoseFullTrial === true) {
-      try {
-        await getSupabase()
-          .from('profiles')
-          .upsert({ id: userId, full_summary_used: true }, { onConflict: 'id' });
-      } catch (e) {
-        console.error('profiles upsert error:', e);
       }
     }
 
