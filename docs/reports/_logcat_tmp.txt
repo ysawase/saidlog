@@ -1,0 +1,705 @@
+﻿--------- beginning of main
+07-13 11:31:50.988  9793  9826 I pixel-thermal: battery:32.1 raw data: battery:32100 
+07-13 11:31:50.988  9793  9826 I pixel-thermal: Power rails total power: 935.78 mW for 60011 ms
+07-13 11:31:50.988  9793  9826 I pixel-thermal: Power rails [S6M_LLDO1: 39.62 mW] [S4M_VDD_CPUCL0: 50.40 mW] [S3M_VDD_CPUCL2: 2.36 mW] [S1M_VDD_MIF: 20.42 mW] [S5M_VDD_INT: 22.82 mW] [S9M_VDD_CPUCL1_M: 7.62 mW] 
+07-13 11:31:50.988  9793  9826 I pixel-thermal: Power rails [S2M_VDD_CPUCL1: 25.20 mW] [VSYS_PWR_CAMERA: 1.19 mW] [VSYS_PWR_DISPLAY: 510.30 mW] [L21S_VDD2L_MEM: 1.81 mW] [S8M_LLDO2: 29.76 mW] [S3S_LLDO1: 32.19 mW] 
+07-13 11:31:50.988  9793  9826 I pixel-thermal: Power rails [VSYS_PWR_RFFE: 1.42 mW] [VSYS_PWR_WLAN_BT: 75.03 mW] [VSYS_PWR_MODEM: 44.79 mW] [L2S_PLL_MIPI_UFS: 20.31 mW] [S4S_VDD2H_MEM: 20.86 mW] [S9S_VDD_AOC: 14.89 mW] 
+07-13 11:31:50.988  9793  9826 I pixel-thermal: Power rails [S2S_VDD_G3D: 0.49 mW] [S1S_VDD_CAM: 5.45 mW] [S7M_VDD_TPU: 0.00 mW] [L22S_UDFPS: 0.25 mW] [S12S_VDD_AUR: 7.43 mW] [S5S_VDDQ_MEM: 1.18 mW] 
+07-13 11:31:50.989  9793  9826 I pixel-thermal: CDEV log dc_icl state:0 gxp-cooling state:0 thermal-uclamp-4 state:0 thermal-cpufreq-2 state:0 thermal-cpufreq-0 state:0 tpu_cooling state:0 usbc-port state:0 thermal-uclamp-0 state:0 fcc state:0 thermal-cpufreq-1 state:0 thermal-gpufreq-0 state:0 thermal-uclamp-7 state:0 
+07-13 11:31:51.164 22341 22341 I adbd    : adbd service requested 'shell,v2,raw:am start -n com.saidlog.app/.MainActivity'
+07-13 11:31:51.247 22341 23932 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:51.248 22341 23932 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:51.269 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+--------- beginning of system
+07-13 11:31:51.316  1672  4493 W ActivityTaskManager: callingPackage for (uid=2000, pid=23940) has no WPC
+07-13 11:31:51.340  1672  4493 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@e68f30b5 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+07-13 11:31:51.345 29317 29317 D RecentsView: onTaskDisplayChanged: 18395, new displayId = 0
+07-13 11:31:51.348  1672  4493 V ActivityTaskManager: TaskLaunchParamsModifier: phase=3 task=Task{c83c569 #18395 type=standard A=10571:com.saidlog.app} activity=ActivityRecord{160230384 u0 com.saidlog.app/.MainActivity t-1} display-from-task=0 display-id=0 task-display-area-windowing-mode=1 suggested-display-area=DefaultTaskDisplayArea@212385652 inherit-from-task=fullscreen non-freeform-task-display-area display-area=DefaultTaskDisplayArea@212385652 skip-bounds-fullscreen
+07-13 11:31:51.348  1672  4493 I ActivityTaskManager: START u0 {flg=0x10000000 xflg=0x5 cmp=com.saidlog.app/.MainActivity} with LAUNCH_SINGLE_TASK from uid 2000 (com.android.shell) (BAL_ALLOW_PERMISSION) result code=0
+07-13 11:31:51.349  2335  2366 D Bubbles : BubbleTaskStackListener.onTaskMovedToFront(): taskId=18395
+07-13 11:31:51.350  2335  2366 V WindowManagerShell: Transition requested (#7224): android.os.BinderProxy@b8d6ead TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=18395 effectiveUid=10571 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.saidlog.app/.MainActivity } baseActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} topActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} origActivity=null realActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} realActivityIsAppLockEnabled=false numActivities=1 lastActiveTime=829181600 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.os.BinderProxy@9bf05e2} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 152 - 0, 0) topActivityInfo=ActivityInfo{8ec8d73 com.saidlog.app.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isTopActivityNoDisplay=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false isActivityStackTransparent=false lastNonFullscreenBounds=null leafTaskBoundsFromOptions= false capturedLink=null capturedLinkTimestamp=0 requestedVisibleTypes=503 topActivityRequestOpenInBrowserEducationTimestamp=0 appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false isLeafTask= true eligibleForLetterboxEducation= false isLetterboxEducationEnabled= false isLetterboxDoubleTapEnabled= false eligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 topActivityAppBounds=Rect(0, 0 - 1080, 2424) isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false hasMinAspectRatioOverride=false topActivityLetterboxBounds=null topNonResizableActivityAspectRatio=-1.0} topActivityMainWindowFrame=null isAppBubble=false}, pipChange = null, remoteTransitionInfo = null, displayChange = null, requestedLocation = null, userChange = null, windowingLayerChange = null, fullscreenRequestChange = null, flags = 0, debugId = 7224 }
+07-13 11:31:51.350  2335  2366 W DisplayDisconnectTransitionHandler: No disconnect change found in the transition, not handling request.
+07-13 11:31:51.351  1672  1752 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@e68f30b5 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+07-13 11:31:51.351  1672  1752 D CompatChangeReporter: Compat change id reported: 441041342; UID 10571; state: ENABLED
+07-13 11:31:51.352  2335  2366 D ShellSplitScreen: logExit: no-op, mLoggerSessionId is null
+07-13 11:31:51.354  2335  2366 V ShellDesktopMode: DesktopTasksController: skipping handleRequest reason=triggerTask's display doesn't support desktop mode
+07-13 11:31:51.354   492  2914 I libbinder.BpBinder: onLastStrongRef automatically unlinking death recipients for binder (0xb40000709aa0e100) with descriptor: '(not cached)'
+07-13 11:31:51.358 29317 29317 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+07-13 11:31:51.361  1672  2046 D CompatChangeReporter: Compat change id reported: 377864165; UID 10571; state: ENABLED
+07-13 11:31:51.364  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.364  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.364  1085  1085 D Zygote  : Forked child process 23954
+07-13 11:31:51.365  1672  1763 I ActivityManager: Start proc 23954:com.saidlog.app/u0a571 for next-top-activity {com.saidlog.app/com.saidlog.app.MainActivity}
+07-13 11:31:51.377 23954 23954 I Zygote  : Process 23954 created for com.saidlog.app
+07-13 11:31:51.377 23954 23954 I com.saidlog.app: Late-enabling -Xcheck:jni
+07-13 11:31:51.381 24439 24439 W ElapsedTimeUtils: getElapsedTime: sSuwFinishedTimeStamp is null
+07-13 11:31:51.392  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.393  1672  2046 V WindowManager: Defer transition id=7224 for TaskFragmentTransaction=android.os.Binder@a6b3120
+07-13 11:31:51.393  1672  4493 V WindowManager: Continue transition id=7224 for TaskFragmentTransaction=android.os.Binder@a6b3120
+07-13 11:31:51.471 23954 23954 I com.saidlog.app: Using generational CollectorTypeCMC GC.
+07-13 11:31:51.486 22341 22347 I adbd    : jdwp connection from 23954
+07-13 11:31:51.490 23954 23954 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+07-13 11:31:51.492 29317 29317 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+07-13 11:31:51.504  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.505 13371 14502 I ewat    : (REDACTED) HDM. appOpsListener %s %s
+07-13 11:31:51.506 13371 14502 I ewat    : (REDACTED) HDM. Ignoring irrelevant audio permission changes for package %s
+07-13 11:31:51.509  1672  2054 D ActivityManager: sync unfroze 14500 com.microsoft.office.outlook for 6
+07-13 11:31:51.518  9793  9793 I pixel-thermal: CPU_THROTTLE_SEVERE:0 raw data: CPU_THROTTLE_SEVERE:0 
+07-13 11:31:51.519  9793  9793 I pixel-thermal: VIRTUAL-SKIN:32.3435 raw data: VIRTUAL-SKIN:32343.5 VIRTUAL-SKIN-LEGACY:32561.2 VIRTUAL-SKIN-LEGACY-MODEL-DIFF:248.75 VIRTUAL-SKIN-LEGACY-SHUTDOWN:0 VIRTUAL-SKIN-MODEL:32312.4 VIRTUAL-SKIN-MODEL-CLAMPED:32312.4 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-248.75 VIRTUAL-SKIN-MODEL-UPDATED:32343.5 VIRTUAL-SKIN-MODEL-UPPER-CLAMPED:32312.4 VIRTUAL-SKIN-SUB-0:31136.3 VIRTUAL-SKIN-SUB-1:32561.2 VIRTUAL-SKIN-SUB-2:32025.5 VIRTUAL-SKIN-SUB-3:32461.8 VIRTUAL-SKIN-SUB-4:32515.6 VT_LEGACY_WEIGHT:0 VT_MODEL_WEIGHT:1 battery:32100 btmspkr_therm:31861 charging_therm:33664 disp_therm:31950 north_therm:33353 quiet_therm:33486 rfpa_therm:33286 soc_therm:33575 usb_pwr_therm:31839 
+07-13 11:31:51.564 14500 14500 D ActivityThread: Package [com.saidlog.app] reported as REPLACED, but missing application info. Assuming REMOVED.
+07-13 11:31:51.565 14500 14500 D ActivityThread: Package [com.saidlog.app] reported as REPLACED, but missing application info. Assuming REMOVED.
+07-13 11:31:51.565 14500 14500 I OutlookAppComponentFactory: instantiateService, androidx.work.impl.background.systemjob.SystemJobService
+07-13 11:31:51.571  1672  4493 W ProcessStats: Tracking association SourceState{e956ebe system/1000 ImpBg #1754599} whose proc state 6 is better than process ProcessState{2b2684a com.microsoft.office.outlook/10516 pkg=com.microsoft.office.outlook} proc state 14 (4 skipped)
+07-13 11:31:51.592 23954 23954 D nativeloader: Configuring clns-9 for other apk /data/app/~~2LrCY2mKZBr8oMHKzGQqyA==/com.saidlog.app-iQKZecNVc5B-1znKJGvzoA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~2LrCY2mKZBr8oMHKzGQqyA==/com.saidlog.app-iQKZecNVc5B-1znKJGvzoA==/lib/arm64, permitted_path=/data:/mnt/expand:/data/user/0/com.saidlog.app
+07-13 11:31:51.601 23954 23954 V GraphicsEnvironment: Currently set values for:
+07-13 11:31:51.601 23954 23954 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[com.android.angle]
+07-13 11:31:51.601 23954 23954 V GraphicsEnvironment:   angle_gl_driver_selection_values=[angle]
+07-13 11:31:51.601 23954 23954 V GraphicsEnvironment: com.saidlog.app is not listed in per-application setting
+07-13 11:31:51.602 23954 23954 V GraphicsEnvironment: No special selections for ANGLE, returning default driver choice
+07-13 11:31:51.602 23954 23954 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+07-13 11:31:51.617  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.617  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.620 23954 23993 I DisplayManager: Choreographer implicitly registered for the refresh rate.
+07-13 11:31:51.621  2335  2618 V WindowManagerShell: onTransitionReady(transaction=7181186028715)
+07-13 11:31:51.621  2335  2366 V WindowManagerShell: onTransitionReady (#7224) android.os.BinderProxy@b8d6ead: {id=7224 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+07-13 11:31:51.621  2335  2366 V WindowManagerShell:         {m=OPEN f=NONE leash=Surface(name=Task=18395#71112)/@0x5f7129a sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0},
+07-13 11:31:51.621  2335  2366 V WindowManagerShell:         {m=TO_BACK f=IN_TASK_WITH_EMBEDDED_ACTIVITY|FILLS_TASK p=WCT{android.os.BinderProxy@f4641ea} leash=Surface(name=TaskFragment{f4f7f5e mode=fullscreen}#71061)/@0xefa07cb sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 bc=ffededf6 taskFragmentToken=android.os.BinderProxy@9a3be66},
+07-13 11:31:51.621  2335  2366 V WindowManagerShell:         {m=TO_BACK f=NONE leash=Surface(name=Task=18393#71043)/@0xd75ba8 sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0}
+07-13 11:31:51.621  2335  2366 V WindowManagerShell:     ]}
+07-13 11:31:51.623  2335  2366 V ShellDesktopMode: DesktopModeLogger: taskInfo map after processing changes 0
+07-13 11:31:51.623  2335  2366 D ShellDesktopMode: DesktopTaskChangeListener: onTaskMovingToBack for taskId=18393, displayId=0 - desktop not supported
+07-13 11:31:51.624  2335  2366 D ShellDesktopMode: DesktopTaskChangeListener: onTaskOpening for taskId=18395, displayId=0 userId=0 currentUserId=0 parentTaskId=-1 isFreeform=false isActive=false isPinned=false
+07-13 11:31:51.624  2335  2366 D ShellDesktopMode: DesktopTaskChangeListener: onTaskOpening for taskId=18395, displayId=0 - desktop not supported
+07-13 11:31:51.624  2335  2366 V WindowManagerShell: Playing animation for (#7224) android.os.BinderProxy@b8d6ead@0
+07-13 11:31:51.624  2335  2366 D ShellSplitScreen: startAnimation: transition=7224 isSplitActive=false
+07-13 11:31:51.625  2335  2366 V ShellRecents: RecentsTransitionHandler.startAnimation: no controller found
+07-13 11:31:51.625  2335  2366 V ShellDesktopMode: DesktopMixedTransitionHandler: No pending desktop transition
+07-13 11:31:51.625  2335  2366 V WindowManagerShell: Transition doesn't have explicit remote, search filters for match for {id=7224 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=OPEN f=NONE leash=Surface(name=Task=18395#71112)/@0x5f7129a sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0},{m=TO_BACK f=IN_TASK_WITH_EMBEDDED_ACTIVITY|FILLS_TASK p=WCT{android.os.BinderProxy@f4641ea} leash=Surface(name=TaskFragment{f4f7f5e mode=fullscreen}#71061)/@0xefa07cb sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 bc=ffededf6 taskFragmentToken=android.os.BinderProxy@9a3be66},{m=TO_BACK f=NONE leash=Surface(name=Task=18393#71043)/@0xd75ba8 sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0}]}
+07-13 11:31:51.625  2335  2366 V WindowManagerShell:  Checking filter Pair{{types=[OPEN,TO_FRONT] flags=0x0] notFlags=0x0 checks=[{atype=standard independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=true order=ANY topActivity=null launchCookie=null windowingMode=freeform isCrossDisplayMove=false}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@46fc47c, appThread = null, debugName = DesktopWindowLimitUnminimize, filter = null }}
+07-13 11:31:51.625  2335  2366 V WindowManagerShell:  Delegate animation for (#7224) to null
+07-13 11:31:51.625  2335  2366 V WindowManagerShell: start default transition animation, info = {id=7224 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{m=OPEN f=NONE leash=Surface(name=Task=18395#71112)/@0x5f7129a sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0},{m=TO_BACK f=IN_TASK_WITH_EMBEDDED_ACTIVITY|FILLS_TASK p=WCT{android.os.BinderProxy@f4641ea} leash=Surface(name=TaskFragment{f4f7f5e mode=fullscreen}#71061)/@0xefa07cb sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 bc=ffededf6 taskFragmentToken=android.os.BinderProxy@9a3be66},{m=TO_BACK f=NONE leash=Surface(name=Task=18393#71043)/@0xd75ba8 sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0}]}
+07-13 11:31:51.625  1672  1749 V WindowManager: Sent Transition (#7224) createdAt=07-13 11:31:51.341 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=18395 effectiveUid=10571 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.saidlog.app/.MainActivity } baseActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} topActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} origActivity=null realActivity=ComponentInfo{com.saidlog.app/com.saidlog.app.MainActivity} realActivityIsAppLockEnabled=false numActivities=1 lastActiveTime=829181600 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{7eac5a Task{c83c569 #18395 type=standard A=10571:com.saidlog.app}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 152 - 0, 0) topActivityInfo=ActivityInfo{60efe8b com.saidlog.app.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isTopActivityNoDisplay=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false isActivityStackTransparent=false lastNonFullscreenBounds=null leafTaskBoundsFromOptions= false capturedLink=null capturedLinkTimestamp=0 requestedVisibleTypes=503 topActivityRequestOpenInBrowserEducationTimestamp=0 appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false isLeafTask= true eligibleForLetterboxEducation= false isLetterboxEducationEnabled= false isLetterboxDoubleTapEnabled= false eligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 topActivityAppBounds=Rect(0, 0 - 1080, 2424) isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false hasMinAspectRatioOverride=false topActivityLetterboxBounds=null topNonResizableActivityAspectRatio=-1.0} topActivityMainWindowFrame=null isAppBubble=false}, pipChange = null, remoteTransitionInfo = null, displayChange = null, requestedLocation = null, userChange = null, windowingLayerChange = null, fullscreenRequestChange = null, flags = 0, debugId = 7224 }
+07-13 11:31:51.626  1672  1749 V WindowManager:     startWCT=WindowContainerTransaction { changes= {} hops= [] flags= 0 errorCallbackToken=null taskFragmentOrganizer=null }
+07-13 11:31:51.626  1672  1749 V WindowManager:     info={id=7224 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+07-13 11:31:51.626  1672  1749 V WindowManager:         {WCT{RemoteToken{7eac5a Task{c83c569 #18395 type=standard A=10571:com.saidlog.app}}} m=OPEN f=NONE leash=Surface(name=Task=18395#71112)/@0x1b3494e sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0},
+07-13 11:31:51.626  1672  1749 V WindowManager:         {WCT{RemoteToken{627196e TaskFragment{f4f7f5e mode=fullscreen}}} m=TO_BACK f=IN_TASK_WITH_EMBEDDED_ACTIVITY|FILLS_TASK p=WCT{RemoteToken{4e9fd7 Task{275cd0b #18393 type=standard A=1000:com.android.settings.root}}} leash=Surface(name=TaskFragment{f4f7f5e mode=fullscreen}#71061)/@0xf0663b3 sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 bc=ffededf6 taskFragmentToken=android.os.BinderProxy@c463412},
+07-13 11:31:51.626  1672  1749 V WindowManager:         {WCT{RemoteToken{4e9fd7 Task{275cd0b #18393 type=standard A=1000:com.android.settings.root}}} m=TO_BACK f=NONE leash=Surface(name=Task=18393#71043)/@0x4933971 sb=Rect(0, 0 - 1080, 2424) eb=Rect(0, 0 - 1080, 2424) epz=Point(1080, 2424) d=0 taskParent=-1 winMode=1 userId=0}
+07-13 11:31:51.626  1672  1749 V WindowManager:     ]}
+07-13 11:31:51.626  2335  2366 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@2b92cf9 animAttr=0x9 type=OPEN isEntrance=false
+07-13 11:31:51.635  2335  2366 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@86cfed8 animAttr=0x8 type=OPEN isEntrance=true
+07-13 11:31:51.636  2335  2366 V WindowManagerShell:  animated by com.android.wm.shell.transition.DefaultTransitionHandler@8a12e71
+07-13 11:31:51.636  2335  2366 V ShellTaskOrganizer: Task appeared taskId=18395 listener=FullscreenTaskListener
+07-13 11:31:51.636  2335  2366 V ShellTaskOrganizer: Fullscreen Task Appeared: #18395
+07-13 11:31:51.636 23954 23954 D DesktopExperienceFlags: Toggle override initialized to: false
+07-13 11:31:51.637 29317 29317 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+07-13 11:31:51.640 23954 23954 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+07-13 11:31:51.660 23954 23954 D CompatChangeReporter: Compat change id reported: 377864165; UID 10571; state: ENABLED
+07-13 11:31:51.660 23954 23954 D DesktopModeFlags: Toggle override initialized to: OVERRIDE_UNSET
+07-13 11:31:51.668 23954 23954 I com.saidlog.app: hiddenapi: Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/appcompat/widget/ViewUtils; (domain=app, TargetSdkVersion=36) using reflection: allowed
+07-13 11:31:51.674 23954 23954 I WebViewFactory: Loading com.google.android.webview version 150.0.7871.46 (code 787104603)
+07-13 11:31:51.677 23954 23954 V ResourcesManager: The following library key has been added: ResourcesKey{ mHash=ab20a46 mResDir=null mSplitDirs=[] mOverlayDirs=[] mLibDirs=[/data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk,/system/framework/android.test.base.jar,/system_ext/framework/androidx.window.extensions.jar] mDisplayId=0 mOverrideConfig=v36 mCompatInfo={420dpi always-compat} mLoaders=[]}
+07-13 11:31:51.678 23954 23954 D ApplicationLoaders: Returning zygote-cached class loader: /system/framework/android.test.base.jar
+07-13 11:31:51.678 23954 23954 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+07-13 11:31:51.681 23954 23954 W com.saidlog.app: Loading /data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/oat/arm64/base.odex non-executable as it requires an image which we failed to load
+07-13 11:31:51.682 23954 23954 D nativeloader: Configuring clns-10 for other apk /data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/lib/arm64:/data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand
+07-13 11:31:51.724 23954 23954 I cr_WVCFactoryProvider: version=150.0.7871.46 (787104603) minSdkVersion=29 multiprocess=true packageId=2 splits=<none>
+07-13 11:31:51.736 23954 23954 D nativeloader: Load /data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk!/lib/arm64-v8a/libwebviewchromium.so using class loader ns clns-10 (caller=/data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk): ok
+07-13 11:31:51.739 23954 23954 D nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using class loader ns clns-10 (caller=/data/app/~~zC3TEa8BEucaejQjrapaZw==/com.google.android.webview-S5yr0EJ29VylVM500Jj23w==/base.apk): ok
+07-13 11:31:51.744 23954 24027 I chromium: [0713/113151.742432:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+07-13 11:31:51.752 23954 23954 I cr_LibraryLoader: Successfully loaded native library
+07-13 11:31:51.754 23954 23954 I cr_CachingUmaRecorder: Flushed 50 samples from 23 histograms, 0 samples were dropped.
+07-13 11:31:51.757 23954 23954 I cr_ChildProcLH: ScopedServiceBindingBatch.tryActivate: false
+07-13 11:31:51.758 23954 23954 I cr_CombinedPProvider: #registerProvider() provider:WV.wk@3266780 isPolicyCacheEnabled:false policyProvidersSize:0
+07-13 11:31:51.758 23954 23954 I cr_PolicyProvider: #setManagerAndSource() 0
+07-13 11:31:51.759 23954 24023 I cr_policy: registerReceiver succeeded after 1ms
+07-13 11:31:51.759 23954 23954 I cr_DisplayManager: Is Display Topology available: false
+07-13 11:31:51.762  1672  2046 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@43fa791e does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+07-13 11:31:51.780 23954 23954 I cr_CombinedPProvider: #linkNativeInternal() 1
+07-13 11:31:51.780 23954 23954 I cr_AppResProvider: #getApplicationRestrictionsFromUserManager() Bundle[EMPTY_PARCEL]
+07-13 11:31:51.780 23954 23954 I cr_PolicyProvider: #notifySettingsAvailable() 0
+07-13 11:31:51.780 23954 23954 I cr_CombinedPProvider: #onSettingsAvailable() 0
+07-13 11:31:51.780 23954 23954 I cr_CombinedPProvider: #flushPolicies()
+07-13 11:31:51.780 10935 10935 D Zygote  : Forked child process 24034
+07-13 11:31:51.785 24034 24034 E libc    : SetHeapTaggingLevel: re-enabling tagging after it was disabled is not supported
+07-13 11:31:51.788 24034 24034 I Zygote  : Process 24034 created for com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0
+07-13 11:31:51.788 24034 24034 I ocessService0:0: Using generational CollectorTypeCMC GC.
+07-13 11:31:51.793  1672  1763 I ActivityManager: Start proc 24034:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i138 for  {com.saidlog.app/org.chromium.content.app.SandboxedProcessService0:0}
+07-13 11:31:51.793 24034 24034 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+07-13 11:31:51.803 24034 24034 D ApplicationLoaders: Returning zygote-cached class loader: /system/framework/android.test.base.jar
+07-13 11:31:51.803 24034 24034 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+07-13 11:31:51.806 24034 24034 I cr_WebViewApkApp: version=150.0.7871.46 (787104603) minSdkVersion=29 processName=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 splits=<none>
+07-13 11:31:51.807  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.810 24034 24034 I cr_ChildProcessService: Creating new ChildProcessService pid=24034
+07-13 11:31:51.840 23954 23954 W chromium: [WARNING:android_webview/browser/network_service/net_helpers.cc:137] HTTP Cache size is: 20971520
+07-13 11:31:51.861  1672  2046 D ActivityManager: sync unfroze 23964 com.google.android.gms for 4
+07-13 11:31:51.862  1672  2046 D ActivityManager: sync unfroze 30303 com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 for 4
+07-13 11:31:51.862  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.862  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:51.865 23964 23964 D BoundBrokerSvc: onUnbind: Intent { act=com.google.android.gms.common.BIND_SHARED_PREFS xflg=0x4 pkg=com.google.android.gms }
+07-13 11:31:51.867  1672  4493 D ConnectivityService: requestNetwork for uid/pid:10571/23954 activeRequest: null callbackRequest: 101666 [NetworkRequest [ REQUEST id=101667, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 10571 RequestorPkg: com.saidlog.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|NC|LP
+07-13 11:31:51.871  1672  2138 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101667, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 10571 RequestorPkg: com.saidlog.app UnderlyingNetworks: Null] ]
+07-13 11:31:51.871  1672  2138 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101667, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 10571 RequestorPkg: com.saidlog.app UnderlyingNetworks: Null] ]
+07-13 11:31:51.871  1672  2138 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=101667, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 10571 RequestorPkg: com.saidlog.app UnderlyingNetworks: Null] ]
+07-13 11:31:51.872  1672  2138 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101667, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 10571 RequestorPkg: com.saidlog.app UnderlyingNetworks: Null] ]
+07-13 11:31:51.872  1672  2145 D ConnectivityService: NetReassign [101667 : null → 189] [c 0] [a 1] [i 5]
+07-13 11:31:51.877 23964 23964 D BoundBrokerSvc: onRebind: Intent { act=com.google.android.gms.safebrowsing.SafeBrowsingService.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.GmsBoundBrokerService }
+07-13 11:31:51.878  1672  2145 D ConnectivityService: NetReassign [no changes] [c 0] [a 2] [i 4]
+07-13 11:31:51.892 23954 23954 D Capacitor: Starting BridgeActivity
+07-13 11:31:51.903 23954 23954 D Capacitor: Registering plugin instance: CapacitorCookies
+07-13 11:31:51.906 23954 23954 D Capacitor: Registering plugin instance: WebView
+07-13 11:31:51.907 23954 23954 D Capacitor: Registering plugin instance: CapacitorHttp
+07-13 11:31:51.908 23954 23954 D Capacitor: Registering plugin instance: SystemBars
+07-13 11:31:51.909 23954 23954 D Capacitor: Registering plugin instance: Filesystem
+07-13 11:31:51.910 23954 23954 D Capacitor: Registering plugin instance: Share
+07-13 11:31:51.911 23954 23954 D Capacitor: Registering plugin instance: CapacitorAudioRecorder
+07-13 11:31:51.912 23954 23954 D Capacitor: Registering plugin instance: PurchasePlugin
+07-13 11:31:51.930 23954 23954 W Capacitor: Unable to read file at path public/plugins
+07-13 11:31:51.933 23954 23954 D Capacitor: Loading app at https://localhost
+07-13 11:31:51.943 23954 24137 W cr_media: BLUETOOTH_CONNECT permission is missing.
+07-13 11:31:51.944 23954 24137 W cr_media: getBluetoothAdapter() requires BLUETOOTH permission
+07-13 11:31:51.944 23954 24137 W cr_media: registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+07-13 11:31:51.958 23954 24079 D Capacitor: Handling local request: https://localhost/
+07-13 11:31:51.959 23954 24137 D AudioSystem: onNewService: media.audio_policy service obtained 0xb400006ec912aa30
+07-13 11:31:51.960 24034 24055 I cr_LibraryLoader: Successfully loaded native library
+07-13 11:31:51.961 23954 23954 D CdvPurchase: handleOnStart()
+07-13 11:31:51.961 23954 23954 D Capacitor: App started
+07-13 11:31:51.961 23954 23954 I ContentCaptureHelper: Setting logging level to OFF
+07-13 11:31:51.963 23954 23954 D Capacitor: App resumed
+07-13 11:31:51.966 23954 24137 D AudioSystem: getService: IAudioPolicyService retrieved: 0xb400006ec912aa30  cached: 0xb400006ec912aa30
+07-13 11:31:51.966 24034 24055 I cr_CachingUmaRecorder: Flushed 2 samples from 2 histograms, 0 samples were dropped.
+07-13 11:31:51.967 24034 24055 W chromium: [WARNING:content/app/android/content_main_android.cc:82] android_setCpu already initialized
+07-13 11:31:51.976  1168  2513 D NativePermissionController: checkPermission: missing 13 for 10571
+07-13 11:31:51.980  1168  5947 D NativePermissionController: checkPermission: missing 13 for 10571
+07-13 11:31:51.988 24034 24055 W chromium: [WARNING:content/child/runtime_features.cc:541] Fenced frames cannot be enabled in this configuration. Use --enable-features=FencedFrames instead.
+07-13 11:31:51.988 24034 24055 W chromium: [WARNING:content/child/runtime_features.cc:566] Topics cannot be enabled in this configuration. Use --enable-features=BrowsingTopics in addition.
+07-13 11:31:51.988 24034 24055 W chromium: [WARNING:content/child/runtime_features.cc:587] SharedStorage cannot be enabled in this configuration. Use --enable-features=SharedStorageAPI in addition.
+07-13 11:31:51.990  1168  5947 D NativePermissionController: checkPermission: missing 13 for 10571
+07-13 11:31:51.990  1168  5947 D NativePermissionController: checkPermission: missing 13 for 10571
+07-13 11:31:51.997 23954 24180 I CameraManagerGlobal: Connecting to camera service
+07-13 11:31:52.017 23954 23954 I cr_AppResProvider: #getApplicationRestrictionsFromUserManager() Bundle[EMPTY_PARCEL]
+07-13 11:31:52.017 23954 23954 I cr_PolicyProvider: #notifySettingsAvailable() 0
+07-13 11:31:52.017 23954 23954 I cr_CombinedPProvider: #onSettingsAvailable() 0
+07-13 11:31:52.017 23954 23954 I cr_CombinedPProvider: #flushPolicies()
+07-13 11:31:52.020 23954 23954 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.app.Activity$$ExternalSyntheticLambda0@73cc455
+07-13 11:31:52.021  1672  5880 D CoreBackPreview: Window{831c2a5 u0 com.saidlog.app/com.saidlog.app.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@21d8aa0, mPriority=-1, mIsAnimationCallback=false, mOverrideBehavior=0}
+07-13 11:31:52.021 23954 23954 D VRI[MainActivity]: WindowInsets changed: 1080x2424 statusBars:[0,152,0,0] navigationBars:[0,0,0,63] mandatorySystemGestures:[0,184,0,84] 
+07-13 11:31:52.043 10305 10316 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.044 10305 10316 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.047 10305 10316 I FontLog : (REDACTED) Font PFD returned from cache for %s
+07-13 11:31:52.048 10305 10316 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.050 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.053 10305 18116 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.053 10305 18116 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.060 10305 18116 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.061 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.063 10305 18116 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.063 10305 18116 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.063 10305 18116 I FontLog : (REDACTED) Font PFD returned from cache for %s
+07-13 11:31:52.063 10305 18116 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.064 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.066 10305 18116 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.066 10305 18116 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.066 10305 18116 I FontLog : (REDACTED) Font PFD returned from cache for %s
+07-13 11:31:52.066 10305 18116 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.067 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.069 10305 18116 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.069 10305 18116 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.069 10305 18116 I FontLog : (REDACTED) Font PFD returned from cache for %s
+07-13 11:31:52.069 10305 18116 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.070 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.087 23954 24127 D Capacitor: Handling local request: https://localhost/assets/index-pecZpG-o.css
+07-13 11:31:52.087 23954 24079 D Capacitor: Handling local request: https://localhost/assets/index-GulOAkz4.js
+07-13 11:31:52.087 23954 24129 D Capacitor: Handling local request: https://localhost/registerSW.js
+07-13 11:31:52.160  2335  2366 V WindowManagerShell: Transition animation finished (aborted=false), notifying core (#7224) android.os.BinderProxy@b8d6ead@0
+07-13 11:31:52.163  1672  1749 V WindowManager: Finish Transition (#7224): created at 07-13 11:31:51.341 collect-started=0.141ms request-sent=6.642ms started=15.489ms ready=275.304ms sent=277.367ms commit=27.371ms finished=821.663ms
+07-13 11:31:52.163 24439 24439 D VRI[SubSettings]: visibilityChanged oldVisibility=true newVisibility=false
+07-13 11:31:52.164  2335  2366 V WindowManagerShell: Track 0 became idle
+07-13 11:31:52.164  2335  2366 V WindowManagerShell: All active transition animations finished
+07-13 11:31:52.171  1672  2214 W ImageReader_JNI: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+07-13 11:31:52.175 23954 23954 I ContentCaptureHelper: Setting logging level to OFF
+07-13 11:31:52.180  1672  1749 I ActivityTaskManager: Displayed com.saidlog.app/.MainActivity for user 0: +867ms
+07-13 11:31:52.193 23954 23954 I Capacitor/Console: File: https://localhost/assets/index-GulOAkz4.js - Line 125 - Msg: Create CdvPurchase...
+07-13 11:31:52.202  1672  2084 I ImeTracker: com.saidlog.app:5bf5b245: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false userId 0 displayId 0
+07-13 11:31:52.214  1672  2046 D InputMethodManagerService: Attach new input but force hide
+07-13 11:31:52.214  1672  2046 I ImeTracker: com.saidlog.app:2533bc1f: onRequestHide at ORIGIN_SERVER reason HIDE_SOFT_INPUT fromUser false userId 0 displayId 0
+07-13 11:31:52.214  1672  2046 I ImeTracker: com.saidlog.app:2533bc1f: onCancelled at PHASE_SERVER_SHOULD_HIDE
+07-13 11:31:52.217  1672  5880 I ImeTracker: system_server:9bd2a9d7: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false displayId 0
+07-13 11:31:52.217  1672  1752 I ImeTracker: system_server:9bd2a9d7: onCancelled at PHASE_SERVER_SHOULD_HIDE
+07-13 11:31:52.217 20878 20878 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():2276 
+07-13 11:31:52.220 20878 20878 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatusInternal():129 repeatCheckTimes = 0, locked = false
+07-13 11:31:52.221 20878 24196 I SystemSettingsModule: SystemSettingsModule$inputSessionListener$1.onFinishInput():34 Settings app closed, reloading all system settings
+07-13 11:31:52.221 20878 24196 I SystemSettings: SystemSettings.reloadAllSettings():224 Reload all system settings
+07-13 11:31:52.221 20878 24196 I SystemSettings: SystemSettings.updateFlagValue():265 Update flag: system_setting_secure_high_text_contrast_enabled = false
+07-13 11:31:52.222 20878 24196 I SystemSettings: SystemSettings.updateFlagValue():265 Update flag: system_setting_secure_ime_switcher_in_navbar_enabled = true
+07-13 11:31:52.222 20878 24196 I SystemSettings: SystemSettings.updateFlagValue():265 Update flag: system_setting_system_device_font_scale = 1.0
+07-13 11:31:52.222 20878 24196 I SystemSettings: SystemSettings.updateFlagValue():265 Update flag: system_setting_secure_accessibility_button_targets = 
+07-13 11:31:52.222 20878 24196 I SystemSettings: SystemSettings.updateFlagValue():265 Update flag: system_setting_system_font_scale = 1.149999976158142
+07-13 11:31:52.223  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.230 20878 20878 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1460 onStartInput(EditorInfo{EditorInfo{packageName=com.saidlog.app, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=12000000, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+07-13 11:31:52.233 20878 20878 I LatinIMEBase: LatinIMEBase.updateInputViewCoverNavigation():317 Update input view padding, isNavbarOverInputWindow=true, bottom inset=126
+07-13 11:31:52.234 23954 23954 I cr_A11yState: Enabled accessibility services list updated. [com.rise.automatic.autoclicker.clicker/.service.accessibility.MouseAccessibilityService]
+07-13 11:31:52.236 20878 20878 I Module  : DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatusInternal():129 repeatCheckTimes = 1, locked = false
+07-13 11:31:52.236 23954 23954 I cr_A11yState: Informing listeners of changes.
+07-13 11:31:52.236 23954 23954 I cr_A11yState: New AccessibilityState: State{isComplexUserInteractionServiceEnabled=false, isTouchExplorationEnabled=false, isPerformGesturesEnabled=true, isAnyAccessibilityServiceEnabled=true, isAccessibilityToolPresent=false, isTextShowPasswordEnabled=true, isOnlyAutofillRunning=false, isOnlyPasswordManagersEnabled=false, isKnownScreenReaderEnabled=false}
+07-13 11:31:52.241 23954 23954 D InsetsController: hide(ime())
+07-13 11:31:52.241 23954 23954 I ImeTracker: com.saidlog.app:5bf5b245: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+07-13 11:31:52.244  1672  2046 W PackageConfigPersister: App-specific configuration not found for packageName: com.saidlog.app and userId: 0
+07-13 11:31:52.245  1672  5880 W ActivityTaskManager: Request to remove task ignored for non-existent task 18394
+07-13 11:31:52.246 29317 29317 D b/417220811: invalidateLoadedTasks - previous requestLoadId: -1
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.247  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.258 24034 24055 E ashmem  : readlink(/proc/self/fd/100) failed: Operation not permitted
+07-13 11:31:52.259 24034 24055 E ashmem  : readlink(/proc/self/fd/112) failed: Operation not permitted
+07-13 11:31:52.259 24034 24055 E ashmem  : readlink(/proc/self/fd/124) failed: Operation not permitted
+07-13 11:31:52.259 24034 24183 E ashmem  : readlink(/proc/self/fd/122) failed: Operation not permitted
+07-13 11:31:52.260 24034 24183 E ashmem  : readlink(/proc/self/fd/125) failed: Operation not permitted
+07-13 11:31:52.260 24034 24183 E ashmem  : readlink(/proc/self/fd/127) failed: Operation not permitted
+07-13 11:31:52.273 23954 24132 D Capacitor: Handling local request: https://localhost/sw.js
+07-13 11:31:52.276 22341 23941 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:52.277 22341 23941 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:52.296 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:52.298 23954 24079 D Capacitor: Handling local request: https://localhost/workbox-9c191d2f.js
+07-13 11:31:52.372 23954 23960 I com.saidlog.app: Compiler allocated 5116KB to compile void android.view.ViewRootImpl.performTraversals()
+07-13 11:31:52.431 24034 24170 E ashmem  : readlink(/proc/self/fd/126) failed: Operation not permitted
+07-13 11:31:52.433 23954 24079 D Capacitor: Handling local request: https://localhost/index.html
+07-13 11:31:52.439 24034 24203 E ashmem  : readlink(/proc/self/fd/128) failed: Operation not permitted
+07-13 11:31:52.442 24034 24170 E ashmem  : readlink(/proc/self/fd/128) failed: Operation not permitted
+07-13 11:31:52.448 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.449 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.449 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.449 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.449 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.453 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494757, pluginId: PurchasePlugin, methodName: addListener
+07-13 11:31:52.453 23954 23954 V Capacitor: callback: 67494757, pluginId: PurchasePlugin, methodName: addListener, methodData: {"eventName":"setPurchases"}
+07-13 11:31:52.453 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494758, pluginId: PurchasePlugin, methodName: addListener
+07-13 11:31:52.453 23954 23954 V Capacitor: callback: 67494758, pluginId: PurchasePlugin, methodName: addListener, methodData: {"eventName":"purchasesUpdated"}
+07-13 11:31:52.453 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494759, pluginId: PurchasePlugin, methodName: addListener
+07-13 11:31:52.453 23954 23954 V Capacitor: callback: 67494759, pluginId: PurchasePlugin, methodName: addListener, methodData: {"eventName":"purchaseConsumed"}
+07-13 11:31:52.454 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494760, pluginId: PurchasePlugin, methodName: addListener
+07-13 11:31:52.454 23954 23954 V Capacitor: callback: 67494760, pluginId: PurchasePlugin, methodName: addListener, methodData: {"eventName":"priceChangeConfirmationResult"}
+07-13 11:31:52.454 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494761, pluginId: PurchasePlugin, methodName: init
+07-13 11:31:52.454 23954 23954 V Capacitor: callback: 67494761, pluginId: PurchasePlugin, methodName: init, methodData: {}
+07-13 11:31:52.454 23954 24136 D Capacitor: Handling local request: https://localhost/favicon.ico
+07-13 11:31:52.454 23954 24152 D CdvPurchase: init()
+07-13 11:31:52.457 23954 24127 D Capacitor: Handling local request: https://localhost/assets/web-DOTymSSO.js
+07-13 11:31:52.458 24034 24175 E ashmem  : readlink(/proc/self/fd/131) failed: Operation not permitted
+07-13 11:31:52.459 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.460 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.465 23954 24127 D Capacitor: Handling local request: https://localhost/assets/web-COTcBpG3.js
+07-13 11:31:52.475 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.475 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.476 10305 18116 I FontLog : (REDACTED) Received query %s, URI %s
+07-13 11:31:52.477 10305 18116 I FontLog : (REDACTED) Query [%s] resolved to %s
+07-13 11:31:52.477 10305 18116 I FontLog : (REDACTED) Fetch %s end status %s
+07-13 11:31:52.478 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.479 23954 24210 I HWUI    : Using FreeType backend (prop=Auto)
+07-13 11:31:52.480 23954 24152 D CdvPurchase: startServiceConnection()
+07-13 11:31:52.485  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.485 23954 24127 D Capacitor: Handling local request: https://localhost/assets/web-C8-hEX0Z.js
+07-13 11:31:52.489 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.491 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.497 23954 24127 D Capacitor: Handling local request: https://localhost/assets/pdfmake-Du1AxqRw.js
+07-13 11:31:52.501 24034 24203 E ashmem  : readlink(/proc/self/fd/130) failed: Operation not permitted
+07-13 11:31:52.519 10305 18116 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+07-13 11:31:52.520  2335  2335 D DLObserver: onReceive(); android.intent.action.BATTERY_CHANGED
+07-13 11:31:52.520  2335  2335 D DLObserver: plugged=0
+07-13 11:31:52.521  2335  2335 D SystemEventDataSource: onReceive: intentAction
+07-13 11:31:52.521  2335  2335 D PowerNotificationWarningsGoogleImpl: onReceive: android.intent.action.BATTERY_CHANGED
+07-13 11:31:52.521  2335  2335 D PulsarController: dispatchIntent: android.intent.action.BATTERY_CHANGED
+07-13 11:31:52.522  2335  2335 D IncompatibleChargerNotification: dispatchIntent: android.intent.action.BATTERY_CHANGED
+07-13 11:31:52.525  2335  2431 D GoogleBatteryDataSource: fetchDwellDefendStatus: DISCONNECTED
+07-13 11:31:52.525  2335  2431 D GoogleBatteryDataSource: fetchTempDefendStatus: t_sum=0, time_sum=0 t_avg=0 lst_v=4444218 lst_t=339 lst_u=828503, dt=736500, t=0 e=1
+07-13 11:31:52.526  2335  2431 D SystemEventDataSource: updatedEventData: SystemEventData(intentAction=android.intent.action.BATTERY_CHANGED, plugged=EventData(value=0), batteryScale=EventData(value=100), batteryLevel=EventData(value=91), chargingStatus=EventData(value=1), maxChargingCurrent=EventData(value=0), maxChargingVoltage=EventData(value=0), batteryStatus=EventData(value=3), halEventData=HalEventData(dockDefendStatus=EventData(value=-3), tempDefendEventData=EventData(value=false), dwellDefendEventData=EventData(value=false)), settingsEventData=SettingsEventData(dockDefenderBypass=EventData(value=0), chargingLimitSettings=EventData(value=0), dndState=EventData(value=false), airplaneState=EventData(value=false)), frameworkApiEventData=FrameworkApiEventData(batterySaverState=EventData(value=false), extremeBatterySaverState=EventData(value=false)))
+07-13 11:31:52.526  2335  2431 D SystemEventDataSource: extra doesn't changed, no need to onEventSourceUpdate
+07-13 11:31:52.535 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.556 23954 24079 D Capacitor: Handling local request: https://localhost/assets/index-GulOAkz4.js
+07-13 11:31:52.561 24034 24203 E ashmem  : readlink(/proc/self/fd/130) failed: Operation not permitted
+07-13 11:31:52.573 24034 24203 E ashmem  : readlink(/proc/self/fd/129) failed: Operation not permitted
+07-13 11:31:52.574  1167  1279 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:31:52.598  1167  1279 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:31:52.598  1167  1279 E WifiHAL : Creating message to get cached scan results
+07-13 11:31:52.601  1167  1279 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:31:52.610  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:52.616  1167  1279 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:31:52.616  1167  1279 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:31:52.616  1167  1279 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:31:52.616  1167  1279 D WifiHAL : len = 4, expected len = 4
+07-13 11:31:52.617  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:31:52.630 23954 24079 D Capacitor: Handling local request: https://localhost/favicon.ico
+07-13 11:31:52.634 23954 23954 I chromium: [INFO:CONSOLE:1] "Uncaught (in promise) bad-precaching-response: bad-precaching-response :: [{"url":"https://localhost/favicon.ico","status":404}]", source: https://localhost/workbox-9c191d2f.js (1)
+07-13 11:31:52.645 14500 24205 W NotificationManager: Shedding cancel (dupe) of NotificationKey[user=UserHandle{0}, pkg=com.microsoft.office.outlook, tag=AQADAAAAawCSJnT1ud4I89YbAAAAACAAAAAAAAAAAAAAIAAAAAAb1vMo3rn1dDvW8wMAAIAAAAAAK3Nhd2FzZS55dWppQHJlbmV0LmpwX0FjdGl2ZVN5bmNFeGNoYW5nZV9IeFM=, id=141321304], rate limit (5.0) exceeded: input 8.887372, output would be 6.2260213
+07-13 11:31:52.648 17573 17649 I Finsky  : [902] com.saidlog.app: Account from first account - [BLcpHmZ8gccnWN7YalKMq2ql64uc5HI3DFMELjF2SxE]
+07-13 11:31:52.648 17573 17649 I Finsky  : [902] Billing preferred account via installer for com.saidlog.app: [BLcpHmZ8gccnWN7YalKMq2ql64uc5HI3DFMELjF2SxE]
+07-13 11:31:52.657 17573 17645 I Finsky  : [898] com.saidlog.app: Account from first account - [BLcpHmZ8gccnWN7YalKMq2ql64uc5HI3DFMELjF2SxE]
+07-13 11:31:52.658 17573 17645 I Finsky  : [898] Billing preferred account via installer for com.saidlog.app: [BLcpHmZ8gccnWN7YalKMq2ql64uc5HI3DFMELjF2SxE]
+07-13 11:31:52.668 23954 23992 D CdvPurchase: startServiceConnection() -> Success
+07-13 11:31:52.668 23954 23992 D CdvPurchase: init() -> Success
+07-13 11:31:52.670 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+07-13 11:31:52.672 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.672 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.672 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494762, pluginId: PurchasePlugin, methodName: getStorefront
+07-13 11:31:52.672 23954 23954 V Capacitor: callback: 67494762, pluginId: PurchasePlugin, methodName: getStorefront, methodData: {}
+07-13 11:31:52.672 23954 24152 D CdvPurchase: getStorefront()
+07-13 11:31:52.673 23954 24152 D CdvPurchase: executeServiceRequest() -> OK
+07-13 11:31:52.673 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494763, pluginId: PurchasePlugin, methodName: getAvailableProducts
+07-13 11:31:52.673 23954 23954 V Capacitor: callback: 67494763, pluginId: PurchasePlugin, methodName: getAvailableProducts, methodData: {"inAppSkus":[],"subsSkus":["take_monthly_680"]}
+07-13 11:31:52.673 23954 24152 D CdvPurchase: getAvailableProducts()
+07-13 11:31:52.673 23954 24152 D CdvPurchase: queryAllProductDetails()
+07-13 11:31:52.673 23954 24152 D CdvPurchase: queryAllProductDetails() -> Query SUBS.
+07-13 11:31:52.673 23954 24152 D CdvPurchase: queryProductDetailsAsync()
+07-13 11:31:52.673 23954 24152 D CdvPurchase: executeServiceRequest() -> OK
+07-13 11:31:52.673 23954 24152 D CdvPurchase: queryProductDetailsAsync() -> Success
+07-13 11:31:52.683  1672  5880 D ConnectivityService: requestNetwork for uid/pid:1000/1672 asUid: 10571 activeRequest: null callbackRequest: 101669 [NetworkRequest [ REQUEST id=101670, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647 isUidTracked: false declaredMethods: AVAIL|LOST|BLK
+07-13 11:31:52.689  1672  2138 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101670, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]
+07-13 11:31:52.690  1672  2138 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101670, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]
+07-13 11:31:52.690  1672  2138 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=101670, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]
+07-13 11:31:52.690  1672  2138 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=101670, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED Uid: 10571 RequestorUid: 1000 RequestorPkg: android UnderlyingNetworks: Null] ]
+07-13 11:31:52.691  1672  2145 D ConnectivityService: NetReassign [101670 : null → 189] [c 1] [a 2] [i 4]
+07-13 11:31:52.694 17573 22334 I Finsky  : [979] Monetization gRPC call timeout resolved: 30000 ms (dynamic: 4000 ms, base: 30000 ms)
+07-13 11:31:52.742 14500 14731 I WM-WorkerWrapper: Worker result SUCCESS for Work [ id=58474ed7-bb4c-4bfd-8cc8-71cc9dc47670, tags={ com.microsoft.office.outlook.calendar.workers.EventNotificationWorker, EventNotificationWorker_Periodic } ]
+07-13 11:31:52.770 14500 14500 D AppCenterCrashes: The memory running level (40) was saved.
+07-13 11:31:52.798 14500 17374 I ReactNativeJNI: Memory warning (pressure level: TRIM_MEMORY_BACKGROUND) received by JS VM, running a GC
+07-13 11:31:52.925 17573 17673 I cn_CronetUrlRequestContext: destroyNativeStreamLocked android.net.http.internal.org.chromium.net.impl.CronetBidirectionalStream@7545d9b
+07-13 11:31:52.934 23954 24223 W CdvPurchase: queryAllProductDetails() -> Query returned nothing.
+07-13 11:31:52.935 23954 24223 D CdvPurchase: queryAllProductDetails() -> Calling listener.
+07-13 11:31:52.935 23954 24223 D CdvPurchase: getAvailableProducts() -> Success
+07-13 11:31:52.938 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: {"products":[]}
+07-13 11:31:52.939 23954 23954 I Capacitor/Console: File:  - Line 349 - Msg: [object Object]
+07-13 11:31:52.942 23954 23954 V Capacitor/Plugin: To native (Capacitor plugin): callbackId: 67494764, pluginId: PurchasePlugin, methodName: getPurchases
+07-13 11:31:52.943 23954 23954 V Capacitor: callback: 67494764, pluginId: PurchasePlugin, methodName: getPurchases, methodData: {}
+07-13 11:31:52.944 23954 24152 D CdvPurchase: getPurchases()
+07-13 11:31:52.944 23954 24152 D CdvPurchase: queryPurchases()
+07-13 11:31:52.944 23954 24152 D CdvPurchase: executeServiceRequest() -> OK
+07-13 11:31:52.948 17573 22334 I Finsky  : [979] User is not an active Play Pass subscriber
+07-13 11:31:52.949 23954 24247 I CdvPurchase: queryPurchases(INAPP) -> Elapsed time: 5ms
+07-13 11:31:52.949 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: undefined
+07-13 11:31:52.949 23954 24251 I CdvPurchase: queryPurchases(SUBS) -> Elapsed time: 5ms
+07-13 11:31:52.949 23954 24247 V Capacitor/PurchasePlugin: Notifying listeners for event setPurchases
+07-13 11:31:52.949 23954 24251 V Capacitor/PurchasePlugin: Notifying listeners for event setPurchases
+07-13 11:31:52.951 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: {"purchases":[]}
+07-13 11:31:52.953 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: {"purchases":[]}
+07-13 11:31:52.970 17573 17645 D Volley  : [898] bdzt.run: Could not delete cache entry for key=[NVLHA5egNS_0UOZ_4JB2m1Jdfd2yS9SdNwlpCc-BNOo], filename=-GWP_iBgqDBZr0g0J_5bC4FEBs4
+07-13 11:31:53.055 23954 23992 D CdvPurchase: getStorefront() -> JP
+07-13 11:31:53.061 23954 23954 I Capacitor/Console: File:  - Line 333 - Msg: {"countryCode":"JP"}
+07-13 11:31:53.069  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:53.069  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:53.305 22341 24206 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:53.305 22341 24206 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:53.325 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:53.570   495 20797 E hwc-display: [PrimaryDisplay,pid=1123,blob#417,chan#0] HistogramDevice::checkQueryResult: BAD_HIST_DATA, no event is handled
+07-13 11:31:53.574  1123  1944 D usf_sensor_hal: [p0]Histogram API error:BAD_HIST_DATA
+07-13 11:31:53.581  1365  1365 D AOC     : A3:MSG: tmd3733_device.cc, 3251: USF: TMD3733: dbv:2667 luma:128 leak:4.95/2.95 rr:60 te2:0 ctx:0x1 status:1 op_hz:0[0
+07-13 11:31:53.634  1365  1365 D AOC     : A3:MSG: tmd3733_device.cc, 3251: USF: TMD3733: dbv:2667 luma:207 leak:5.41/3.23 rr:60 te2:0 ctx:0x0 status:1 op_hz:0[0
+07-13 11:31:54.151  1672  5880 D ActivityManager: sync unfroze 20584 com.mgoogle.android.gms for 7
+07-13 11:31:54.153  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:54.159 13630 13685 D GmsGcmMcsSvc: Heartbeat initiated, reason: Intent { act=org.microg.gms.gcm.mcs.HEARTBEAT flg=0x4 xflg=0x4 cmp=com.mgoogle.android.gms/org.microg.gms.gcm.McsService (has extras) }
+07-13 11:31:54.170 13630 13685 D GmsGcmMcsSvc: Scheduling heartbeat in 60 seconds...
+07-13 11:31:54.172 13630 31304 D GmsGcmMcsOutput: Outgoing message: HeartbeatPing{last_stream_id_received=378}
+07-13 11:31:54.242 13630 31303 D GmsGcmMcsInput: Incoming message: HeartbeatAck{last_stream_id_received=378}
+07-13 11:31:54.249 13630 31303 D GmsGcmPrefs: learnReached: gcm_network_wifi / 59993
+07-13 11:31:54.286  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:54.290  1672  5851 D ActivityManager: sync unfroze 17998 com.google.android.webview:webview_service for 6
+07-13 11:31:54.295  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:31:54.296 17998 17998 D ActivityThread: Package [com.saidlog.app] reported as REPLACED, but missing application info. Assuming REMOVED.
+07-13 11:31:54.305 17998 17998 D ActivityThread: Package [com.saidlog.app] reported as REPLACED, but missing application info. Assuming REMOVED.
+07-13 11:31:54.324 17998 18003 W webview_service: Reducing the number of considered missed Gc histogram windows from 108 to 100
+07-13 11:31:54.334 22341 24257 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:54.334 22341 24257 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:54.360  1672  4760 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+07-13 11:31:54.365 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:54.670 17573 17651 I libbinder.IPCThreadState: oneway function results for code 2 on binder at 0xb4000070a91285b0 will be dropped but finished with status UNKNOWN_TRANSACTION
+07-13 11:31:54.678 23494 23494 I Finsky:background: [2] Memory trim requested to level 40
+07-13 11:31:55.375 22341 24279 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:55.377 22341 24279 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:55.410 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:55.605  9793  9826 I pixel-thermal: disp_therm:31.95 raw data: disp_therm:31950 
+07-13 11:31:55.606  9793  9826 I pixel-thermal: VIRTUAL-USB-UI:0 raw data: USB-MINUS-CHARGER:-1825 VIRTUAL-USB-UI:0 charging_therm:33664 usb_pwr_therm:31839 
+07-13 11:31:55.607  9793  9826 I pixel-thermal: btmspkr_therm:31.861 raw data: btmspkr_therm:31861 
+07-13 11:31:55.607  9793  9826 I pixel-thermal: usb_pwr_therm:31.839 raw data: usb_pwr_therm:31839 
+07-13 11:31:55.607  9793  9826 I pixel-thermal: VIRTUAL-USB-THROTTLING:0 raw data: USB-MINUS-CHARGER:-1825 VIRTUAL-USB-THROTTLING:0 usb_pwr_therm:31839 
+07-13 11:31:55.621  1167  1279 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:31:55.661  1167  2221 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:31:55.661  1167  2221 E WifiHAL : Creating message to get cached scan results
+07-13 11:31:55.666  1167  2221 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:31:55.696  1167  2221 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:31:55.696  1167  2221 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:31:55.696  1167  2221 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:31:55.696  1167  2221 D WifiHAL : len = 4, expected len = 4
+07-13 11:31:55.698  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:31:55.851  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_input: [33286.00 33486.00 33664.00 31839.00 31861.00 31950.00 33353.00 33575.00 ]
+07-13 11:31:55.851  9793  9826 I native  : I0000 00:00:1783909915.851464    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:31:55.852  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_output: [32343.2 ]
+07-13 11:31:55.852  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: predicted_value: [32343.2 ]
+07-13 11:31:55.852  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-MID:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-CPU-MID:32343.4 VIRTUAL-SKIN-LEGACY:32574.8 VIRTUAL-SKIN-LEGACY-MODEL-DIFF:231.549 VIRTUAL-SKIN-LEGACY-SHUTDOWN:0 VIRTUAL-SKIN-MODEL:32343.2 VIRTUAL-SKIN-MODEL-CLAMPED:32343.2 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-231.549 VIRTUAL-SKIN-MODEL-UPDATED:32343.4 VIRTUAL-SKIN-MODEL-UPPER-CLAMPED:32343.2 VIRTUAL-SKIN-SUB-0:31138.2 VIRTUAL-SKIN-SUB-1:32574.8 VIRTUAL-SKIN-SUB-2:32028.2 VIRTUAL-SKIN-SUB-3:32466.6 VIRTUAL-SKIN-SUB-4:32548.8 VT_LEGACY_WEIGHT:0 VT_MODEL_WEIGHT:1 battery:32200 btmspkr_therm:31861 charging_therm:33664 disp_therm:31950 north_therm:33353 quiet_therm:33486 rfpa_therm:33286 soc_therm:33575 usb_pwr_therm:31839 
+07-13 11:31:55.852  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SOC:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-SOC:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-DISPLAY:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-DISPLAY:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: CPU_THROTTLE_SEVERE:0 raw data: CPU_THROTTLE_SEVERE:0 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN:32.3434 raw data: VIRTUAL-SKIN:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-HINT:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-HINT:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-LIGHT-ODPM:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-CPU-LIGHT-ODPM:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-ODPM:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-CPU-ODPM:32343.4 
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_input: [33286.00 33486.00 33664.00 31839.00 31861.00 31950.00 33353.00 33575.00 32200.00 369.56 1.36 463.10 46.71 1.51 81.97 ]
+07-13 11:31:55.853  9793  9826 I native  : I0000 00:00:1783909915.853684    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_output: [31228 ]
+07-13 11:31:55.853  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: predicted_value: [31228 ]
+07-13 11:31:55.854  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_input: [32200.00 31861.00 33664.00 31950.00 33353.00 33486.00 33286.00 33575.00 31839.00 ]
+07-13 11:31:55.854  9793  9826 I native  : I0000 00:00:1783909915.854430    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:31:55.854  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_output: [31597.9 ]
+07-13 11:31:55.854  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: predicted_value: [31597.9 ]
+07-13 11:31:55.854  9793  9826 I pixel-thermal: STATS-UPDATOR:0 raw data: EXTREME-SOC-CONDITION-CHECK:0 MAIN_SOC_POWER:439.966 MODEL_CAMERA_PWR:1.35705 MODEL_DISPLAY_PWR:463.099 MODEL_MISC_PWR:369.562 MODEL_MODEM_PWR:46.7099 MODEL_RFFE_PWR:1.51136 MODEL_WLAN_BT_PWR:81.9662 NORTH_THERM-UNDER-THRESHOLD:1 NORTH_THERM-VSKIN-DIFF-DURING-NORTH_THERM-OVER-THRESHOLD:-998990 NORTH_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998990 QUIET_THERM-UNDER-THRESHOLD:1 QUIET_THERM-VSKIN-DIFF-DURING-QUIET_THERM-OVER-THRESHOLD:-998857 QUIET_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998857 RFPA_THERM-UNDER-THRESHOLD:1 RFPA_THERM-VSKIN-DIFF-DURING-RFPA_THERM-OVER-THRESHOLD:-999057 RFPA_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-999057 SOC_THERM-UNDER-THRESHOLD:1 SOC_THERM-VSKIN-DIFF-DURING-SOC_THERM-OVER-THRESHOLD:-998768 SOC_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998768 STATS-UPDATOR:0 TPU_35S:0 VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-LEGACY:32574.8 VIRTUAL-SKIN-MODEL:32343.2 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-231.549 VIRTUAL-SKIN-ODPM-MODEL:31228 VIRTUAL-SKIN-SPEAKER-MODEL:31597.9 VSKIN-SKIN-UNDER-52:1 battery:32200 btmspkr_therm:31861 charging_therm:33664 disp_therm:31950 north_therm:33353 quiet_therm:33486 rfpa_therm:33286 soc_therm:33575 usb_pwr_therm:31839 
+07-13 11:31:55.854  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-HIGH:32.3434 raw data: VIRTUAL-SKIN:32343.4 VIRTUAL-SKIN-CPU-HIGH:32343.4 
+07-13 11:31:55.854  9793  9826 I pixel-thermal: cellular-emergency:32.3434 raw data: VIRTUAL-SKIN:32343.4 cellular-emergency:32343.4 
+07-13 11:31:55.866  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 3: Enabled 0, odr_index 0, period_ns 0.
+07-13 11:31:55.866  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:31:55.867  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 896036ns.
+07-13 11:31:55.867  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Accelerometer (active:5).
+07-13 11:31:55.868  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Stationary Detect (active:1).
+07-13 11:31:55.870  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 4: Enabled 1, odr_index 1, period_ns 500000000.
+07-13 11:31:55.870  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:31:55.871  1365  1365 D AOC     : CHRE: DRAM vote count begins
+07-13 11:31:55.871  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 786174ns.
+07-13 11:31:55.872  1365  1365 D AOC     : A3:MSG: motion_state_sensor.cc, 328: USF: MoSt: StationaryDetect sampling started with sampling ID 134432.
+07-13 11:31:55.874  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Accelerometer (active:6).
+07-13 11:31:55.874  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 0: Enabled 1, odr_index 5, period_ns 20000000.
+07-13 11:31:55.875  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:31:55.875  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 462077ns.
+07-13 11:31:55.878  1365  1365 D AOC     : CHRE: DRAM vote count ends: 0 ms
+07-13 11:31:55.878  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Accelerometer (active:6).
+07-13 11:31:55.878  1110  1142 I CHRE    : @ 829188.230: [AR] IDLE => ON
+07-13 11:31:55.879  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV FreeFall Detect (active:1).
+07-13 11:31:55.881  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 5: Enabled 1, odr_index 2, period_ns 500000000.
+07-13 11:31:55.881  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:31:55.882  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 728190ns.
+07-13 11:31:55.884  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Stationary Detect (active:2).
+07-13 11:31:56.346 10305 23575 I NearbyMediums: No BLE Fast/GATT advertisements found in the latest cycle.
+07-13 11:31:56.346 10305 23575 I NearbyMediums: Current Tracked Scanning Clients are : {NearbyConnections.EnvironmentMonitor, NearbySharing, NearbyConnections.TxAdvertisement}
+07-13 11:31:56.419 22341 24283 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:56.420 22341 24283 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:56.437 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:56.596  1362  1362 W TracingMuxer: type=1400 audit(0.0:541802): avc:  denied  { write } for  name="traced_producer" dev="tmpfs" ino=1317 scontext=u:r:gxp_logging:s0 tcontext=u:object_r:traced_producer_socket:s0 tclass=sock_file permissive=0
+07-13 11:31:57.112  3229  3387 I twoshay.touchsuez: TouchVeetwoErrorMetrics queued (4), missed frame = 2
+07-13 11:31:57.206  2326  2327 I deeptouch: I0000 00:00:1783909917.204132    2327 tf_lite_classifier.cc:415] Event stream classified as kNone
+07-13 11:31:57.262  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.263  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.264  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10150} in 5ms
+07-13 11:31:57.265  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.267  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.267  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={20150} in 4ms
+07-13 11:31:57.270  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.272  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.272  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10119} in 4ms
+07-13 11:31:57.275  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.277  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.277  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={20119} in 4ms
+07-13 11:31:57.310  2516  2768 D TemperatureStateSource: sequence=57818 actualDelay=10001
+07-13 11:31:57.311  2516  2768 D TemperatureStateSource: Reading temperature: sequence=57819
+07-13 11:31:57.314  9793  9793 I pixel-thermal: CPU_THROTTLE_SEVERE:0 raw data: CPU_THROTTLE_SEVERE:0 
+07-13 11:31:57.314  9793  9793 I pixel-thermal: VIRTUAL-SKIN:32.3434 raw data: VIRTUAL-SKIN:32343.4 
+07-13 11:31:57.315  2516  2768 D TemperatureStateSource: getDeviceTemperatures: sequence=57819 deviceTemperatureType=3 temperatureSource=0 temperatures=[32.34339]
+07-13 11:31:57.315  2516  2768 D BusinessScope: Enqueuing the block
+07-13 11:31:57.315  2516  2768 D TemperatureStateSource: sequence=57819 waitTime=10000
+07-13 11:31:57.315  2516  2650 D BusinessScope: Start running the #119575 block
+07-13 11:31:57.316  2516  2650 D BusinessScope: Enqueuing the block
+07-13 11:31:57.316  2516  2650 D ImpulseStateSource: Notify clients: 59780
+07-13 11:31:57.316  2516  2650 D BusinessScope: Finish running the #119575 block
+07-13 11:31:57.316  2516  2650 D BusinessScope: Start running the #119576 block
+07-13 11:31:57.317  2516  2650 D BusinessScope: Finish running the #119576 block
+07-13 11:31:57.351  2455 13205 D IpClient/wlan0: interfaceLinkStateChanged: ifindex 47 up
+07-13 11:31:57.445 22341 24297 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:57.445 22341 24297 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:57.465 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:57.639 23954 24304 D ProfileInstaller: Installing profile for com.saidlog.app
+07-13 11:31:57.761  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.763  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.763  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10516} in 6ms
+07-13 11:31:57.765  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:57.766  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:57.766  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={20516} in 4ms
+07-13 11:31:58.267  2326  2327 I deeptouch: I0000 00:00:1783909918.267286    2327 tf_lite_classifier.cc:415] Event stream classified as kNone
+07-13 11:31:58.473 22341 24303 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:58.473 22341 24303 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:58.496 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:31:58.702  1167  2221 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:31:58.757  1167  1279 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:31:58.758  1167  1279 E WifiHAL : Creating message to get cached scan results
+07-13 11:31:58.762  1167  1279 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:31:58.786  1167  1279 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:31:58.786  1167  1279 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:31:58.786  1167  1279 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:31:58.786  1167  1279 D WifiHAL : len = 4, expected len = 4
+07-13 11:31:58.788  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:31:58.838 24034 24170 E ashmem  : readlink(/proc/self/fd/112) failed: Operation not permitted
+07-13 11:31:58.839 24034 24170 E ashmem  : readlink(/proc/self/fd/128) failed: Operation not permitted
+07-13 11:31:58.845 24034 24170 E ashmem  : readlink(/proc/self/fd/124) failed: Operation not permitted
+07-13 11:31:58.885  2326  2327 I deeptouch: I0000 00:00:1783909918.885135    2327 tf_lite_classifier.cc:415] Event stream classified as kNone
+07-13 11:31:59.326  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:59.327  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:59.327  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10196} in 2ms
+07-13 11:31:59.328  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:31:59.328  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:31:59.328  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={20196} in 2ms
+07-13 11:31:59.505 22341 24305 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:31:59.505 22341 24305 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:31:59.529 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:32:00.534 22341 24308 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:32:00.534 22341 24308 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:32:00.565 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:32:01.489  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 4: Enabled 0, odr_index 0, period_ns 0.
+07-13 11:32:01.490  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:32:01.490  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 1382813ns.
+07-13 11:32:01.491  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Motion Detect (active:1).
+07-13 11:32:01.492  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 3: Enabled 1, odr_index 1, period_ns 500000000.
+07-13 11:32:01.492  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:32:01.493  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 555827ns.
+07-13 11:32:01.494  1365  1365 D AOC     : A3:MSG: motion_state_sensor.cc, 328: USF: MoSt: MotionDetect sampling started with sampling ID 134435.
+07-13 11:32:01.496  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1866: USF: Received start sampling request for LSM6DSV Motion Detect (active:2).
+07-13 11:32:01.497  1365  1365 D AOC     : A3:MSG: usf_sensor.cc, 1881: USF: Received stop sampling request for LSM6DSV FreeFall Detect (active:0).
+07-13 11:32:01.498  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 732: USF: Lsm6dsvDevice: Sensor 5: Enabled 0, odr_index 0, period_ns 0.
+07-13 11:32:01.498  1365  1365 D AOC     : A3:MSG: lsm6dsv_fifo.cc, 755: USF: Lsm6dsvFifo: ODR: XL/G/T/TS: 60/60/15/7 WM: 6 Intr: 24.
+07-13 11:32:01.499  1365  1365 D AOC     : A3:MSG: lsm6dsv_device.cc, 641: USF: Lsm6dsvDevice: Fifo was disabled for 555582ns.
+07-13 11:32:01.571 22341 24312 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:32:01.571 22341 24312 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:32:01.597 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:32:01.793  1167  1279 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:32:01.879  1167  2221 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:32:01.879  1167  2221 E WifiHAL : Creating message to get cached scan results
+07-13 11:32:01.884  1167  2221 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:32:01.917  2326  2327 I deeptouch: I0000 00:00:1783909921.917123    2327 tf_lite_classifier.cc:415] Event stream classified as kNone
+07-13 11:32:01.935  2600  3978 W SHANNON_IMS: 3787 [CONN] NetworkSpecifier and TransportInfo are not valid (DefaultNetworkCallback%updateSubscriptionId:121)
+07-13 11:32:01.935  2600  3978 I SHANNON_IMS: 3791 [CONN] network:189 WIFI connected, subId: -1 [SLID:0] (DefaultNetworkCallback%onCapabilitiesChanged:76)
+07-13 11:32:01.938  2600  4048 W SHANNON_IMS: 3789 [CONN] NetworkSpecifier and TransportInfo are not valid (DefaultNetworkCallback%updateSubscriptionId:121)
+07-13 11:32:01.938  2600  4048 I SHANNON_IMS: 3792 [CONN] network:189 WIFI connected, subId: -1 [SLID:1] (DefaultNetworkCallback%onCapabilitiesChanged:76)
+07-13 11:32:01.941  2988  3145 D IwlanNetworkStatusTracker: onCapabilitiesChanged: 189
+07-13 11:32:01.941  2988  3145 D IwlanNetworkStatusTracker: OnCapability : Wifi Available already true and validation status unchanged
+07-13 11:32:01.945  2908  2942 D IwlanDataService: onCapabilitiesChanged: 189 [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=9069Kbps LinkDnBandwidth>=57259Kbps TransportInfo: <SSID: "Buffalo-A-88A0", BSSID: f2:f8:4a:26:88:aa, MAC: 66:68:81:d6:76:89, IP: /192.168.11.10, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ax, RSSI: -54, Link speed: 720Mbps, Tx Link speed: 720Mbps, Max Supported Tx Link speed: 1200Mbps, Calculated Tx : 542Mbps, Rx Link speed: 612Mbps, Max Supported Rx Link speed: 1200Mbps, Calculated Rx : 813Mbps, Frequency: 5700MHz, Net ID: 6, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: 1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none>"Buffalo-A-88A0"wpa2-pskMLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -54 AdminUids: [10122] SSID: "Buffalo-A-88A0" UnderlyingNetworks: Null]
+07-13 11:32:01.945  2908  2942 D IwlanDataService: Network 189 connected using transport WIFI
+07-13 11:32:01.948  2908  3119 D IwlanNetworkService: onCapabilitiesChanged: 189
+07-13 11:32:01.950  1167  2221 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:32:01.950  1167  2221 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:32:01.950  1167  2221 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:32:01.950  1167  2221 D WifiHAL : len = 4, expected len = 4
+07-13 11:32:01.951 10305 10338 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+07-13 11:32:01.951 10305 10338 W libbinder.Binder: Large reply transaction of 1056768 bytes, interface descriptor , code 1, flags 17
+07-13 11:32:01.953  1672  1762 D ActivityManager: sync unfroze 24000 com.google.android.apps.privacy.wildlife for 3
+07-13 11:32:01.954 24856 25289 D DeviceStateHelper: Wifi freq: 5700
+07-13 11:32:01.955  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:32:01.959  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:32:01.959  1672  1762 W ProcessStats: Tracking association SourceState{7c6de5b com.google.android.apps.privacy.wildlife/10165 Receivr #1754640} whose proc state 10 is better than process ProcessState{e6cd601 com.google.android.gms/10178 pkg=com.google.android.gms} proc state 14 (23 skipped)
+07-13 11:32:01.961  2988  3145 E IwlanNetworkStatusTracker: Could not get Wifi SSID
+07-13 11:32:01.963 24856 25350 I WifiSignalInfo: onCapabilitiesChanged: rssi:-54
+07-13 11:32:01.995  2575  3841 D SHANNON_RCS: 9607 [0][PROX][TELE] onCapabilitiesChanged, Network: 189, NetworkCapabilities: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=9069Kbps LinkDnBandwidth>=57259Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /192.168.11.10, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ax, RSSI: -54, Link speed: 720Mbps, Tx Link speed: 720Mbps, Max Supported Tx Link speed: 1200Mbps, Calculated Tx : 542Mbps, Rx Link speed: 612Mbps, Max Supported Rx Link speed: 1200Mbps, Calculated Rx : 813Mbps, Frequency: 5700MHz, Net ID: -1, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -54 UnderlyingNetworks: Null] (DefaultNetworkCallback%onCapabilitiesChanged:76)
+07-13 11:32:01.996  2575  3841 D SHANNON_RCS: 9608 [1][PROX][TELE] onCapabilitiesChanged, Network: 189, NetworkCapabilities: [ Transports: WIFI Capabilities: NOT_METERED&INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VPN&VALIDATED&NOT_ROAMING&FOREGROUND&NOT_CONGESTED&NOT_SUSPENDED&NOT_VCN_MANAGED&NOT_BANDWIDTH_CONSTRAINED LinkUpBandwidth>=9069Kbps LinkDnBandwidth>=57259Kbps TransportInfo: <SSID: <unknown ssid>, BSSID: 02:00:00:00:00:00, MAC: 02:00:00:00:00:00, IP: /192.168.11.10, Security type: 2, Supplicant state: COMPLETED, Wi-Fi standard: 11ax, RSSI: -54, Link speed: 720Mbps, Tx Link speed: 720Mbps, Max Supported Tx Link speed: 1200Mbps, Calculated Tx : 542Mbps, Rx Link speed: 612Mbps, Max Supported Rx Link speed: 1200Mbps, Calculated Rx : 813Mbps, Frequency: 5700MHz, Net ID: -1, Metered hint: false, score: 100, isUsable: true, CarrierMerged: false, SubscriptionId: -1, IsPrimary: -1, Trusted: true, Restricted: false, Ephemeral: false, OEM paid: false, OEM private: false, OSU AP: false, FQDN: <none>, Provider friendly name: <none>, Requesting package name: <none><none>MLO Information: , Is TID-To-Link negotiation supported by the AP: false, AP MLD Address: <none>, AP MLO Link Id: <none>, AP MLO Affiliated links: <none>, Vendor Data: <none>> SignalStrength: -54 UnderlyingNetworks: Null] (DefaultNetworkCallback%onCapabilitiesChanged:76)
+07-13 11:32:02.004  1365  1365 D AOC     : CHRE: DRAM vote count begins
+07-13 11:32:02.004  1365  1365 D AOC     : CHRE: DRAM vote count ends: 0 ms
+07-13 11:32:02.005  1110  1142 D CHRE    : @ 829194.362: Parsed nanoapp message from host: app ID 0x476f6f676c00100b endpoint 0x94 msgType 112 payload size 14
+07-13 11:32:02.005  1110  1142 I CHRE    : @ 829194.363: [NanoMinion] received MSG Type 0x70, Version 1, 10 bytes
+07-13 11:32:02.005  1110  1142 I CHRE    : @ 829194.363: [AR] context-signal: has_bt=0, bt=0, has_wifi=1, wifi=1
+07-13 11:32:02.005  1365  1365 D AOC     : CHRE: DRAM vote count begins
+07-13 11:32:02.005  1365  1365 D AOC     : CHRE: DRAM vote count ends: 0 ms
+07-13 11:32:02.005  1365  1365 D AOC     : CHRE: DRAM vote count begins
+07-13 11:32:02.005  1365  1365 D AOC     : CHRE: DRAM vote count ends: 0 ms
+07-13 11:32:02.006 24000 24000 I Wildlife_WildlifeVpnReceiver: ACTION_WIFI_STATE_CHANGED
+07-13 11:32:02.011 24000 24000 I Wildlife_WildlifeCobaltEventLoggerImpl: SysUI wifi state changed event logged
+07-13 11:32:02.012 24000 24000 I Wildlife_WildlifeVpnManagerImpl: restoreSettingsFromBackupIfNecessary() false, true, false
+07-13 11:32:02.013  1672  2145 D ConnectivityService: NetReassign [no changes] [c 0] [a 12] [i 1]
+07-13 11:32:02.013 27462 27504 I BugleRcsEngine: handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[d36b2e08-ec90]>Handler" thread_id=251 ]
+07-13 11:32:02.015 24856 24977 D ImsPreconditionCheck: {subId=3} handleMessage: { when=0 what=16 target=emf async=false heapIndex=-1 }
+07-13 11:32:02.015 24856 24977 D ImsPreconditionCheck: {subId=3} onWifiCapabilitiesChanged: wifiNetworkValidated: true
+07-13 11:32:02.015 10305 10305 D BoundBrokerSvc: onRebind: Intent { act=com.google.android.gms.common.telemetry.service.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.PersistentApiService }
+07-13 11:32:02.015 27462 27498 I BugleRcsEngine: Connected state: [1], networkType: [WIFI] [CONTEXT thread_id=247 ]
+07-13 11:32:02.015 24000 24000 I Wildlife_OpenWifiNudgeManagerImpl: wifiStateChangedFuture
+07-13 11:32:02.016 24856 24977 D ImsPreconditionCheck: {subId=2} handleMessage: { when=-1ms what=16 target=emf async=false heapIndex=-1 }
+07-13 11:32:02.016 24856 24977 D ImsPreconditionCheck: {subId=2} onWifiCapabilitiesChanged: wifiNetworkValidated: true
+07-13 11:32:02.017 10146  7805 I NearbyMediums: Wifi changed new SSID: "Buffalo-A-88A0"
+07-13 11:32:02.018 10146  7805 I NearbyMediums: WifiLanConnectivityInfo is not changed, skip notify.
+07-13 11:32:02.020  1672  2145 D ConnectivityService: NetReassign [no changes] [c 0] [a 2] [i 2]
+07-13 11:32:02.022 27462 27504 I BugleRcsEngine: Cannot use CS.apk as it's battery optimized [CONTEXT thread_id=251 ]
+07-13 11:32:02.022 10305 24321 I NearbyMediums: Wifi changed new SSID: "Buffalo-A-88A0"
+07-13 11:32:02.022 10305 24321 I NearbyMediums: WifiLanConnectivityInfo is not changed, skip notify.
+07-13 11:32:02.023 23964 20437 I CobaltLoggerImpl: (REDACTED) Logging Cobalt occurrence for metric %d-%d-%d, with count %d and event vector %s, for caller: %s
+07-13 11:32:02.023 23964 20437 I CobaltLoggerImpl: (REDACTED) Loaded Cobalt registry contains metric: %d-%d-%d
+07-13 11:32:02.027 24000 24322 I Wildlife_OpenWifiNudgeManagerImpl: handleWifiStateChanged(): consumer is not active
+07-13 11:32:02.033  1672  5880 D ActivityManager: sync unfroze 23640 com.google.android.apps.messaging for 7
+07-13 11:32:02.036  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:32:02.076 24034 24170 E ashmem  : readlink(/proc/self/fd/112) failed: Operation not permitted
+07-13 11:32:02.077 24034 24170 E ashmem  : readlink(/proc/self/fd/124) failed: Operation not permitted
+07-13 11:32:02.091 24034 24170 E ashmem  : readlink(/proc/self/fd/128) failed: Operation not permitted
+07-13 11:32:02.282  2617  2857 D SatelliteController: isInCarrierRoamingNbIotNtn: satellite is disabled
+07-13 11:32:02.282  2617  2857 D SatelliteController: getCarrierRoamingNtnConnectType: Checking connect type from PLMN config for subId: 3
+07-13 11:32:02.282  2617  2857 D SatelliteController: getCarrierRoamingNtnConnectType: config: null
+07-13 11:32:02.287  2600  2600 I SHANNON_IMS: 3793 [PROX] Received onSignalStrengthsChanged [CellSignalStrengthLte: rssi=-65 rsrp=-98 rsrq=-10 rssnr=2 cqiTableIndex=1 cqi=4 ta=5 level=4 parametersUseForLevel=0] [SLID:0 APM:false] (ImsConnectivityProxyListener$ImsPhoneStateListener%onSignalStrengthsChanged:413)
+07-13 11:32:02.287  2617  2857 D SatelliteController: getCarrierRoamingNtnConnectType: Falling back to global carrier config connect type: 0
+07-13 11:32:02.288  2617  2857 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(3)
+07-13 11:32:02.288  2617  2857 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(3) lastNotifiedSignalStrength level: 0
+07-13 11:32:02.288  2617  2857 D SatelliteController: updateLastNotifiedCarrierRoamingNtnSignalStrengthAndNotify(3) currSignalStrength level: 0
+07-13 11:32:02.604 22341 24317 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:32:02.604 22341 24317 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:32:02.623  9793  9826 I pixel-thermal: disp_therm:31.883 raw data: disp_therm:31883 
+07-13 11:32:02.624  9793  9826 I pixel-thermal: VIRTUAL-USB-UI:0 raw data: USB-MINUS-CHARGER:-2293 VIRTUAL-USB-UI:0 charging_therm:34176 usb_pwr_therm:31883 
+07-13 11:32:02.624  9793  9826 I pixel-thermal: btmspkr_therm:31.928 raw data: btmspkr_therm:31928 
+07-13 11:32:02.624  9793  9826 I pixel-thermal: usb_pwr_therm:31.883 raw data: usb_pwr_therm:31883 
+07-13 11:32:02.624 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:32:02.625  9793  9826 I pixel-thermal: VIRTUAL-USB-THROTTLING:0 raw data: USB-MINUS-CHARGER:-2293 VIRTUAL-USB-THROTTLING:0 usb_pwr_therm:31883 
+07-13 11:32:02.752  1672  2067 D ActivityManager: freezing 14500 com.microsoft.office.outlook
+07-13 11:32:02.760  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:32:02.762  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:32:02.762  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10516} in 4ms
+07-13 11:32:02.829 10146  7805 I NearbySharing: Network state changed: NetworkState(isRestricted=false, isOnline=true, isCongested=false, isMetered=false, isWifiConnected=true)
+07-13 11:32:02.832 10305 24321 I NearbySharing: Network state changed: NetworkState(isRestricted=false, isOnline=true, isCongested=false, isMetered=false, isWifiConnected=true)
+07-13 11:32:02.833 10305 24324 I NearbySharing: Network state changed: NetworkState(isRestricted=false, isOnline=true, isCongested=false, isMetered=false, isWifiConnected=true)
+07-13 11:32:02.860  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_input: [33531.00 33709.00 34176.00 31883.00 31928.00 31883.00 33575.00 35245.00 ]
+07-13 11:32:02.861  9793  9826 I native  : I0000 00:00:1783909922.860946    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:32:02.861  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_output: [32407.6 ]
+07-13 11:32:02.861  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: predicted_value: [32407.6 ]
+07-13 11:32:02.861  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-MID:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-CPU-MID:32369.1 VIRTUAL-SKIN-LEGACY:32684 VIRTUAL-SKIN-LEGACY-MODEL-DIFF:276.361 VIRTUAL-SKIN-LEGACY-SHUTDOWN:0 VIRTUAL-SKIN-MODEL:32407.6 VIRTUAL-SKIN-MODEL-CLAMPED:32407.6 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-276.361 VIRTUAL-SKIN-MODEL-UPDATED:32369.1 VIRTUAL-SKIN-MODEL-UPPER-CLAMPED:32407.6 VIRTUAL-SKIN-SUB-0:31621.7 VIRTUAL-SKIN-SUB-1:32668.6 VIRTUAL-SKIN-SUB-2:32362.8 VIRTUAL-SKIN-SUB-3:32682.7 VIRTUAL-SKIN-SUB-4:32684 VT_LEGACY_WEIGHT:0 VT_MODEL_WEIGHT:1 battery:32200 btmspkr_therm:31928 charging_therm:34176 disp_therm:31883 north_therm:33575 quiet_therm:33709 rfpa_therm:33531 soc_therm:35245 usb_pwr_therm:31883 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SOC:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-SOC:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-DISPLAY:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-DISPLAY:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: CPU_THROTTLE_SEVERE:0 raw data: CPU_THROTTLE_SEVERE:0 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN:32.3691 raw data: VIRTUAL-SKIN:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-HINT:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-HINT:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-LIGHT-ODPM:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-CPU-LIGHT-ODPM:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-ODPM:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-CPU-ODPM:32369.1 
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_input: [33531.00 33709.00 34176.00 31883.00 31928.00 31883.00 33575.00 35245.00 32200.00 374.95 1.35 469.69 47.16 1.51 81.65 ]
+07-13 11:32:02.862  9793  9826 I native  : I0000 00:00:1783909922.862839    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_output: [31661.7 ]
+07-13 11:32:02.862  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: predicted_value: [31661.7 ]
+07-13 11:32:02.863  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_input: [32200.00 31928.00 34176.00 31883.00 33575.00 33709.00 33531.00 35245.00 31883.00 ]
+07-13 11:32:02.863  9793  9826 I native  : I0000 00:00:1783909922.863618    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:32:02.863  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_output: [32110.4 ]
+07-13 11:32:02.863  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: predicted_value: [32110.4 ]
+07-13 11:32:02.863  9793  9826 I pixel-thermal: STATS-UPDATOR:0 raw data: EXTREME-SOC-CONDITION-CHECK:0 MAIN_SOC_POWER:480.642 MODEL_CAMERA_PWR:1.35442 MODEL_DISPLAY_PWR:469.695 MODEL_MISC_PWR:374.954 MODEL_MODEM_PWR:47.1624 MODEL_RFFE_PWR:1.51003 MODEL_WLAN_BT_PWR:81.651 NORTH_THERM-UNDER-THRESHOLD:1 NORTH_THERM-VSKIN-DIFF-DURING-NORTH_THERM-OVER-THRESHOLD:-998794 NORTH_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998794 QUIET_THERM-UNDER-THRESHOLD:1 QUIET_THERM-VSKIN-DIFF-DURING-QUIET_THERM-OVER-THRESHOLD:-998660 QUIET_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998660 RFPA_THERM-UNDER-THRESHOLD:1 RFPA_THERM-VSKIN-DIFF-DURING-RFPA_THERM-OVER-THRESHOLD:-998838 RFPA_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998838 SOC_THERM-UNDER-THRESHOLD:1 SOC_THERM-VSKIN-DIFF-DURING-SOC_THERM-OVER-THRESHOLD:-997124 SOC_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-997124 STATS-UPDATOR:0 TPU_35S:0 VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-LEGACY:32684 VIRTUAL-SKIN-MODEL:32407.6 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-276.361 VIRTUAL-SKIN-ODPM-MODEL:31661.7 VIRTUAL-SKIN-SPEAKER-MODEL:32110.4 VSKIN-SKIN-UNDER-52:1 battery:32200 btmspkr_therm:31928 charging_therm:34176 disp_therm:31883 north_therm:33575 quiet_therm:33709 rfpa_therm:33531 soc_therm:35245 usb_pwr_therm:31883 
+07-13 11:32:02.864  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-HIGH:32.3691 raw data: VIRTUAL-SKIN:32369.1 VIRTUAL-SKIN-CPU-HIGH:32369.1 
+07-13 11:32:02.864  9793  9826 I pixel-thermal: cellular-emergency:32.3691 raw data: VIRTUAL-SKIN:32369.1 cellular-emergency:32369.1 
+07-13 11:32:03.462  2326  2327 I deeptouch: I0000 00:00:1783909923.461973    2327 tf_lite_classifier.cc:415] Event stream classified as kNone
+07-13 11:32:03.530 23964 20437 I gle.android.gms: Explicit concurrent mark compact GC freed 909KB AllocSpace bytes, 2(104KB) LOS objects, 90% free, 24MB/256MB, paused 859us,2.773ms total 248.116ms
+07-13 11:32:03.632 22341 24326 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:32:03.632 22341 24326 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:32:03.653 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:32:03.789 22341 22341 I adbd    : adbd service requested 'shell,v2:export ANDROID_LOG_TAGS=''; exec logcat '-d' '-t' '800''

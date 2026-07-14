@@ -1,0 +1,100 @@
+--------- beginning of main
+07-13 11:40:31.993 22341 22341 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:input tap 540 957'
+07-13 11:40:32.113 23954 23954 E Capacitor/Console: File: https://localhost/assets/index-GulOAkz4.js - Line 127 - Msg: [upgrade] purchaseTake failed: Error: Product not found: take_monthly_680
+07-13 11:40:32.119 23954 23954 D CompatChangeReporter: Compat change id reported: 379365266; UID 10571; state: ENABLED
+07-13 11:40:32.162 23954 23954 D WindowOnBackDispatcher: setTopOnBackInvokedCallback (unwrapped): android.app.Dialog$$ExternalSyntheticLambda2@4a67a6c
+--------- beginning of system
+07-13 11:40:32.163  1672  4493 D CoreBackPreview: Window{6ee182c u0 com.saidlog.app/com.saidlog.app.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@ad940c4, mPriority=-1, mIsAnimationCallback=false, mOverrideBehavior=0}
+07-13 11:40:32.214 23954 23954 W TextView: onProvideContentCaptureStructure(): calling assumeLayout()
+07-13 11:40:32.214 23954 23954 W TextView: onProvideContentCaptureStructure(): calling assumeLayout()
+07-13 11:40:32.642  1167  1279 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:40:32.655 22341 25607 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:40:32.655 22341 25607 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:40:32.681 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:40:32.687  1167  2221 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:40:32.687  1167  2221 E WifiHAL : Creating message to get cached scan results
+07-13 11:40:32.692  1167  2221 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:40:32.735  1167  2221 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:40:32.735  1167  2221 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:40:32.735  1167  2221 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:40:32.735  1167  2221 D WifiHAL : len = 4, expected len = 4
+07-13 11:40:32.737  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:40:33.369  1672  2067 D ActivityManager: freezing 24000 com.google.android.apps.privacy.wildlife
+07-13 11:40:33.377  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+07-13 11:40:33.379  1672  2145 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+07-13 11:40:33.379  1672  2145 D InetDiagMessage: Destroyed live tcp sockets for uids={10165} in 5ms
+07-13 11:40:33.692 22341 25616 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:40:33.692 22341 25616 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:40:33.713 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:40:33.940  7022  7022 W ndroid.apps.map: type=1400 audit(0.0:541859): avc:  denied  { search } for  name="/" dev="cgroup2" ino=1 scontext=u:r:untrusted_app:s0:c37,c258,c512,c768 tcontext=u:object_r:cgroup_v2:s0 tclass=dir permissive=0 app=jp.co.yahoo.android.apps.map
+07-13 11:40:33.940  7022  7022 W ndroid.apps.map: type=1400 audit(0.0:541860): avc:  denied  { search } for  name="/" dev="cgroup2" ino=1 scontext=u:r:untrusted_app:s0:c37,c258,c512,c768 tcontext=u:object_r:cgroup_v2:s0 tclass=dir permissive=0 app=jp.co.yahoo.android.apps.map
+07-13 11:40:34.180  9793  9826 I pixel-thermal: rfpa_therm:32.44 raw data: rfpa_therm:32440 
+07-13 11:40:34.579   485 25584 I keystore2: system/security/keystore2/watchdog/src/lib.rs:371 - Watchdog thread idle -> terminating. Have a great day.
+07-13 11:40:34.640  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_input: [32440.00 32863.00 32640.00 31260.00 31305.00 31327.00 32440.00 32841.00 ]
+07-13 11:40:34.640  9793  9826 I native  : I0000 00:00:1783910434.640394    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:40:34.640  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: model_output: [31626 ]
+07-13 11:40:34.640  9793  9826 I pixel-thermal: VIRTUAL-SKIN-MODEL: predicted_value: [31626 ]
+07-13 11:40:34.641  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-MID:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-CPU-MID:31637.5 VIRTUAL-SKIN-LEGACY:31852.8 VIRTUAL-SKIN-LEGACY-MODEL-DIFF:226.867 VIRTUAL-SKIN-LEGACY-SHUTDOWN:0 VIRTUAL-SKIN-MODEL:31626 VIRTUAL-SKIN-MODEL-CLAMPED:31626 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-226.867 VIRTUAL-SKIN-MODEL-UPDATED:31637.5 VIRTUAL-SKIN-MODEL-UPPER-CLAMPED:31626 VIRTUAL-SKIN-SUB-0:30391.8 VIRTUAL-SKIN-SUB-1:31836.3 VIRTUAL-SKIN-SUB-2:31235.5 VIRTUAL-SKIN-SUB-3:31688 VIRTUAL-SKIN-SUB-4:31852.8 VT_LEGACY_WEIGHT:0 VT_MODEL_WEIGHT:1 battery:31300 btmspkr_therm:31305 charging_therm:32640 disp_therm:31327 north_therm:32440 quiet_therm:32863 rfpa_therm:32440 soc_therm:32841 usb_pwr_therm:31260 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: disp_therm:31.327 raw data: disp_therm:31327 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: VIRTUAL-USB-UI:0 raw data: USB-MINUS-CHARGER:-1380 VIRTUAL-USB-UI:0 charging_therm:32640 usb_pwr_therm:31260 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SOC:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-SOC:31637.5 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: VIRTUAL-SKIN-DISPLAY:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-DISPLAY:31637.5 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: CPU_THROTTLE_SEVERE:0 raw data: CPU_THROTTLE_SEVERE:0 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: VIRTUAL-SKIN:31.6375 raw data: VIRTUAL-SKIN:31637.5 
+07-13 11:40:34.641  9793  9826 I pixel-thermal: btmspkr_therm:31.305 raw data: btmspkr_therm:31305 
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-HINT:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-HINT:31637.5 
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-LIGHT-ODPM:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-CPU-LIGHT-ODPM:31637.5 
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-ODPM:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-CPU-ODPM:31637.5 
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_input: [32440.00 32863.00 32640.00 31260.00 31305.00 31327.00 32440.00 32841.00 31300.00 260.15 1.35 511.24 41.84 1.56 80.35 ]
+07-13 11:40:34.642  9793  9826 I native  : I0000 00:00:1783910434.642462    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: model_output: [31009.8 ]
+07-13 11:40:34.642  9793  9826 I pixel-thermal: VIRTUAL-SKIN-ODPM-MODEL: predicted_value: [31009.8 ]
+07-13 11:40:34.643  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_input: [31300.00 31305.00 32640.00 31327.00 32440.00 32863.00 32440.00 32841.00 31260.00 ]
+07-13 11:40:34.643  9793  9826 I native  : I0000 00:00:1783910434.643159    9826 thermal_tflite_wrapper.cc:261] ThermalTfliteInvoke
+07-13 11:40:34.643  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: model_output: [31092 ]
+07-13 11:40:34.643  9793  9826 I pixel-thermal: VIRTUAL-SKIN-SPEAKER-MODEL: predicted_value: [31092 ]
+07-13 11:40:34.643  9793  9826 I pixel-thermal: STATS-UPDATOR:0 raw data: EXTREME-SOC-CONDITION-CHECK:0 MAIN_SOC_POWER:224.576 MODEL_CAMERA_PWR:1.35294 MODEL_DISPLAY_PWR:511.241 MODEL_MISC_PWR:260.148 MODEL_MODEM_PWR:41.8414 MODEL_RFFE_PWR:1.56362 MODEL_WLAN_BT_PWR:80.348 NORTH_THERM-UNDER-THRESHOLD:1 NORTH_THERM-VSKIN-DIFF-DURING-NORTH_THERM-OVER-THRESHOLD:-999198 NORTH_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-999198 QUIET_THERM-UNDER-THRESHOLD:1 QUIET_THERM-VSKIN-DIFF-DURING-QUIET_THERM-OVER-THRESHOLD:-998774 QUIET_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998774 RFPA_THERM-UNDER-THRESHOLD:1 RFPA_THERM-VSKIN-DIFF-DURING-RFPA_THERM-OVER-THRESHOLD:-999198 RFPA_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-999198 SOC_THERM-UNDER-THRESHOLD:1 SOC_THERM-VSKIN-DIFF-DURING-SOC_THERM-OVER-THRESHOLD:-998796 SOC_THERM-VSKIN-DIFF-DURING-VSKIN-OVER-52:-998796 STATS-UPDATOR:0 TPU_35S:0 VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-LEGACY:31852.8 VIRTUAL-SKIN-MODEL:31626 VIRTUAL-SKIN-MODEL-LEGACY-DIFF:-226.867 VIRTUAL-SKIN-ODPM-MODEL:31009.8 VIRTUAL-SKIN-SPEAKER-MODEL:31092 VSKIN-SKIN-UNDER-52:1 battery:31300 btmspkr_therm:31305 charging_therm:32640 disp_therm:31327 north_therm:32440 quiet_therm:32863 rfpa_therm:32440 soc_therm:32841 usb_pwr_therm:31260 
+07-13 11:40:34.643  9793  9826 I pixel-thermal: VIRTUAL-SKIN-CPU-HIGH:31.6375 raw data: VIRTUAL-SKIN:31637.5 VIRTUAL-SKIN-CPU-HIGH:31637.5 
+07-13 11:40:34.643  9793  9826 I pixel-thermal: usb_pwr_therm:31.26 raw data: usb_pwr_therm:31260 
+07-13 11:40:34.643  9793  9826 I pixel-thermal: VIRTUAL-USB-THROTTLING:0 raw data: USB-MINUS-CHARGER:-1380 VIRTUAL-USB-THROTTLING:0 usb_pwr_therm:31260 
+07-13 11:40:34.643  9793  9826 I pixel-thermal: cellular-emergency:31.6375 raw data: VIRTUAL-SKIN:31637.5 cellular-emergency:31637.5 
+07-13 11:40:34.723 22341 25617 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:40:34.723 22341 25617 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:40:34.750 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:40:34.881  1115  1115 I android.hardware.health-service.zumapro: Recording a sample at time 829705
+07-13 11:40:35.304  1672  4493 D ActivityManager: sync unfroze 12766 com.google.android.apps.turbo for 7
+07-13 11:40:35.306  1672  2195 D BackgroundInstallControlService: Package event received: 0
+07-13 11:40:35.306  1672  4493 W ProcessStats: Tracking association SourceState{656183a jp.co.yahoo.android.weather.type1/10293 ImpBg #1755148} whose proc state 6 is better than process ProcessState{e6cd601 com.google.android.gms/10178 pkg=com.google.android.gms} proc state 14 (67 skipped)
+07-13 11:40:35.312 12766 31977 W Turbo.OnDeviceBatteryHistory: addEvents: loaded 1 battery events.
+07-13 11:40:35.312 12766 31977 W Turbo.OnDeviceBatteryHistory: addEvents: loaded battery events completed.
+07-13 11:40:35.314 12766 31977 W Turbo.EstimatedTimeRemainingProvider: queryTimeToDischarge: 31614736
+07-13 11:40:35.352  1672  2054 W AnrTimerService: error: canceling id=1049957 pid=0 uid=10293 status=expired
+07-13 11:40:35.419  1672  2054 W AnrTimerService: error: canceling id=1049966 pid=0 uid=10293 status=expired
+07-13 11:40:35.604  2455 13205 D IpClient/wlan0: addressUpdated: 2404:7a80:5f20:a000:6468:81ff:fed6:7689/64 on ifindex 47 flags 0x00000100 scope 0
+07-13 11:40:35.605  2455 13205 D IpClient/wlan0: addressUpdated: 2404:7a80:5f20:a000:cb13:2f90:85e9:546d/64 on ifindex 47 flags 0x00000001 scope 0
+07-13 11:40:35.605  1292  1300 I WPKTRT  : process_address_event: 2404:7a80:5f20:a000:6468:81ff:fed6:7689 added to wlan0
+07-13 11:40:35.605  1292  1300 I WPKTRT  : process_address_event: 2404:7a80:5f20:a000:cb13:2f90:85e9:546d added to wlan0
+07-13 11:40:35.605  2455 13205 W AlarmManager: Unrecognized alarm listener com.android.networkstack.android.net.ip.IpClientLinkObserver$Dhcp6PdPreferredPrefixAlarmListener@7702778
+07-13 11:40:35.606  2455 13205 D ApfFilter: (wlan0): Adding RA fe80::f2f8:4aff:fe26:88a0 -> ff02::1 108s 2404:7a80:5f20:a000::/64 14400s/12600s DNS 600s 2404:1a8:7f01:a::3 2404:1a8:7f01:b::3 RIO 14400s 2404:7a80:5f20:a000::/56 
+07-13 11:40:35.616  1167  2221 E WifiHAL : Setting APF program, halHandle = 0xb4000072c6113cd0
+07-13 11:40:35.617  1167  2221 E WifiHAL : Set apf filter for iface = wlan0
+07-13 11:40:35.617  1167  2221 I WifiHAL : createRequest: APF set program request
+07-13 11:40:35.617  1167  2221 I WifiHAL : mProgramLen : 2485
+07-13 11:40:35.740  1167  2221 I WifiHAL : Creating message to get link statistics; iface = 47
+07-13 11:40:35.760 22341 25618 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:40:35.760 22341 25618 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:40:35.776 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:40:35.797  1167  1279 I WifiHAL : Getting cached scan results, iface handle = 0xb4000072c6113cd0
+07-13 11:40:35.798  1167  1279 E WifiHAL : Creating message to get cached scan results
+07-13 11:40:35.806  1167  1279 I WifiHAL : In GetCachedScanResultsCommand::handleResponse
+07-13 11:40:35.855  1167  1279 D WifiHAL : Start debug command: mType GET_FEATURE
+07-13 11:40:35.855  1167  1279 I WifiHAL : CreateRequest mType = GET_FEATURE
+07-13 11:40:35.855  1167  1279 D WifiHAL : In DebugCommand::handleResponse, mType:GET_FEATURE
+07-13 11:40:35.855  1167  1279 D WifiHAL : len = 4, expected len = 4
+07-13 11:40:35.857  1672  2138 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+07-13 11:40:36.515 10305 25560 I NearbyMediums: No BLE Fast/GATT advertisements found in the latest cycle.
+07-13 11:40:36.515 10305 25560 I NearbyMediums: Current Tracked Scanning Clients are : {NearbyConnections.EnvironmentMonitor, NearbySharing, NearbyConnections.TxAdvertisement}
+07-13 11:40:36.785 22341 25621 W adbd    : timed out while waiting for FUNCTIONFS_BIND, trying again
+07-13 11:40:36.785 22341 25621 I adbd    : UsbFfs: connection terminated: monitor thread finished
+07-13 11:40:36.805 22341 22346 I adbd    : opening control endpoint /dev/usb-ffs/adb/ep0
+07-13 11:40:37.344 22341 22341 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color:export ANDROID_LOG_TAGS=''; exec logcat '-d' '-t' '300''

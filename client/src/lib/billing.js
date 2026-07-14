@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { store, ProductType, Platform } from 'capacitor-plugin-cdv-purchase';
 import { supabase } from './supabase';
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? '';
@@ -54,14 +55,6 @@ export async function initBilling() {
   if (!isNative()) return;
   if (storeInitialized) return;
 
-  const { CdvPurchase } = window;
-  if (!CdvPurchase) {
-    console.warn('[billing] CdvPurchase not available');
-    return;
-  }
-
-  const { store, ProductType, Platform } = CdvPurchase;
-
   store.register([{
     id: 'take_monthly_680',
     type: ProductType.PAID_SUBSCRIPTION,
@@ -88,10 +81,6 @@ export async function purchaseTake() {
     return;
   }
 
-  const { CdvPurchase } = window;
-  if (!CdvPurchase) throw new Error('CdvPurchase not available');
-
-  const { store, Platform } = CdvPurchase;
   const product = store.get('take_monthly_680', Platform.GOOGLE_PLAY);
   if (!product) throw new Error('Product not found: take_monthly_680');
 
@@ -107,8 +96,5 @@ export async function purchaseTake() {
 export async function restorePurchases() {
   if (!isNative()) return;
 
-  const { CdvPurchase } = window;
-  if (!CdvPurchase) return;
-
-  await CdvPurchase.store.restorePurchases();
+  await store.restorePurchases();
 }
