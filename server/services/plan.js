@@ -12,7 +12,6 @@ export async function getEntitlement(userId) {
     .eq('user_id', userId)
     .eq('plan_id', 'take')
     .eq('status', 'active')
-    .gt('current_period_end', new Date().toISOString())
     .maybeSingle();
 
   const planId = data ? 'take' : 'ume';
