@@ -89,11 +89,13 @@ router.post('/verify', optionalAuth, async (req, res) => {
   try {
     const verification = await verifyGooglePlaySubscription(purchase_token);
 
-    if (!verification.valid) {
-      if (verification.reason === 'NOT_CONFIGURED') {
-        // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
-        return res.status(500).json({ error: 'billing not configured' });
-      }
+    if (verification.reason === 'NOT_CONFIGURED') {
+      // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
+      return res.status(500).json({ error: 'billing not configured' });
+    }
+
+    const { result, status: newStatus } = resolveEntitlementStatus(verification);
+    if (result !== 'entitled') {
       console.warn('[billing/verify] 検証失敗:', verification.reason, verification.subscriptionState);
       return res.status(403).json({ error: '購入トークンの検証に失敗しました', reason: verification.reason });
     }
@@ -116,9 +118,6 @@ router.post('/verify', optionalAuth, async (req, res) => {
       ? new Date(verification.expiryTime)
       : new Date(now);
     if (!verification.expiryTime) periodEnd.setMonth(periodEnd.getMonth() + 1);
-
-    // verification.valid が true の場合、resolveEntitlementStatus は必ず 'active' か 'grace_period' を返す
-    const newStatus = resolveEntitlementStatus(verification);
 
     const { error } = await getSupabase()
       .from('user_entitlements')
@@ -182,13 +181,19 @@ router.post('/webhook', async (req, res) => {
         return res.status(500).json({ error: 'billing not configured' });
       }
 
-      const newStatus = resolveEntitlementStatus(verification);
-      if (newStatus === null) {
-        // PRODUCT_MISMATCH / TOKEN_INVALID 等の異常系。既存entitlementは書き換えない。
+      const { result, status: newStatus } = resolveEntitlementStatus(verification);
+
+      if (result === 'retryable_error') {
+        console.error('[billing/webhook] retryable error:', verification.reason);
+        return res.status(500).json({ error: 'internal error' });
+      }
+      if (result === 'invalid_purchase') {
+        // TOKEN_INVALID / PRODUCT_MISMATCH 等の異常系。既存entitlementは書き換えない。
         console.warn('[billing/webhook] 検証結果により更新をスキップ:', verification.reason);
         return res.status(200).json({ ok: true });
       }
 
+      // result === 'entitled' または 'not_entitled': 通常通り DB 更新して 200
       const update = { status: newStatus, updated_at: new Date().toISOString() };
       if (verification.expiryTime) {
         update.current_period_end = verification.expiryTime;

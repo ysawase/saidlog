@@ -1,5 +1,6 @@
 import { getSupabase } from './storage.js';
 import { PLANS } from '../config/plans.js';
+import { ENTITLED_STATUSES } from './subscriptionStatus.js';
 
 /**
  * ユーザーの現在プランを返す。
@@ -11,7 +12,7 @@ export async function getEntitlement(userId) {
     .select('plan_id')
     .eq('user_id', userId)
     .eq('plan_id', 'take')
-    .in('status', ['active', 'grace_period'])
+    .in('status', ENTITLED_STATUSES)
     .maybeSingle();
 
   const planId = data ? 'take' : 'ume';
