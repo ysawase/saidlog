@@ -14,12 +14,6 @@ let storeInitialized = false;
  * 成功時のみ true を返す。
  */
 async function verifyPurchaseOnServer(receipt) {
-  // [DEBUG] receiptオブジェクトの構造確認（キー名のみ・値は出力しない）
-  console.log('[billing][debug] receipt class:', receipt?.className);
-  console.log('[billing][debug] receipt keys:', Object.keys(receipt ?? {}));
-  console.log('[billing][debug] sourceReceipt keys:', receipt?.sourceReceipt ? Object.keys(receipt.sourceReceipt) : 'undefined');
-  console.log('[billing][debug] collection length:', receipt?.collection?.length ?? 'n/a');
-
   // VerifiedReceipt には purchaseToken は直接存在しない。
   // Google Play の購入トークンは sourceReceipt (GooglePlay.Receipt) に格納されている。
   const purchaseToken = receipt.sourceReceipt?.purchaseToken;
