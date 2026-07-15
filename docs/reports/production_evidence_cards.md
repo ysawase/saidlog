@@ -41,9 +41,9 @@
 | 本番初回full要約生成 | PASS |
 | 本番DB保存（transcript_full_summaries） | PASS |
 | 本番再閲覧（cached:true、本文完全一致） | PASS |
-| 本番Anthropic非再呼び出し（cached:trueを直接証拠として採用、応答時間による推測なし） | PASS |
+| 保存済みキャッシュ経路の利用 | PASS（コード確認：cached:true経路はcallAnthropicを呼ばずDBのsummary_fullをそのまま返す実装。callAnthropic呼び出し回数を直接数える自動テスト、本番cached:true、初回/再閲覧の本文完全一致、の複合証拠で確認。cached:true単独をAnthropic未呼び出しの証明とはしない） |
 | 本番履歴範囲外の遮断（キャッシュ実在状態での403を実証） | PASS |
-| テストデータ削除・残存ゼロ確認 | PASS |
+| テストデータ削除・残存ゼロ確認 | PASS（transcript_full_summaries・transcripts・userをそれぞれ個別に明示DELETEで削除。CASCADE制約の動作確認ではなく、クリーンアップ手順の成功と残存ゼロの確認） |
 
 **一般公開判定**：詳細要約永続化の技術的な合格ライン到達。ただし一般公開には、UI文言ブロッカー（別項目）の解消が別途必要。
 
