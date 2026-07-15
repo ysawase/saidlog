@@ -71,7 +71,7 @@ export async function getAccountStatus() {
   if (session?.access_token) {
     headers['Authorization'] = `Bearer ${session.access_token}`;
   }
-  const res = await fetch(`${API_BASE}/api/account/status`, { headers });
+  const res = await fetch(`${API_BASE}/api/account/status`, { headers, cache: 'no-cache' });
   if (!res.ok) return null;
   return res.json();
 }
