@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
 import { verifyGooglePlaySubscription, PACKAGE_NAME } from '../services/googlePlay.js';
+import { applyEntitlementUpdate } from '../services/billingWebhook.js';
 
 const router = express.Router();
 
@@ -199,13 +200,15 @@ router.post('/webhook', async (req, res) => {
         update.current_period_end = verification.expiryTime;
       }
 
-      const { error: updateError } = await getSupabase()
-        .from('user_entitlements')
-        .update(update)
-        .eq('purchase_token', purchaseToken);
-      if (updateError) {
-        console.error('[billing/webhook] update error:', updateError);
-      }
+      const result = await applyEntitlementUpdate({
+        purchaseToken,
+        update,
+        notificationType,
+        subscriptionState: verification.subscriptionState ?? null,
+        environment: isProduction() ? 'production' : 'development',
+      });
+
+      return res.status(result.status).json(result.body);
     }
 
     return res.status(200).json({ ok: true });
