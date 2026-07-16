@@ -16,13 +16,15 @@ export const ENTITLED_STATUSES = ['active', 'grace_period'];
  * 常に Developer API を再照会してから本関数を呼ぶこと。
  *
  * @param {object} verification - verifyGooglePlaySubscription() の返却値
- * @returns {{ result: 'entitled'|'not_entitled'|'retryable_error'|'invalid_purchase', status: string|null }}
+ * @returns {{ result: 'entitled'|'not_entitled'|'retryable_error'|'product_mismatch'|'token_invalid'|'unknown_result', status: string|null }}
  *   result:
  *     'entitled'         - Plus利用可能。status は 'active' または 'grace_period'
  *     'not_entitled'     - Plus利用不可（期限切れ・停止）。status は 'expired'
  *     'retryable_error'  - 設定不備等の一時的エラー。呼び出し元は非2xxを返してPub/Subに再試行させること
- *     'invalid_purchase' - TOKEN_INVALID / PRODUCT_MISMATCH / 未知のreason。
- *                          既存entitlementを維持し、活性化も停止もしない
+ *     'product_mismatch' - 別商品の購入トークン。既存entitlementは変更しない。
+ *                          自然回復しないため再送しても無意味だが、人間による確認が必要な異常
+ *     'token_invalid'    - 無効なトークン。一時的な整合遅延の可能性があるため、初回は再試行の余地を残す
+ *     'unknown_result'   - コードが把握していない結果。成功扱いにしてはならない
  *   status: DB に書き込む user_entitlements.status 値。null は DB 更新をスキップすることを示す
  */
 export function resolveEntitlementStatus(verification) {
@@ -43,7 +45,15 @@ export function resolveEntitlementStatus(verification) {
     return { result: 'retryable_error', status: null };
   }
 
-  // TOKEN_INVALID / PRODUCT_MISMATCH / 未知のreason:
-  // 既存entitlementを書き換えない。active への倒し込みも expired への即時剥奪も行わない。
-  return { result: 'invalid_purchase', status: null };
+  if (verification.reason === 'PRODUCT_MISMATCH') {
+    // 既存entitlementを書き換えない。activeへの倒し込みも即時expired剥奪も行わない。
+    return { result: 'product_mismatch', status: null };
+  }
+
+  if (verification.reason === 'TOKEN_INVALID') {
+    return { result: 'token_invalid', status: null };
+  }
+
+  // 未知のreason: 既存entitlementを書き換えない。
+  return { result: 'unknown_result', status: null };
 }

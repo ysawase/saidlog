@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
 import { verifyGooglePlaySubscription, PACKAGE_NAME } from '../services/googlePlay.js';
 import { resolveEntitlementStatus } from '../services/subscriptionStatus.js';
-import { applyEntitlementUpdate } from '../services/billingWebhook.js';
+import { applyEntitlementUpdate, resolveWebhookErrorResponse } from '../services/billingWebhook.js';
 
 const router = express.Router();
 
@@ -188,10 +188,14 @@ router.post('/webhook', async (req, res) => {
         console.error('[billing/webhook] retryable error:', verification.reason);
         return res.status(500).json({ error: 'internal error' });
       }
-      if (result === 'invalid_purchase') {
-        // TOKEN_INVALID / PRODUCT_MISMATCH 等の異常系。既存entitlementは書き換えない。
-        console.warn('[billing/webhook] 検証結果により更新をスキップ:', verification.reason);
-        return res.status(200).json({ ok: true });
+      if (result === 'product_mismatch' || result === 'token_invalid' || result === 'unknown_result') {
+        const errorResult = await resolveWebhookErrorResponse({
+          result,
+          notificationType,
+          subscriptionState: verification.subscriptionState ?? null,
+          environment: isProduction() ? 'production' : 'development',
+        });
+        return res.status(errorResult.status).json(errorResult.body);
       }
 
       // result === 'entitled' または 'not_entitled': 通常通り DB 更新して 200

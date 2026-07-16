@@ -4,7 +4,11 @@ function defaultSupabase() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 }
 
-async function recordError(supabase, { errorClass, notificationType, subscriptionState, environment, retryable }) {
+/**
+ * billing_webhook_errorsへ固定分類のエラーを記録する（fire-and-forget、never throw）。
+ * PII禁止方針を維持するため、固定の名前付き引数のみを受け取る。
+ */
+export async function recordError(supabase, { errorClass, notificationType, subscriptionState, environment, retryable }) {
   try {
     const { error } = await supabase
       .from('billing_webhook_errors')
@@ -70,4 +74,43 @@ export async function applyEntitlementUpdate(
   }
 
   return { status: 200, body: { ok: true } };
+}
+
+const WEBHOOK_ERROR_RESPONSES = {
+  product_mismatch: { status: 200, body: { ok: true }, retryable: false, logLevel: 'warn' },
+  token_invalid: { status: 503, body: { error: 'token invalid' }, retryable: true, logLevel: 'warn' },
+  unknown_result: { status: 500, body: { error: 'unknown verification result' }, retryable: true, logLevel: 'error' },
+};
+
+/**
+ * result が product_mismatch / token_invalid / unknown_result のいずれかである前提で、
+ * 固定分類のエラー記録とHTTPレスポンスを決定する。
+ * retryable_error / entitled / not_entitled はこの関数の対象外（呼び出し元で別途分岐）。
+ * 未知のresult値（想定外の呼び出し）は成功扱いにせず、500 + error_class: 'unknown_result' に倒す。
+ * @param {{ result: string, notificationType: number, subscriptionState: string|null, environment: 'production'|'development' }} params
+ * @param {{ supabase?: object }} [_deps] テスト用依存注入（省略時は本番クライアント）
+ * @returns {Promise<{ status: number, body: object }>}
+ */
+export async function resolveWebhookErrorResponse(
+  { result, notificationType, subscriptionState, environment },
+  _deps = {}
+) {
+  const config = WEBHOOK_ERROR_RESPONSES[result] ?? WEBHOOK_ERROR_RESPONSES.unknown_result;
+  const errorClass = WEBHOOK_ERROR_RESPONSES[result] ? result : 'unknown_result';
+  const supabase = _deps.supabase ?? defaultSupabase();
+
+  if (!WEBHOOK_ERROR_RESPONSES[result]) {
+    console.error(`[billing/webhook] resolveWebhookErrorResponse: 想定外のresult値 "${result}"`);
+  }
+  (config.logLevel === 'error' ? console.error : console.warn)(`[billing/webhook] ${errorClass}:`, subscriptionState);
+
+  await recordError(supabase, {
+    errorClass,
+    notificationType,
+    subscriptionState,
+    environment,
+    retryable: config.retryable,
+  });
+
+  return { status: config.status, body: config.body };
 }

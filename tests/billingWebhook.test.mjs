@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyEntitlementUpdate } from '../server/services/billingWebhook.js';
+import { applyEntitlementUpdate, resolveWebhookErrorResponse } from '../server/services/billingWebhook.js';
 
 // user_entitlements / billing_webhook_errors を模擬するモックSupabaseクライアント。
 // entitlementsは呼び出しをまたいで状態を保持するため、同一トークンへの
@@ -137,4 +137,74 @@ test('同一通知を2回処理: 1行のケースは2回とも同じstatusで、
   assert.equal(mock.rows.length, 1);
   assert.equal(mock.rows[0].status, 'active');
   assert.equal(mock.insertedErrors.length, 0);
+});
+
+const WEBHOOK_ERROR_PARAMS = {
+  notificationType: 4,
+  subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE',
+  environment: 'development',
+};
+
+test('resolveWebhookErrorResponse: product_mismatch → 200、retryable:falseで記録', async () => {
+  const mock = makeMockSupabase({});
+  const result = await resolveWebhookErrorResponse(
+    { result: 'product_mismatch', ...WEBHOOK_ERROR_PARAMS },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 200);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'product_mismatch');
+  assert.equal(mock.insertedErrors[0].retryable, false);
+});
+
+test('resolveWebhookErrorResponse: token_invalid → 503、retryable:trueで記録', async () => {
+  const mock = makeMockSupabase({});
+  const result = await resolveWebhookErrorResponse(
+    { result: 'token_invalid', ...WEBHOOK_ERROR_PARAMS },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 503);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'token_invalid');
+  assert.equal(mock.insertedErrors[0].retryable, true);
+});
+
+test('resolveWebhookErrorResponse: unknown_result → 500、retryable:trueで記録', async () => {
+  const mock = makeMockSupabase({});
+  const result = await resolveWebhookErrorResponse(
+    { result: 'unknown_result', ...WEBHOOK_ERROR_PARAMS },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 500);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'unknown_result');
+  assert.equal(mock.insertedErrors[0].retryable, true);
+});
+
+test('resolveWebhookErrorResponse: 想定外のresult値はunknown_resultにフォールバックする（防御実装）', async () => {
+  const mock = makeMockSupabase({});
+  const result = await resolveWebhookErrorResponse(
+    { result: 'something_else', ...WEBHOOK_ERROR_PARAMS },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 500);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'unknown_result');
+  assert.equal(mock.insertedErrors[0].retryable, true);
+});
+
+test('resolveWebhookErrorResponse: 記録行にはPII禁止項目が一切含まれない（キー完全一致チェック）', async () => {
+  const mock = makeMockSupabase({});
+  await resolveWebhookErrorResponse(
+    { result: 'token_invalid', ...WEBHOOK_ERROR_PARAMS },
+    { supabase: mock.client }
+  );
+
+  const row = mock.insertedErrors[0];
+  const allowedKeys = ['error_class', 'notification_type', 'subscription_state', 'environment', 'retryable'].sort();
+  assert.deepEqual(Object.keys(row).sort(), allowedKeys);
 });
