@@ -33,6 +33,7 @@ router.get('/account/status', optionalAuth, async (req, res, next) => {
     const usedSeconds = period?.used_seconds ?? 0;
     const limitSeconds = plan.monthlySeconds;
 
+    res.set('Cache-Control', 'no-cache');
     res.json({
       planId,
       planName: plan.name,

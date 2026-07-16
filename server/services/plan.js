@@ -1,9 +1,10 @@
 import { getSupabase } from './storage.js';
 import { PLANS } from '../config/plans.js';
+import { ENTITLED_STATUSES } from './subscriptionStatus.js';
 
 /**
  * ユーザーの現在プランを返す。
- * status="active" かつ current_period_end が未来の take レコードがあればSaidLog Plus（旧称：竹）、それ以外は無料プラン（旧称：梅）。
+ * status が 'active' または 'grace_period' の take レコードがあればSaidLog Plus（旧称：竹）、それ以外は無料プラン（旧称：梅）。
  */
 export async function getEntitlement(userId) {
   const { data } = await getSupabase()
@@ -11,8 +12,7 @@ export async function getEntitlement(userId) {
     .select('plan_id')
     .eq('user_id', userId)
     .eq('plan_id', 'take')
-    .eq('status', 'active')
-    .gt('current_period_end', new Date().toISOString())
+    .in('status', ENTITLED_STATUSES)
     .maybeSingle();
 
   const planId = data ? 'take' : 'ume';

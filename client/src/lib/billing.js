@@ -14,8 +14,11 @@ let storeInitialized = false;
  * 成功時のみ true を返す。
  */
 async function verifyPurchaseOnServer(receipt) {
-  if (!receipt.purchaseToken) {
-    console.error('[billing] receipt.purchaseToken is missing, skipping verification');
+  // VerifiedReceipt には purchaseToken は直接存在しない。
+  // Google Play の購入トークンは sourceReceipt (GooglePlay.Receipt) に格納されている。
+  const purchaseToken = receipt.sourceReceipt?.purchaseToken;
+  if (!purchaseToken) {
+    console.error('[billing] purchaseToken is missing from receipt.sourceReceipt, skipping verification');
     return false;
   }
 
@@ -33,7 +36,7 @@ async function verifyPurchaseOnServer(receipt) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ purchase_token: receipt.purchaseToken }),
+      body: JSON.stringify({ purchase_token: purchaseToken }),
     });
 
     if (!res.ok) {

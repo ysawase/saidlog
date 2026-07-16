@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
 import { verifyGooglePlaySubscription, PACKAGE_NAME } from '../services/googlePlay.js';
+import { resolveEntitlementStatus } from '../services/subscriptionStatus.js';
 import { applyEntitlementUpdate } from '../services/billingWebhook.js';
 
 const router = express.Router();
@@ -89,11 +90,13 @@ router.post('/verify', optionalAuth, async (req, res) => {
   try {
     const verification = await verifyGooglePlaySubscription(purchase_token);
 
-    if (!verification.valid) {
-      if (verification.reason === 'NOT_CONFIGURED') {
-        // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
-        return res.status(500).json({ error: 'billing not configured' });
-      }
+    if (verification.reason === 'NOT_CONFIGURED') {
+      // 本番でサービスアカウント未設定：検証をスキップせずエラーにする
+      return res.status(500).json({ error: 'billing not configured' });
+    }
+
+    const { result, status: newStatus } = resolveEntitlementStatus(verification);
+    if (result !== 'entitled') {
       console.warn('[billing/verify] 検証失敗:', verification.reason, verification.subscriptionState);
       return res.status(403).json({ error: '購入トークンの検証に失敗しました', reason: verification.reason });
     }
@@ -122,7 +125,7 @@ router.post('/verify', optionalAuth, async (req, res) => {
       .upsert({
         user_id,
         plan_id: 'take',
-        status: 'active',
+        status: newStatus,
         provider: 'google_play',
         purchase_token,
         current_period_start: now.toISOString(),
@@ -173,34 +176,31 @@ router.post('/webhook', async (req, res) => {
 
       const verification = await verifyGooglePlaySubscription(purchaseToken);
 
-      let newStatus;
-      if (verification.valid) {
-        // ACTIVE / CANCELED（期限内）はどちらもアクセス継続として扱う
-        newStatus = verification.subscriptionState === 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD'
-          ? 'grace_period'
-          : 'active';
-      } else if (verification.reason === 'EXPIRED') {
-        newStatus = 'expired';
-      } else if (verification.reason === 'NOT_ACTIVE') {
-        // ON_HOLD/PAUSED/PENDING等。Plusアクセスを付与すべきでないため'expired'に寄せる。
-        // grace_periodには絶対にしない（誤ってアクセス継続を許すことになるため）。
-        newStatus = 'expired';
-      } else if (verification.reason === 'NOT_CONFIGURED') {
+      if (verification.reason === 'NOT_CONFIGURED') {
         // 本番の設定不備。/verify と同じfail-close方針でPub/Subに再試行させる。
         console.error('[billing/webhook] verifyGooglePlaySubscription: NOT_CONFIGURED');
         return res.status(500).json({ error: 'billing not configured' });
-      } else {
-        // PRODUCT_MISMATCH / TOKEN_INVALID 等の異常系。既存entitlementは書き換えない。
+      }
+
+      const { result, status: newStatus } = resolveEntitlementStatus(verification);
+
+      if (result === 'retryable_error') {
+        console.error('[billing/webhook] retryable error:', verification.reason);
+        return res.status(500).json({ error: 'internal error' });
+      }
+      if (result === 'invalid_purchase') {
+        // TOKEN_INVALID / PRODUCT_MISMATCH 等の異常系。既存entitlementは書き換えない。
         console.warn('[billing/webhook] 検証結果により更新をスキップ:', verification.reason);
         return res.status(200).json({ ok: true });
       }
 
+      // result === 'entitled' または 'not_entitled': 通常通り DB 更新して 200
       const update = { status: newStatus, updated_at: new Date().toISOString() };
       if (verification.expiryTime) {
         update.current_period_end = verification.expiryTime;
       }
 
-      const result = await applyEntitlementUpdate({
+      const updateResult = await applyEntitlementUpdate({
         purchaseToken,
         update,
         notificationType,
@@ -208,7 +208,7 @@ router.post('/webhook', async (req, res) => {
         environment: isProduction() ? 'production' : 'development',
       });
 
-      return res.status(result.status).json(result.body);
+      return res.status(updateResult.status).json(updateResult.body);
     }
 
     return res.status(200).json({ ok: true });
