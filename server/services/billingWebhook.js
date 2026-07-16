@@ -63,7 +63,8 @@ export async function applyEntitlementUpdate(
       notificationType,
       subscriptionState,
       environment,
-      retryable: false,
+      // 競合状態自体は自然回復しないが、人間がデータ修正した後の再送は成功しうるため true
+      retryable: true,
     });
     return { status: 500, body: { error: 'data integrity error' } };
   }

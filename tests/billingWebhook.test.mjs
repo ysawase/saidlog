@@ -80,7 +80,7 @@ test('複数行更新: 成功扱いにせず非2xxを返し、entitlement_confli
   assert.ok(result.status >= 400);
   assert.equal(mock.insertedErrors.length, 1);
   assert.equal(mock.insertedErrors[0].error_class, 'entitlement_conflict');
-  assert.equal(mock.insertedErrors[0].retryable, false);
+  assert.equal(mock.insertedErrors[0].retryable, true);
 });
 
 test('DB更新エラー: 成功扱いにせず500を返す', async () => {
