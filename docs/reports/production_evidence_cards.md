@@ -105,3 +105,75 @@
 5. 禁止情報が含まれない
 6. error_classが想定enumになる
 7. 本番の直近エラーを確認する方法が決まっている（保存済みSQLまたは簡易確認手順）
+
+---
+
+## 公開前ブロッカー：Google Play課金・権利付与・RTDNライフサイクル同期
+
+状態：一般公開 FAIL（複数項目が未確認・未実装）
+
+### 検証済み項目（PASS）
+
+- 新規テスト購入トランザクション：PASS
+- purchaseToken取得：PASS
+- サーバー検証：PASS
+- user_entitlements更新：PASS
+- 購入直後のPlus表示：PASS
+- acknowledgeコード経路：PASS
+- RTDN Play Console設定：PASS
+- Pub/Sub publisher権限：PASS
+- Pub/Sub push／OIDC肯定・否定系：PASS
+- RTDNテスト通知到達：PASS
+- grace_periodコード：PASS
+- 0行silent failure：コード修正PASS
+- Productionエラーテーブル（billing_webhook_errors）：PASS
+  - service roleでSELECT/INSERT/DELETE可能
+  - anonからのSELECT/INSERT拒否：実測PASS
+  - authenticatedからの拒否：RLS有効・ポリシー0件という構造確認PASS（直接実測は未実施）
+  - 列構成がmigration定義と一致
+  - テスト行削除後の残存ゼロを確認
+- count > 1（複数行更新）とHTTP応答のretryable整合：PASS
+- product_mismatch分岐：自動テストPASS（200 ACK、retryable: false）
+- token_invalid分岐：自動テストPASS（503、retryable: true）
+- unknown_result分岐：自動テストPASS（500、retryable: true）
+- 未登録result値への防御フォールバック：PASS
+- purchase_token重複調査：PASS（現状重複ゼロ）
+- 自動テスト：87件全通過
+
+### 未確認項目
+
+- 修正後の購入回帰：未確認
+- 実acknowledgementState：未確認
+- 実subscriptionNotification：未確認
+- Developer API再照会：未確認
+- grace_period実状態：未確認
+- account hold：未確認
+- recovery：未確認
+- recordError失敗時の非2xx維持：コード確認PASS、故障注入テスト未実施
+- 再起動後のPlus維持：未確認
+- 再ログイン後のPlus維持：未確認
+
+### 未実装項目
+
+- purchase_token DB一意制約（部分UNIQUE INDEX）：未実装
+  - 現状、DBレベルではpurchase_tokenの重複を防げない
+  - アプリケーションロジックのみに依存している状態
+
+---
+
+## 公開前ブロッカー：Plus権利状態の確認UI
+
+状態：未実装（一般公開は反映確認まで不可）
+
+### 最低要件
+
+- 購入成功時にPlus有効化を明示する
+- 現在のプランがSaidLog Plusだと明確に分かる
+- 月10時間の上限と現在使用量を判別できる
+- 状態取得中を無料と誤表示しない
+- grace period中はPlus維持と支払い確認を案内する
+- account hold中は支払い問題による一時停止を明示する
+- 解約済み期限内は利用可能終了日を表示する
+- 反映失敗時に再確認手段を表示する
+
+備考：色・装飾の磨き込みとは別に、課金状態を誤認させないための最低限の表示として扱う。内部テストは継続可、一般公開には反映確認が必須。
