@@ -19,6 +19,39 @@ function isProduction() {
   return process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
 }
 
+const PURCHASE_TOKEN_CONFLICT_RESPONSE = {
+  status: 403,
+  body: { error: 'このトークンは既に別のアカウントで使用されています' },
+};
+
+/**
+ * user_entitlementsへpurchase_token付きのupsertを実行する。
+ * 一意制約違反(23505)は、事前のSELECTチェック（別関数）をすり抜けた
+ * 競合（TOCTOU）としてP1-Aの既存チェックと同じ403+同一メッセージを返す。
+ * error.detailsにDBが衝突値（purchase_token本体）を含むことがあるため、
+ * 23505検知時はエラーオブジェクトを一切ログに出さない。
+ * @param {object} entitlement upsertするuser_entitlements行
+ * @param {{ supabase?: object }} [_deps] テスト用依存注入（省略時は本番クライアント）
+ * @returns {Promise<{status: number, body: object}>}
+ */
+export async function upsertPurchaseEntitlement(entitlement, _deps = {}) {
+  const supabase = _deps.supabase ?? getSupabase();
+
+  const { error } = await supabase
+    .from('user_entitlements')
+    .upsert(entitlement, { onConflict: 'user_id' });
+
+  if (error) {
+    if (error.code === '23505') {
+      console.error('[billing/verify] purchase_token_conflict');
+      return PURCHASE_TOKEN_CONFLICT_RESPONSE;
+    }
+    throw error;
+  }
+
+  return { status: 200, body: { ok: true } };
+}
+
 let cachedOAuth2Client = null;
 
 function getOAuth2Client() {
@@ -120,22 +153,18 @@ router.post('/verify', optionalAuth, async (req, res) => {
       : new Date(now);
     if (!verification.expiryTime) periodEnd.setMonth(periodEnd.getMonth() + 1);
 
-    const { error } = await getSupabase()
-      .from('user_entitlements')
-      .upsert({
-        user_id,
-        plan_id: 'take',
-        status: newStatus,
-        provider: 'google_play',
-        purchase_token,
-        current_period_start: now.toISOString(),
-        current_period_end: periodEnd.toISOString(),
-        updated_at: now.toISOString(),
-      }, { onConflict: 'user_id' });
+    const upsertResult = await upsertPurchaseEntitlement({
+      user_id,
+      plan_id: 'take',
+      status: newStatus,
+      provider: 'google_play',
+      purchase_token,
+      current_period_start: now.toISOString(),
+      current_period_end: periodEnd.toISOString(),
+      updated_at: now.toISOString(),
+    });
 
-    if (error) throw error;
-
-    return res.json({ ok: true });
+    return res.status(upsertResult.status).json(upsertResult.body);
   } catch (err) {
     console.error('[billing/verify]', err);
     return res.status(500).json({ error: 'internal error' });
