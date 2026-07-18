@@ -46,6 +46,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   const [showCopyModal, setShowCopyModal] = useState(false);
 
   const longEnough = (result.audioDurationSec ?? 0) >= 180;
+  const showSummaryUI = longEnough || upgradeMode === 'plus_active';
 
   const colorOf = (speaker) =>
     SPEAKER_COLORS[speakers.indexOf(speaker) % SPEAKER_COLORS.length];
@@ -88,11 +89,11 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
   // 選択UIでどちらかのボタンが押されたら（null→値への遷移）即座に要約生成を開始する
   const prevChoiceRef = useRef(userChoseFullTrial);
   useEffect(() => {
-    if (prevChoiceRef.current === null && userChoseFullTrial !== null && longEnough) {
+    if (prevChoiceRef.current === null && userChoseFullTrial !== null && showSummaryUI) {
       generateSummary();
     }
     prevChoiceRef.current = userChoseFullTrial;
-  }, [userChoseFullTrial, generateSummary, longEnough]);
+  }, [userChoseFullTrial, generateSummary, showSummaryUI]);
 
   const exportRaw = async () => {
     if (!canExport) {
@@ -263,7 +264,7 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
       </div>
 
       <div className="summary-section">
-        {!longEnough ? (
+        {!showSummaryUI ? (
           <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', lineHeight: '1.8' }}>
             <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>音声が短いです。3分以上の音声であれば、『AI議事録ツール』機能が解放されます。</p>
             <p style={{ margin: '0 0 1.25rem', fontSize: '0.9rem', color: '#4b5563' }}>決定事項・次にやることをAIが自動で整理します。</p>
