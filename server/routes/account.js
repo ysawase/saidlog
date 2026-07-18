@@ -12,7 +12,7 @@ router.get('/account/status', optionalAuth, async (req, res, next) => {
       return res.status(401).json({ error: 'ログインが必要です' });
     }
 
-    const { planId, plan } = await getEntitlement(userId);
+    const { planId, plan, status } = await getEntitlement(userId);
     const supabase = getSupabase();
     const periodStart = getCurrentPeriodStart().toISOString();
 
@@ -43,6 +43,7 @@ router.get('/account/status', optionalAuth, async (req, res, next) => {
       fullSummaryUsed: profile?.full_summary_used ?? false,
       historyLimit: plan.historyLimit,
       canExport: plan.canExport,
+      isGracePeriod: planId === 'take' && status === 'grace_period',
     });
   } catch (err) {
     next(err);

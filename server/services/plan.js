@@ -5,18 +5,21 @@ import { ENTITLED_STATUSES } from './subscriptionStatus.js';
 /**
  * ユーザーの現在プランを返す。
  * status が 'active' または 'grace_period' の take レコードがあればSaidLog Plus（旧称：竹）、それ以外は無料プラン（旧称：梅）。
+ * ただし current_period_end が過去の場合は、status に関わらず無料プラン扱いにする
+ * （RTDN配達漏れ等でstatusが古いまま残った場合の防衛線）。
  */
 export async function getEntitlement(userId) {
   const { data } = await getSupabase()
     .from('user_entitlements')
-    .select('plan_id')
+    .select('plan_id, status, current_period_end')
     .eq('user_id', userId)
     .eq('plan_id', 'take')
     .in('status', ENTITLED_STATUSES)
     .maybeSingle();
 
-  const planId = data ? 'take' : 'ume';
-  return { planId, plan: PLANS[planId] };
+  const expired = data?.current_period_end != null && new Date(data.current_period_end) < new Date();
+  const planId = data && !expired ? 'take' : 'ume';
+  return { planId, plan: PLANS[planId], status: data?.status ?? null };
 }
 
 /**

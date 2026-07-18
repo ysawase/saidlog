@@ -313,6 +313,12 @@ function AppInner() {
           </p>
         )}
 
+        {user && accountStatus?.isGracePeriod && (
+          <div className="notice" style={{ marginBottom: '1rem' }}>
+            <p style={{ margin: 0 }}>{t('account.graceWarning')}</p>
+          </div>
+        )}
+
         {/* S01: idle 時のヒーローレイアウト */}
         {status === 'idle' && (
           <div className="s01">

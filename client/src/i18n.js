@@ -49,6 +49,9 @@ const resources = {
         },
         footer: 'SaidLog — AI会議メモ',
       },
+      account: {
+        graceWarning: 'お支払いの確認が取れていません。期限までにお支払い方法をご確認ください。確認が取れない場合、SaidLog Plusの機能が利用できなくなります。',
+      },
       auth: {
         login: 'ログイン',
         signup: '無料アカウントを作成',
@@ -175,6 +178,9 @@ const resources = {
           noServer: 'Recording data is stored on your device only. Nothing is saved to the server.',
         },
         footer: 'SaidLog — AI Meeting Notes',
+      },
+      account: {
+        graceWarning: 'We could not confirm your payment. Please check your payment method before the deadline — SaidLog Plus features will be unavailable if this is not resolved.',
       },
       auth: {
         login: 'Log in',
