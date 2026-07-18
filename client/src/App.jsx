@@ -378,6 +378,7 @@ function AppInner() {
                 <Recorder
                   onTranscribe={handleRecordedTranscribe}
                   onRecordStart={() => trackEvent('s01_record_click', { source: 's01', planState })}
+                  remainingSeconds={accountStatus?.remainingSeconds ?? null}
                 />
               </div>
 

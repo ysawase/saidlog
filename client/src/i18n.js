@@ -86,6 +86,7 @@ const resources = {
           long: '長時間の録音は精度・コストの面で分割をお勧めします',
           size: 'ファイルサイズが大きくなっています。まもなく上限（50MB）に近づきます。上限を超えると文字起こしができなくなります。録音を停止して分割することをお勧めします。',
           overSize: '50MBを超えているため文字起こしできません。端末に保存して分割してください',
+          quotaNear: '今月の利用可能時間に近づいています（残り約{{remaining}}分）。時間内に録音を終えることをお勧めします',
         },
         stop: '停止',
         confirm: {
@@ -212,6 +213,7 @@ const resources = {
           long: 'Long recordings may affect accuracy and cost. Consider splitting.',
           size: 'File size is growing. Approaching the 50MB limit. Stop and split the recording to avoid losing transcription.',
           overSize: 'Exceeds 50MB — transcription unavailable. Save to device and split the file.',
+          quotaNear: 'Approaching your monthly usage limit (about {{remaining}} min left). Consider finishing the recording soon.',
         },
         stop: 'Stop',
         confirm: {

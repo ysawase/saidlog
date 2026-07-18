@@ -17,7 +17,7 @@ function formatDuration(ms) {
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-export default function Recorder({ onTranscribe, onRecordStart }) {
+export default function Recorder({ onTranscribe, onRecordStart, remainingSeconds = null }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState('idle'); // idle | recording | confirming
   const [restoreInfo, setRestoreInfo] = useState(null);
@@ -169,6 +169,16 @@ export default function Recorder({ onTranscribe, onRecordStart }) {
 
   const oversize = result && result.blob.size > MAX_SIZE_BYTES;
 
+  // プラン別の残り利用可能秒数が取得できる場合は「残り時間の80%消化時点」と
+  // 既存の90分固定閾値の短い方を警告閾値にする（Plus等、残り時間が長いプランで
+  // 従来の90分警告より大幅に後退しないようにするため）。
+  // 未ログイン・ロード中・エラー時（remainingSeconds未提供）は従来通り90分固定にフォールバック。
+  const remainingMs = remainingSeconds != null ? remainingSeconds * 1000 : null;
+  const warningThresholdMs = remainingMs != null
+    ? Math.min(remainingMs * 0.8, LONG_RECORDING_MS)
+    : LONG_RECORDING_MS;
+  const quotaBasedWarning = remainingMs != null;
+
   return (
     <div className="recorder">
       {phase === 'idle' && (
@@ -206,8 +216,12 @@ export default function Recorder({ onTranscribe, onRecordStart }) {
               />
             ))}
           </div>
-          {recordingMs > LONG_RECORDING_MS && (
-            <p className="warning">{t('recorder.warning.long')}</p>
+          {recordingMs > warningThresholdMs && (
+            <p className="warning">
+              {quotaBasedWarning
+                ? t('recorder.warning.quotaNear', { remaining: Math.max(0, Math.round((remainingMs - recordingMs) / 60000)) })
+                : t('recorder.warning.long')}
+            </p>
           )}
           {sizeWarning && (
             <p className="warning">{t('recorder.warning.size')}</p>
