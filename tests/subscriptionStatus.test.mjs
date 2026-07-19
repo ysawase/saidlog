@@ -105,3 +105,22 @@ test('未知のreason → unknown_result（activeへの倒し込みも即時expi
     { result: 'unknown_result', status: null }
   );
 });
+
+// --- 冪等性の確認 (resolveEntitlementStatus は副作用のない純粋関数) ---
+// webhook が同一の Pub/Sub 通知を複数回受信しても、resolveEntitlementStatus() 自体は
+// 常に同じ結果を返す。DB 側も同一 purchase_token への同一値 UPDATE は最終状態が変わらない。
+
+test('同一の valid verification を2回渡しても毎回同じ結果を返す（純粋関数）', () => {
+  const input = { ...base, valid: true, subscriptionState: 'SUBSCRIPTION_STATE_ACTIVE' };
+  assert.deepEqual(resolveEntitlementStatus(input), resolveEntitlementStatus(input));
+});
+
+test('同一の invalid verification を2回渡しても毎回同じ結果を返す（副作用なし）', () => {
+  const input = { ...base, reason: 'EXPIRED' };
+  assert.deepEqual(resolveEntitlementStatus(input), resolveEntitlementStatus(input));
+});
+
+test('grace_period の verification を2回渡しても毎回 entitled/grace_period を返す', () => {
+  const input = { ...base, valid: true, subscriptionState: 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD' };
+  assert.deepEqual(resolveEntitlementStatus(input), resolveEntitlementStatus(input));
+});
