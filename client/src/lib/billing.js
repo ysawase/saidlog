@@ -54,7 +54,7 @@ async function verifyPurchaseOnServer(receipt) {
  * Google Play Billingの初期化
  * ネイティブ環境以外では何もしない
  */
-export async function initBilling() {
+export async function initBilling({ onPurchaseComplete } = {}) {
   if (!isNative()) return;
   if (storeInitialized) return;
 
@@ -68,7 +68,10 @@ export async function initBilling() {
     .approved(transaction => transaction.verify())
     .verified(async receipt => {
       const ok = await verifyPurchaseOnServer(receipt);
-      if (ok) await receipt.finish();
+      if (ok) {
+        await receipt.finish();
+        onPurchaseComplete?.();
+      }
     });
 
   await store.initialize([Platform.GOOGLE_PLAY]);

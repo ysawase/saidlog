@@ -38,7 +38,20 @@ function AppInner() {
   const fileInputRef = useRef(null);
   const s01ViewTrackedRef = useRef(false);
 
-  useEffect(() => { initBilling(); }, []);
+  useEffect(() => {
+    initBilling({
+      onPurchaseComplete: () => {
+        getAccountStatus().then((s) => {
+          if (!s) { setAccountStatusLoadState('error'); return; }
+          setAccountStatus(s);
+          setAccountStatusLoadState('success');
+        }).catch((err) => {
+          console.error('[account] post-purchase refresh failed:', err);
+          setAccountStatusLoadState('error');
+        });
+      },
+    });
+  }, []);
 
   const planState = planStateFromPlanId(accountStatus?.planId);
 
@@ -247,14 +260,6 @@ function AppInner() {
     if (upgradeMode === 'purchase') {
       try {
         await purchaseTake();
-        getAccountStatus().then((s) => {
-          if (!s) { setAccountStatusLoadState('error'); return; }
-          setAccountStatus(s);
-          setAccountStatusLoadState('success');
-        }).catch((err) => {
-          console.error('[account] post-purchase refresh failed:', err);
-          setAccountStatusLoadState('error');
-        });
       } catch (err) {
         console.error('[upgrade] purchaseTake failed:', err);
         alert('購入処理に失敗しました。時間をおいて再度お試しください。');
