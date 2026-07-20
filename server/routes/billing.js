@@ -259,6 +259,19 @@ router.post('/webhook', async (req, res) => {
         linkedPurchaseToken: verification.linkedPurchaseToken ?? null,
       });
 
+      // acknowledge失敗はwebhookのレスポンスに影響させない（ログのみ）。
+      // /verify側と同様、entitled確定時に未acknowledgeのまま3日経過すると
+      // Googleが自動返金するため、linkedPurchaseTokenフォールバック経由の
+      // 引き継ぎ成功時も含めて必ず試みる。
+      if (updateResult.status === 200 && result === 'entitled' && needsAcknowledgement(verification.acknowledgementState)) {
+        try {
+          await acknowledgeGooglePlaySubscription(purchaseToken);
+          console.log('[billing/webhook] acknowledge成功');
+        } catch (ackErr) {
+          console.error('[billing/webhook] acknowledge失敗:', ackErr?.message);
+        }
+      }
+
       return res.status(updateResult.status).json(updateResult.body);
     }
 
