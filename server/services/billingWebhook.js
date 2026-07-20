@@ -27,14 +27,18 @@ export async function recordError(supabase, { errorClass, notificationType, subs
 
 /**
  * RTDN webhookの検証結果をuser_entitlementsへ反映する。
- * purchase_tokenにDB制約（UNIQUE等）がないため、update()の影響行数を
- * count: 'exact' で必ず確認し、0件・複数件を成功扱いにしない。
- * @param {{ purchaseToken: string, update: object, notificationType: number, subscriptionState: string|null, environment: 'production'|'development' }} params
+ * purchase_tokenには部分UNIQUE INDEX（user_entitlements_purchase_token_unique、
+ * NULLは対象外）があるため通常はマッチ0件か1件のはずだが、制約に依存しきらず
+ * update()の影響行数を count: 'exact' で必ず確認し、0件・複数件を成功扱いにしない
+ * （防御的な多重チェック）。
+ * @param {{ purchaseToken: string, update: object, notificationType: number, subscriptionState: string|null, environment: 'production'|'development', linkedPurchaseToken?: string|null }} params
+ *   linkedPurchaseToken: トークンローテーション時にGoogle Play Developer APIが
+ *   返す旧purchase_token。purchaseToken完全一致で0件だった場合のフォールバック検索に使う。
  * @param {{ supabase?: object }} [_deps] テスト用依存注入（省略時は本番クライアント）
  * @returns {Promise<{ status: number, body: object }>}
  */
 export async function applyEntitlementUpdate(
-  { purchaseToken, update, notificationType, subscriptionState, environment },
+  { purchaseToken, update, notificationType, subscriptionState, environment, linkedPurchaseToken },
   _deps = {}
 ) {
   const supabase = _deps.supabase ?? defaultSupabase();
@@ -49,15 +53,8 @@ export async function applyEntitlementUpdate(
     return { status: 500, body: { error: 'internal error' } };
   }
 
-  if (count === 0) {
-    await recordError(supabase, {
-      errorClass: 'entitlement_not_found',
-      notificationType,
-      subscriptionState,
-      environment,
-      retryable: true,
-    });
-    return { status: 503, body: { error: 'entitlement not found' } };
+  if (count === 1) {
+    return { status: 200, body: { ok: true } };
   }
 
   if (count > 1) {
@@ -73,7 +70,58 @@ export async function applyEntitlementUpdate(
     return { status: 500, body: { error: 'data integrity error' } };
   }
 
-  return { status: 200, body: { ok: true } };
+  // count === 0: purchase_token完全一致なし。トークンローテーション
+  // （linkedPurchaseToken）による同期漏れの可能性を、旧トークンでの
+  // フォールバック更新で救済する。
+  if (linkedPurchaseToken) {
+    const { error: fallbackError, count: fallbackCount } = await supabase
+      .from('user_entitlements')
+      .update({ ...update, purchase_token: purchaseToken }, { count: 'exact' })
+      .eq('purchase_token', linkedPurchaseToken);
+
+    if (fallbackError) {
+      if (fallbackError.code === '23505') {
+        console.error('[billing/webhook] linkedPurchaseTokenフォールバック: purchase_token一意制約違反');
+        await recordError(supabase, {
+          errorClass: 'entitlement_conflict',
+          notificationType,
+          subscriptionState,
+          environment,
+          retryable: true,
+        });
+        return { status: 500, body: { error: 'data integrity error' } };
+      }
+      console.error('[billing/webhook] linkedPurchaseTokenフォールバック update error:', fallbackError.message);
+      return { status: 500, body: { error: 'internal error' } };
+    }
+
+    if (fallbackCount === 1) {
+      console.log('[billing/webhook] linkedPurchaseTokenフォールバックでentitlementを引き継ぎました');
+      return { status: 200, body: { ok: true } };
+    }
+
+    if (fallbackCount > 1) {
+      console.error(`[billing/webhook] linkedPurchaseTokenフォールバックが${fallbackCount}行にマッチ`);
+      await recordError(supabase, {
+        errorClass: 'entitlement_conflict',
+        notificationType,
+        subscriptionState,
+        environment,
+        retryable: true,
+      });
+      return { status: 500, body: { error: 'data integrity error' } };
+    }
+    // fallbackCount === 0: 旧トークンでも見つからない → 通常のnot_foundへ
+  }
+
+  await recordError(supabase, {
+    errorClass: 'entitlement_not_found',
+    notificationType,
+    subscriptionState,
+    environment,
+    retryable: true,
+  });
+  return { status: 503, body: { error: 'entitlement not found' } };
 }
 
 const WEBHOOK_ERROR_RESPONSES = {

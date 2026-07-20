@@ -2,7 +2,12 @@ import express from 'express';
 import { google } from 'googleapis';
 import { createClient } from '@supabase/supabase-js';
 import { optionalAuth } from '../middleware/auth.js';
-import { verifyGooglePlaySubscription, PACKAGE_NAME } from '../services/googlePlay.js';
+import {
+  verifyGooglePlaySubscription,
+  acknowledgeGooglePlaySubscription,
+  needsAcknowledgement,
+  PACKAGE_NAME,
+} from '../services/googlePlay.js';
 import { resolveEntitlementStatus } from '../services/subscriptionStatus.js';
 import { applyEntitlementUpdate, resolveWebhookErrorResponse } from '../services/billingWebhook.js';
 
@@ -164,6 +169,18 @@ router.post('/verify', optionalAuth, async (req, res) => {
       updated_at: now.toISOString(),
     });
 
+    // acknowledge失敗はPlus付与結果に影響させない（ログのみ）。
+    // 未acknowledgeのまま3日経過するとGoogleが自動返金するため、
+    // entitlement確定後に必ず試みる。
+    if (upsertResult.status === 200 && needsAcknowledgement(verification.acknowledgementState)) {
+      try {
+        await acknowledgeGooglePlaySubscription(purchase_token);
+        console.log('[billing/verify] acknowledge成功');
+      } catch (ackErr) {
+        console.error('[billing/verify] acknowledge失敗:', ackErr?.message);
+      }
+    }
+
     return res.status(upsertResult.status).json(upsertResult.body);
   } catch (err) {
     console.error('[billing/verify]', err);
@@ -239,6 +256,7 @@ router.post('/webhook', async (req, res) => {
         notificationType,
         subscriptionState: verification.subscriptionState ?? null,
         environment: isProduction() ? 'production' : 'development',
+        linkedPurchaseToken: verification.linkedPurchaseToken ?? null,
       });
 
       return res.status(updateResult.status).json(updateResult.body);

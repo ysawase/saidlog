@@ -126,6 +126,101 @@ test('同一通知を2回処理: 0行のケースは2回とも503のまま成功
   assert.equal(mock.insertedErrors[1].error_class, 'entitlement_not_found');
 });
 
+test('linkedPurchaseTokenフォールバック: 完全一致0件でも旧トークンにヒットすればentitlementを引き継ぎ200を返す', async () => {
+  const mock = makeMockSupabase({ entitlements: [{ purchase_token: 'old-tok', status: 'expired' }] });
+  const result = await applyEntitlementUpdate(
+    { ...BASE_PARAMS, purchaseToken: 'new-tok', linkedPurchaseToken: 'old-tok' },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body, { ok: true });
+  assert.equal(mock.rows.length, 1);
+  assert.equal(mock.rows[0].purchase_token, 'new-tok');
+  assert.equal(mock.rows[0].status, 'active');
+  assert.equal(mock.insertedErrors.length, 0);
+});
+
+test('linkedPurchaseTokenフォールバック: 旧トークンでも見つからない場合は従来通りentitlement_not_foundで503', async () => {
+  const mock = makeMockSupabase({ entitlements: [] });
+  const result = await applyEntitlementUpdate(
+    { ...BASE_PARAMS, purchaseToken: 'new-tok', linkedPurchaseToken: 'old-tok' },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 503);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'entitlement_not_found');
+});
+
+test('linkedPurchaseToken未指定（null）: フォールバックせず従来通りentitlement_not_foundで503', async () => {
+  const mock = makeMockSupabase({ entitlements: [{ purchase_token: 'old-tok', status: 'expired' }] });
+  const result = await applyEntitlementUpdate(
+    { ...BASE_PARAMS, purchaseToken: 'new-tok', linkedPurchaseToken: null },
+    { supabase: mock.client }
+  );
+
+  assert.equal(result.status, 503);
+  assert.equal(mock.rows[0].purchase_token, 'old-tok');
+  assert.equal(mock.rows[0].status, 'expired');
+});
+
+test('linkedPurchaseTokenフォールバックが複数行にマッチ: entitlement_conflictとして500', async () => {
+  const mock = makeMockSupabase({
+    entitlements: [
+      { purchase_token: 'old-tok', status: 'expired' },
+      { purchase_token: 'old-tok', status: 'expired' },
+    ],
+  });
+  const result = await applyEntitlementUpdate(
+    { ...BASE_PARAMS, purchaseToken: 'new-tok', linkedPurchaseToken: 'old-tok' },
+    { supabase: mock.client }
+  );
+
+  assert.ok(result.status >= 400);
+  assert.equal(mock.insertedErrors.length, 1);
+  assert.equal(mock.insertedErrors[0].error_class, 'entitlement_conflict');
+});
+
+test('linkedPurchaseTokenフォールバック: 新トークンが既に別行で使われている場合(23505)はentitlement_conflictとして500', async () => {
+  let callCount = 0;
+  const client = {
+    from(table) {
+      if (table === 'user_entitlements') {
+        return {
+          update() {
+            return {
+              eq() {
+                callCount += 1;
+                if (callCount === 1) {
+                  return Promise.resolve({ error: null, count: 0, data: null });
+                }
+                return Promise.resolve({
+                  error: { code: '23505', message: 'duplicate key value violates unique constraint' },
+                  count: null,
+                  data: null,
+                });
+              },
+            };
+          },
+        };
+      }
+      if (table === 'billing_webhook_errors') {
+        return { insert: () => Promise.resolve({ error: null }) };
+      }
+      throw new Error(`unexpected table: ${table}`);
+    },
+  };
+
+  const result = await applyEntitlementUpdate(
+    { ...BASE_PARAMS, purchaseToken: 'new-tok', linkedPurchaseToken: 'old-tok' },
+    { supabase: client }
+  );
+
+  assert.equal(result.status, 500);
+  assert.deepEqual(result.body, { error: 'data integrity error' });
+});
+
 test('同一通知を2回処理: 1行のケースは2回とも同じstatusで、行が重複作成されない', async () => {
   const mock = makeMockSupabase({ entitlements: [{ purchase_token: 'tok-1', status: 'expired' }] });
 

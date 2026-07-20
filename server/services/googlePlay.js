@@ -55,6 +55,7 @@ function getAndroidPublisher() {
  *   expiryTime: string|null,
  *   startTime: string|null,
  *   acknowledgementState: string|null,
+ *   linkedPurchaseToken: string|null,
  *   testPurchase: boolean,
  * }>}
  *   reason（valid=false時）: 'NOT_CONFIGURED' | 'TOKEN_INVALID' |
@@ -73,6 +74,7 @@ export async function verifyGooglePlaySubscription(purchaseToken) {
     expiryTime: null,
     startTime: null,
     acknowledgementState: null,
+    linkedPurchaseToken: null,
     testPurchase: false,
   };
 
@@ -114,6 +116,7 @@ export async function verifyGooglePlaySubscription(purchaseToken) {
     expiryTime: lineItem?.expiryTime ?? null,
     startTime: purchase.startTime ?? null,
     acknowledgementState: purchase.acknowledgementState ?? null,
+    linkedPurchaseToken: purchase.linkedPurchaseToken ?? null,
     testPurchase: purchase.testPurchase != null,
   };
 
@@ -128,4 +131,40 @@ export async function verifyGooglePlaySubscription(purchaseToken) {
   }
 
   return { ...result, valid: true };
+}
+
+const PENDING_ACKNOWLEDGEMENT_STATE = 'ACKNOWLEDGEMENT_STATE_PENDING';
+
+/**
+ * verifyGooglePlaySubscription() が返した acknowledgementState から、
+ * acknowledge実行が必要かどうかを判定する。
+ * 未acknowledgeのままだと購入から3日でGoogleが自動返金するため、
+ * 検証成功後は必ずこの判定を行うこと。
+ * @param {string|null} acknowledgementState
+ * @returns {boolean}
+ */
+export function needsAcknowledgement(acknowledgementState) {
+  return acknowledgementState === PENDING_ACKNOWLEDGEMENT_STATE;
+}
+
+/**
+ * Google Play Developer API（purchases.subscriptions.acknowledge）で
+ * 購入をacknowledgeする。未設定環境（開発環境でGOOGLE_SERVICE_ACCOUNT_JSON
+ * 未設定）ではスキップする。API呼び出し失敗時はthrowするため、
+ * 呼び出し元でPlus付与処理をブロックしないようtry/catchすること。
+ * @param {string} purchaseToken
+ * @returns {Promise<void>}
+ */
+export async function acknowledgeGooglePlaySubscription(purchaseToken) {
+  if (!isGooglePlayConfigured()) {
+    console.warn('[googlePlay] GOOGLE_SERVICE_ACCOUNT_JSON 未設定のためacknowledgeをスキップします');
+    return;
+  }
+
+  await getAndroidPublisher().purchases.subscriptions.acknowledge({
+    packageName: PACKAGE_NAME,
+    subscriptionId: SUBSCRIPTION_PRODUCT_ID,
+    token: purchaseToken,
+    requestBody: {},
+  });
 }
