@@ -67,12 +67,9 @@ export async function initBilling({ onPurchaseComplete } = {}) {
   store.when()
     .approved(transaction => transaction.verify())
     .verified(async receipt => {
-      console.log('[billing][debug] verified event fired');
       const ok = await verifyPurchaseOnServer(receipt);
-      console.log('[billing][debug] verifyPurchaseOnServer result:', ok);
       if (ok) {
         await receipt.finish();
-        console.log('[billing][debug] calling onPurchaseComplete');
         onPurchaseComplete?.();
       }
     });
