@@ -110,8 +110,8 @@
 
 ## カード1: Google Play課金・権利付与・RTDNライフサイクル同期
 
-最終更新: 2026-07-17
-関連commit: f071b0b (purchase_token部分UNIQUE INDEX migration作成), 70efc29 (23505ハンドリング・403統一)
+最終更新: 2026-07-21
+関連commit: f071b0b (purchase_token部分UNIQUE INDEX migration作成), 70efc29 (23505ハンドリング・403統一), 63ec5f8 (versionCode 4 git反映漏れ), 0fbaf00 (デバッグログ削除)
 
 | 項目 | 状態 |
 |---|---|
@@ -120,14 +120,16 @@
 | サーバー検証 | PASS |
 | user_entitlements更新 | PASS |
 | 購入直後のPlus表示 | PASS |
-| 修正後の新規購入回帰 | 未確認 |
+| 修正後の新規購入回帰 | PASS |
 | acknowledgeコード経路 | PASS |
 | acknowledgementState実測 | 未確認 |
 | RTDN設定 | PASS |
 | Pub/Sub輸送経路 | PASS |
 | OIDC肯定・否定系 | PASS |
 | RTDNテスト通知 | PASS |
-| 実subscriptionNotification | 未確認 |
+| 実subscriptionNotification受信 | PASS |
+| RTDN後のDB状態遷移 | 未確認 |
+| アプリ表示の状態遷移 | 未確認 |
 | grace_periodコード | PASS |
 | grace_period実状態 | 未確認 |
 | account hold | 未確認 |
@@ -147,6 +149,8 @@
 | 一般公開 | FAIL |
 
 **備考（旧版から引き継ぐ詳細）**：
+- 2026-07-21更新：GPT#47判定により「修正後の新規購入回帰」「実subscriptionNotification受信」をPASSへ変更。ただし「実subscriptionNotification受信」PASSは通知の受信自体の確認であり、受信後のDB状態遷移・アプリ表示への反映は別項目（「RTDN後のDB状態遷移」「アプリ表示の状態遷移」）として未確認のまま分離した
+- GPT#46が指摘した「実測3点」（同一purchase_token拒否・403固定応答・既存所有者entitlement維持）は今回の実測とは別物であり、本表内「Production重複拒否の実動作確認」「Production既存所有者entitlement維持実測」として未確認のまま残っている（403固定応答単独の実測項目は本表に未追加、要検討）
 - Pub/Sub publisher権限：PASS
 - billing_webhook_errorsのRLS：service roleでSELECT/INSERT/DELETE可能、anonからのSELECT/INSERT拒否は実測PASS、authenticatedからの拒否はRLS有効・ポリシー0件という構造確認PASS（直接実測は未実施）
 - recordError失敗時の非2xx維持：コード確認PASS、故障注入テスト未実施
