@@ -18,23 +18,106 @@
 
 ```
 saidlog/
+├── .claude/
+├── .gitattributes
+├── .gitignore
+├── 90_vault-admin/
+├── CLAUDE.md
+├── README.md
+├── android/
 ├── api/
-│   └── index.js                 # Vercel Functions エントリ（Expressをエクスポート）
-├── client/                      # フロントエンド (React + Vite)
+├── capacitor.config.json
+├── client/
 │   └── src/
-│       ├── App.jsx              # 画面全体の状態管理
-│       ├── api.js               # バックエンド呼び出し
-│       └── components/
-│           ├── UploadForm.jsx   # ファイルアップロードUI
-│           └── TranscriptView.jsx # 結果表示（話者名は編集可能）
-├── server/                      # バックエンド (Express)
-│   ├── app.js                   # Expressアプリ本体（ローカル/Vercel共通）
-│   ├── index.js                 # ローカル開発用エントリポイント
-│   ├── routes/transcribe.js     # POST /api/transcribe
-│   ├── services/assemblyai.js   # AssemblyAI 呼び出し
-│   └── utils/removeFillers.js   # フィラー語除去
-├── vercel.json                  # Vercel ビルド・ルーティング設定
-└── package.json                 # ルート（サーバー依存＋一括起動スクリプト）
+│       ├── components/
+│       │   ├── AuthModal.jsx
+│       │   ├── HistoryList.jsx
+│       │   ├── Recorder.jsx
+│       │   ├── TranscriptView.jsx
+│       │   └── UploadForm.jsx
+│       ├── constants/
+│       │   └── limits.js
+│       ├── context/
+│       │   └── AuthContext.jsx
+│       ├── lib/
+│       │   ├── adapters/
+│       │   │   ├── WebMediaRecorderAdapter.js
+│       │   │   ├── index.js
+│       │   │   └── types.js
+│       │   ├── analytics.js
+│       │   ├── billing.js
+│       │   ├── guestId.js
+│       │   ├── history.js
+│       │   ├── recorder.js
+│       │   ├── recordingDb.js
+│       │   ├── storage.js
+│       │   ├── supabase.js
+│       │   └── upgradeGuard.js
+│       ├── utils/
+│       │   └── export.js
+│       ├── App.css
+│       ├── App.jsx
+│       ├── api.js
+│       ├── i18n.js
+│       └── main.jsx
+├── docs/
+├── meetlog-phase2-design.md
+├── package-lock.json
+├── package.json
+├── saidlog_handover.md
+├── scripts/
+├── server/
+│   ├── config/
+│   │   └── plans.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── routes/
+│   │   ├── account.js
+│   │   ├── authCheck.js
+│   │   ├── billing.js
+│   │   ├── deleteAccount.js
+│   │   ├── events.js
+│   │   ├── history.js
+│   │   ├── summarize.js
+│   │   └── transcribe.js
+│   ├── services/
+│   │   ├── billingWebhook.js
+│   │   ├── cleanup.js
+│   │   ├── events.js
+│   │   ├── googlePlay.js
+│   │   ├── plan.js
+│   │   ├── storage.js
+│   │   ├── subscriptionStatus.js
+│   │   └── supabaseAdmin.js
+│   ├── stt/
+│   │   ├── providers/
+│   │   │   ├── amivoice.js
+│   │   │   ├── assemblyai.js
+│   │   │   └── groq.js
+│   │   └── index.js
+│   ├── utils/
+│   │   ├── classifyTranscriptionError.js
+│   │   └── removeFillers.js
+│   ├── # Saidlog 作業引き継ぎ（2026-06-12）.md
+│   ├── .env.example
+│   ├── app.js
+│   └── index.js
+├── supabase/
+│   └── migrations/
+│       ├── 20260615000000_plan_control.sql
+│       ├── 20260615100000_profiles_trigger.sql
+│       ├── 20260621000000_summary_tables.sql
+│       ├── 20260623000000_add_purchase_token.sql
+│       ├── 20260623000001_add_guest_usage.sql
+│       ├── 20260703000000_fix_stt_provider_check.sql
+│       ├── 20260704000000_add_events.sql
+│       ├── 20260716000000_add_billing_webhook_errors.sql
+│       ├── 20260716000001_extend_billing_webhook_errors_check.sql
+│       ├── 20260717000000_add_purchase_token_unique_index.sql
+│       ├── 20260718000000_add_deleted_entitlements_log.sql
+│       └── 20260723000000_add_email_is_registered_function.sql
+├── tests/
+└── vercel.json
 ```
 
 ## セットアップ
