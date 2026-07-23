@@ -11,8 +11,8 @@
 | フロントエンド | React (Vite) |
 | バックエンド | Node.js + Express |
 | 文字起こし・話者識別 | AssemblyAI API |
-| データベース | Supabase（フェーズ2で追加予定） |
-| デプロイ | Vercel（フェーズ2で追加予定） |
+| データベース | Supabase |
+| デプロイ | Vercel |
 
 ## ディレクトリ構成
 
