@@ -271,7 +271,23 @@ export default function TranscriptView({ result, userChoseFullTrial = null, canE
             <hr style={{ margin: '0 0 1.25rem', border: 'none', borderTop: '1px solid #d1d5db' }} />
             <p style={{ margin: '0 0 0.25rem', fontWeight: 'bold' }}>さらにSaidLog Plusにアップグレードすると、『詳細議事録・エクスポート』機能が解放されます。</p>
             <p style={{ margin: '0 0 1rem', fontSize: '0.9rem', color: '#4b5563' }}>月額680円で、詳細な議事録の生成・テキストエクスポート・履歴30件保存が使えます。月10時間まで利用可能。</p>
-            <button className="btn summary-upgrade-btn" onClick={onUpgrade}>SaidLog Plusに進む</button>
+            {upgradeMode === 'web' ? (
+              <p style={{ fontSize: '0.9rem', color: '#4b5563', margin: 0 }}>
+                SaidLog PlusはAndroidアプリ版でご利用いただけます。
+                {/* TODO: Google Play 申請完了後、ここをストアリンクに差し替える */}
+              </p>
+            ) : upgradeMode === 'account_error' ? (
+              <>
+                <p style={{ fontSize: '0.9rem', color: '#b91c1c', margin: '0 0 8px' }}>プラン情報を確認できませんでした</p>
+                <button className="btn summary-upgrade-btn" onClick={onRetry}>再試行</button>
+              </>
+            ) : upgradeMode === 'loading' ? (
+              <button className="btn summary-upgrade-btn" disabled>確認中...</button>
+            ) : upgradeMode === 'not_logged_in' ? (
+              <button className="btn summary-upgrade-btn" onClick={onUpgrade}>無料登録 / ログイン</button>
+            ) : (
+              <button className="btn summary-upgrade-btn" onClick={onUpgrade}>SaidLog Plusに進む</button>
+            )}
           </div>
         ) : (
         <>
