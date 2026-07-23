@@ -97,3 +97,39 @@ commit: 959ee0d
 別途検討する。
 
 実機での動作確認：未実施（次のアクションとして残す）
+
+---追記・訂正（2026-07-23）
+
+上記「解決（2026-07-22）」に記載したidentities.length === 0による判定は、
+実機テストの結果、機能しないことが判明した。確認済みの既存メールアドレスで
+再登録しても、修正前と同じ「確認メールを送信しました」という誤った成功
+表示が出た。
+
+原因：この判定はSupabase Auth内部挙動に依存する非公式な回避策であり、
+「既知の制約」として記載していた懸念が実際に顕在化する形となった。
+確認済み既存メールアドレスであっても、環境によってはidentities配列が
+空にならないケースがあると、Supabaseコミュニティでも同症状の報告がある。
+
+最終対応：クライアント側の非公式な判定には依存しない方式へ作り直した。
+
+1. DB側：auth.usersを直接照会するsecurity definer関数
+   email_is_registered(check_email text) を追加。service_roleからのみ
+   実行可能（migration: supabase/migrations/20260723000000_add_email_is_registered_function.sql、
+   commit ee51d88。DB本番環境への適用はSupabaseダッシュボードのSQL Editorから
+   手動実行）
+2. サーバー側：server/services/supabaseAdmin.js（service role client、
+   isEmailRegistered関数）と、server/routes/authCheck.js
+   （POST /api/auth/check-email、express-rate-limitで1分10回/IPに制限）を新規作成
+3. クライアント側：AuthModal.jsxのidentities判定を削除し、signUp呼び出し前に
+   checkEmailRegistered()でサーバーへ問い合わせる方式に変更。チェックAPI自体が
+   失敗した場合は、エラー表示せず通常のsignUpへフォールバックする
+   （fail-closeにせず、チェックAPI障害が新規登録全体を止めないようにするため）
+
+commit: 932537b（push済み）
+
+実機での動作確認（2026-07-23）：
+- 既存の登録済みメールアドレスで再登録 → 「このメールアドレスは既に登録されて
+  います。ログインをお試しください。」と正しく表示され、確認メールは送信されない
+  ことを確認
+- 未登録の新しいメールアドレス（Gmailのサブアドレス）で新規登録 →
+  通常通り確認メールが届くことを確認
