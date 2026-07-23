@@ -25,8 +25,9 @@ export function AuthModal({ onClose, user, initialMode }) {
     } else {
       // 送信「試行」の計測（成否を問わず発火。email等の入力値は一切送らない）
       trackEvent('signup_submit', { source: 'auth_modal' })
-      const { error } = await supabase.auth.signUp({ email, password })
+      const { data, error } = await supabase.auth.signUp({ email, password })
       if (error) setError(error.message)
+      else if (data?.user?.identities?.length === 0) setError(t('auth.emailAlreadyExists'))
       else setDone(true)
     }
     setLoading(false)

@@ -72,6 +72,7 @@ const resources = {
         deleteConfirm: '削除すると元に戻せません。本当に削除しますか？',
         deleting: '削除中...',
         deleteError: '削除に失敗しました。時間をおいて再度お試しください。',
+        emailAlreadyExists: 'このメールアドレスは既に登録されています。ログインをお試しください。',
       },
       history: {
         title: '履歴',
@@ -202,6 +203,7 @@ const resources = {
         deleteConfirm: 'This cannot be undone. Are you sure you want to delete your account?',
         deleting: 'Deleting...',
         deleteError: 'Failed to delete account. Please try again later.',
+        emailAlreadyExists: 'This email address is already registered. Please try logging in instead.',
       },
       history: {
         title: 'History',
