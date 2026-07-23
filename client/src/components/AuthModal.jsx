@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext.jsx'
-import { deleteAccount } from '../api.js'
+import { deleteAccount, checkEmailRegistered } from '../api.js'
 import { trackEvent } from '../lib/analytics.js'
 
 export function AuthModal({ onClose, user, initialMode }) {
@@ -23,11 +23,21 @@ export function AuthModal({ onClose, user, initialMode }) {
       if (error) setError(error.message)
       else onClose()
     } else {
+      let exists = false
+      try {
+        exists = await checkEmailRegistered(email)
+      } catch (err) {
+        console.warn('[AuthModal] checkEmailRegistered failed, falling back to signUp', err)
+      }
+      if (exists === true) {
+        setError(t('auth.emailAlreadyExists'))
+        setLoading(false)
+        return
+      }
       // 送信「試行」の計測（成否を問わず発火。email等の入力値は一切送らない）
       trackEvent('signup_submit', { source: 'auth_modal' })
       const { data, error } = await supabase.auth.signUp({ email, password })
       if (error) setError(error.message)
-      else if (data?.user?.identities?.length === 0) setError(t('auth.emailAlreadyExists'))
       else setDone(true)
     }
     setLoading(false)
