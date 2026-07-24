@@ -38,21 +38,36 @@ function AppInner() {
   const processingTimerRef = useRef(null);
   const fileInputRef = useRef(null);
   const s01ViewTrackedRef = useRef(false);
+  const lastAccountStatusFetchRef = useRef(0);
 
   useEffect(() => {
     initBilling({
       onPurchaseComplete: () => {
-        getAccountStatus().then((s) => {
-          if (!s) { setAccountStatusLoadState('error'); return; }
-          setAccountStatus(s);
-          setAccountStatusLoadState('success');
-        }).catch((err) => {
-          console.error('[account] post-purchase refresh failed:', err);
-          setAccountStatusLoadState('error');
-        });
+        refreshAccountStatus();
       },
     });
   }, []);
+
+  async function refreshAccountStatus({ isCancelled } = {}) {
+    setAccountStatusLoadState('loading');
+    try {
+      const s = await getAccountStatus();
+      if (isCancelled?.()) return null;
+      if (!s) {
+        setAccountStatusLoadState('error');
+        return null;
+      }
+      setAccountStatus(s);
+      setAccountStatusLoadState('success');
+      lastAccountStatusFetchRef.current = Date.now();
+      return s;
+    } catch (err) {
+      if (isCancelled?.()) return null;
+      console.error('[account] refreshAccountStatus failed:', err);
+      setAccountStatusLoadState('error');
+      return null;
+    }
+  }
 
   const planState = planStateFromPlanId(accountStatus?.planId);
 
@@ -83,21 +98,21 @@ function AppInner() {
       return;
     }
     let cancelled = false;
-    setAccountStatusLoadState('loading');
-    getAccountStatus()
-      .then((s) => {
-        if (cancelled) return;
-        if (!s) { setAccountStatusLoadState('error'); return; }
-        setAccountStatus(s);
-        setAccountStatusLoadState('success');
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.error('[account] getAccountStatus failed:', err);
-        setAccountStatusLoadState('error');
-      });
+    refreshAccountStatus({ isCancelled: () => cancelled });
     return () => { cancelled = true; };
   }, [user, accountStatusRetryCount]);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState !== 'visible') return;
+      if (!user) return;
+      const now = Date.now();
+      if (now - lastAccountStatusFetchRef.current < 60000) return;
+      refreshAccountStatus();
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user]);
 
   useEffect(() => {
     if (status === 'processing') {
@@ -172,10 +187,8 @@ function AppInner() {
         saveTranscript({ filename: file.name, result: data });
       }
       if (user) {
-        getAccountStatus().then((s) => {
-          if (!s) { setAccountStatusLoadState('error'); return; }
-          setAccountStatus(s);
-          setAccountStatusLoadState('success');
+        const s = await refreshAccountStatus();
+        if (s) {
           const eligible = (
             s?.planId === 'ume' &&
             s?.fullSummaryUsed === false &&
@@ -183,10 +196,7 @@ function AppInner() {
           );
           setSummaryTrialPending(eligible);
           if (!eligible) setUserChoseFullTrial(null);
-        }).catch((err) => {
-          console.error('[account] post-transcription refresh failed:', err);
-          setAccountStatusLoadState('error');
-        });
+        }
       } else {
         setUserChoseFullTrial(false);
       }
