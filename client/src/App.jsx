@@ -11,7 +11,8 @@ import { HistoryList } from './components/HistoryList.jsx';
 import { initBilling, purchaseTake, restorePurchases } from './lib/billing';
 import { getUpgradeMode } from './lib/upgradeGuard';
 import { getOrCreateGuestId } from './lib/guestId';
-import { trackEvent, planStateFromPlanId } from './lib/analytics.js';
+import { trackEventSafe } from './lib/analyticsLoader.js';
+import { planStateFromPlanId } from './lib/planState.js';
 import { MAX_SIZE_MB } from './constants/limits.js';
 
 function AppInner() {
@@ -66,12 +67,12 @@ function AppInner() {
   useEffect(() => {
     if (s01ViewTrackedRef.current) return;
     s01ViewTrackedRef.current = true;
-    trackEvent('s01_view', { source: 's01' });
+    trackEventSafe('s01_view', { source: 's01' });
   }, []);
 
   useEffect(() => {
     if (showAuthModal) {
-      trackEvent('auth_modal_open', { source: authModalSource, planState });
+      trackEventSafe('auth_modal_open', { source: authModalSource, planState });
     }
   }, [showAuthModal]);
 
@@ -388,7 +389,7 @@ function AppInner() {
               <div className="s01-recorder-wrap">
                 <Recorder
                   onTranscribe={handleRecordedTranscribe}
-                  onRecordStart={() => trackEvent('s01_record_click', { source: 's01', planState })}
+                  onRecordStart={() => trackEventSafe('s01_record_click', { source: 's01', planState })}
                   remainingSeconds={accountStatus?.remainingSeconds ?? null}
                 />
               </div>
@@ -424,7 +425,7 @@ function AppInner() {
                 <button
                   className="s01-file-btn"
                   onClick={() => {
-                    trackEvent('s01_upload_click', { source: 's01', planState });
+                    trackEventSafe('s01_upload_click', { source: 's01', planState });
                     fileInputRef.current?.click();
                   }}
                 >

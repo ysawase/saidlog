@@ -24,13 +24,6 @@ export function getOrCreateSessionId() {
   }
 }
 
-/** accountStatusのplanId('ume'|'take')をイベント用plan_stateに変換する。 */
-export function planStateFromPlanId(planId) {
-  if (planId === 'take') return 'plus';
-  if (planId === 'ume') return 'free';
-  return 'unknown';
-}
-
 function getDeviceCategory() {
   try {
     return window.matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop';
